@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using CPU_Preference_Changer.Core;
 
 namespace CPU_Preference_Changer {
     public partial class coreSelectForm : Form {

@@ -26,6 +26,7 @@ namespace CPU_Preference_Changer {
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(coreSelectForm));
             this.cbCheckLB = new System.Windows.Forms.CheckedListBox();
             this.btOK = new System.Windows.Forms.Button();
             this.btCancel = new System.Windows.Forms.Button();
@@ -70,6 +71,7 @@ namespace CPU_Preference_Changer {
             this.Controls.Add(this.btOK);
             this.Controls.Add(this.cbCheckLB);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "coreSelectForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "코어 선택 창";

@@ -1,10 +1,14 @@
 ﻿using CPU_Preference_Changer.MabiProcessListView;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
+using CPU_Preference_Changer.Core;
 using System.Windows;
+using System.Windows.Controls;
+using CPU_Preference_Changer.UI.OptionForm;
+using static CPU_Preference_Changer.UI.OptionForm.CloseAskForm;
+using CPU_Preference_Changer.UI.InfoForm;
 
-namespace CPU_Preference_Changer
+namespace CPU_Preference_Changer.UI.MainUI
 {
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
@@ -30,8 +34,9 @@ namespace CPU_Preference_Changer
             // ignore maximize title button
             this.ResizeMode = ResizeMode.CanMinimize;
 
-            // disable refresh button
-            this.btRefresh.IsEnabled = false;
+#if __WIN__64__DBG__
+            dbgPanel.Visibility = Visibility.Visible;
+#endif
         }
 
         /// <summary>
@@ -67,10 +72,13 @@ namespace CPU_Preference_Changer
             this.tb_CpuName.Text = SystemInfo.GetCpuName();
             this.tb_CpuCoreCnt.Text = SystemInfo.GetCpuCoreCntStr();
 
-            //LvMabiDataCollection lvItm = new LvMabiDataCollection();
-            //object param = lvItm; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
-            //MabiProcess.getAllTargets(CB_FindMabiProcess, ref param);
-            //lvMabiProcess.setDataSoure(lvItm);
+            /*
+             * 별도 타이머에서 작업하게되어 필요없어짐.
+            LvMabiDataCollection lvItm = new LvMabiDataCollection();
+            object param = lvItm; 함수인자에서 바로 object로 캐스팅하면 에러 발생한다.
+            MabiProcess.getAllTargets(CB_FindMabiProcess, ref param);
+            lvMabiProcess.setDataSoure(lvItm);
+            */
         }
 
         /// <summary>
@@ -249,17 +257,33 @@ namespace CPU_Preference_Changer
             {
                 if (this.trayIcon != null)
                 {
-                    // cancel event
-                    e.Cancel = true;
+                    /*바로 종료할건지 트레이로 보낼건지 물어보게 유저에게 물어본다.*/
+                    CloseAskForm askForm = new CloseAskForm();
+                    askForm.ShowDialog();
 
-                    // hide thie window
-                    this.Hide();
+                    switch (askForm.getUsrSelect()) {
+                        /*그냥 종료하기 누루면 바로 종료..*/
+                        case CloseAskFormResult.eClose:
+                            CloseApplication();
+                            return;
+                            break;/* return때문에 필요없지만 프로그래머를 위해 명시적으로 넣어 둠*/
 
-                    // activity tray icon 
-                    this.trayIcon.Visible = true;
-
-                    // up BalloonTip
-                    this.trayIcon.ShowBalloonTip(500, "마비 CPU", "트레이아이콘 활성화", System.Windows.Forms.ToolTipIcon.None);
+                        /*트레이로 보내기 누루면 보냄*/
+                        case CloseAskFormResult.eGoTray:
+                            // cancel event
+                            e.Cancel = true;
+                            // hide thie window
+                            this.Hide();
+                            // activity tray icon 
+                            this.trayIcon.Visible = true;
+                            // up BalloonTip
+                            this.trayIcon.ShowBalloonTip(500, "마비 CPU", "트레이아이콘 활성화", System.Windows.Forms.ToolTipIcon.None);
+                            break;
+                        /*취소 or 예외 발생 시 아무것도 안함*/
+                        case CloseAskFormResult.eCancel: default:
+                            e.Cancel = true;
+                            break;
+                    }
                 }
             }
             catch
@@ -298,8 +322,42 @@ namespace CPU_Preference_Changer
             this.trayIcon = null;
 
             this.CloseRefreshTimer();
-
             Application.Current.Shutdown();
+        }
+
+        private void UI_DispatchEvt(Delegate method, params object[] obj)
+        {
+            Dispatcher.Invoke(method, obj);
+        }
+
+        /// <summary>
+        /// CROSS THREAD 에러를 방지하면서 LABEL 내용 업데이트.
+        /// </summary>
+        /// <param name="c"></param>
+        private void ControlTextUpdateInvoke(object c,string str)
+        {
+            var type = c.GetType();
+            
+            UI_DispatchEvt(new Action(delegate {
+                if (type == typeof(TextBlock)) {
+                    (c as TextBlock).Text = str;
+                } else if ( type == typeof(Label)) {
+                    (c as Label).Content = str;
+                } else {
+                    /*일단 아무것도 안함*/
+                }
+            }));
+        }
+
+        private void menu_Close_Click(object sender, RoutedEventArgs e)
+        {
+            CloseApplication();
+        }
+
+        private void menu_Info_Click(object sender, RoutedEventArgs e)
+        {
+            ProgramInfo pi = new ProgramInfo(this);
+            pi.ShowDialog();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Management;
 
-namespace CPU_Preference_Changer
+namespace CPU_Preference_Changer.Core
 {
     class SystemInfo
     {
