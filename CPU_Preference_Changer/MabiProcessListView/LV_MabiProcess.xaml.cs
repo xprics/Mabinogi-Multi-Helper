@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace CPU_Preference_Changer.MabiProcessListView
 {
@@ -30,12 +19,15 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// </summary>
         private LvMabiDataCollection lvItms;
 
+        private int? iMainCharacterPID = null;
+
         private OnProcessNameClicked onProcessNameClick;
         private OnPCoreStateClicked onCoreStateClick;
 
         public LV_MabiProcess()
         {
             InitializeComponent();
+            this.iMainCharacterPID = null;
             this.onProcessNameClick = null;
             this.onCoreStateClick = null;
         }
@@ -101,6 +93,25 @@ namespace CPU_Preference_Changer.MabiProcessListView
             return false;
         }
 
+        private void ComposeMainCharacter(ref LvMabiDataCollection items)
+        {
+            bool checkMain = false;
+            if (this.iMainCharacterPID != null)
+            {
+                foreach (LV_MabiProcessRowData data in items)
+                {
+                    if ((int)data.userParam == this.iMainCharacterPID)
+                    {
+                        data.bMainCharacter = true;
+                        checkMain = true;
+                    }
+                }
+            }
+
+            if (checkMain == false)
+                this.iMainCharacterPID = null;
+        }
+
         /// <summary>
         /// 리스트뷰 연동 데이터 모두 해제...
         /// </summary>
@@ -116,9 +127,10 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// 주어진 컬렉션을 리스트뷰와 연동하기..
         /// </summary>
         /// <param name="items"></param>
-        public void setDataSoure(LvMabiDataCollection items )
+        public void setDataSoure(LvMabiDataCollection items)
         {
             if (items == null) return;
+            ComposeMainCharacter(ref items);
             DisposeAllResourece();
             lvItms = items;
             MabiProcessListView.ItemsSource = items;
@@ -162,12 +174,13 @@ namespace CPU_Preference_Changer.MabiProcessListView
             if (data == null) return;
             ResetMainCharFlag();
             data.bMainCharacter = true;
+            this.iMainCharacterPID = (int)data.userParam;
             MabiProcessListView.SelectedItem = data;
             MabiProcessListView.SelectedIndex = selIdx;
         }
 
         #region 프로세스명 클릭 이벤트 처리
-        private bool bProcessNameClick=false;
+        private bool bProcessNameClick = false;
 
         private void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
