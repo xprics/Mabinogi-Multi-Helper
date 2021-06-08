@@ -17,7 +17,6 @@ Build : Visual Studio 2019
 ## Change Log
 
 ```Text
-
 2021-06-08
     - add trayicon
     - set activity window
