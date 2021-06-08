@@ -58,6 +58,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
 
         /// <summary>
         /// 다양한 용도로 사용 될 유저 Param..
+        /// (fixed) process PID
         /// </summary>
         public object userParam { get; set; }
 
@@ -70,7 +71,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// <param name="coreState">코어 할당 상태값</param>
         /// <param name="processFilePath">실행파일경로</param>
         public LV_MabiProcessRowData(string prName, string PID, string sTime,
-                                  string coreState,string processFilePath)
+                                  string coreState, string processFilePath)
         {
             this.processName = prName;
             this.processID = PID;
@@ -82,7 +83,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
 
         public LV_MabiProcessRowData() { }
 
-        
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
@@ -101,7 +102,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
     /// </summary>
     public class LvMabiDataCollection : ObservableCollection<LV_MabiProcessRowData>
     {
-        int itmIdx=0;
+        int itmIdx = 0;
 
         /// <summary>
         /// add함수 재정의,,, 자동으로 idx를 생성한 뒤 넣게한다!

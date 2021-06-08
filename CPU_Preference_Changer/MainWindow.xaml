@@ -6,8 +6,24 @@
         xmlns:CLV="clr-namespace:CPU_Preference_Changer.MabiProcessListView"
         xmlns:local="clr-namespace:CPU_Preference_Changer"
         mc:Ignorable="d"
-        Title="마비노기 CPU 코어 할당" Height="340" Width="620" WindowStartupLocation="CenterScreen">
+        Title="마비노기 CPU 코어 할당" Height="355" Width="620" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
 
+    <Window.Resources>
+        <Style x:Key="buttonRadius" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="5">
+                            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid  Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="177*"/>
@@ -42,13 +58,20 @@
                     마비노기 프로세스 목록
                 </TextBlock>
                 <DockPanel Grid.Column="2" LastChildFill="False">
-                    <Button DockPanel.Dock="Left" Width="80" Name="btAutoSet" Click="btAutoSet_Click">자동 할당</Button>
-                    <Button Margin="8 0 0 0" Width="80" Name="btReset" Click="btReset_Click">초기화</Button>
-                    <Button DockPanel.Dock="Right" Name="btRefresh" Click="btRefresh_Click">🔃</Button>
+                    <Button DockPanel.Dock="Left" Width="80" Name="btAutoSet" Click="btAutoSet_Click" Style="{StaticResource buttonRadius}">자동 할당</Button>
+                    <Button Margin="8 0 0 0" Width="80" Name="btReset" Click="btReset_Click" Style="{StaticResource buttonRadius}">초기화</Button>
+                    <Button DockPanel.Dock="Right" Name="btRefresh" Click="btRefresh_Click" Style="{StaticResource buttonRadius}" Width="20" Height="20" ToolTip="새로고침">🔃</Button>
                 </DockPanel>
             </Grid>
             <!-- 마비노기 실행 정보 출력 용 커스텀 리스트 뷰 -->
             <CLV:LV_MabiProcess x:Name="lvMabiProcess" Margin="0 5 0 0" Height="200"/>
+
+            <!-- 프로그램 종료 버튼 -->
+            <DockPanel Grid.Column="2" LastChildFill="False" Margin="0,5,0,0" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <Label x:Name="refreshTimeLabel" DockPanel.Dock="Left" Content="N" HorizontalContentAlignment="Right" Padding="0" VerticalContentAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" Foreground="#FF360404"/>
+                <Label Content="초 후 프로세스 새로고침" ScrollViewer.VerticalScrollBarVisibility="Disabled" Padding="0" VerticalContentAlignment="Center"/>
+                <Button DockPanel.Dock="Right" Width="85" Name="btExit" Height="20" Click="btExit_Click" ScrollViewer.VerticalScrollBarVisibility="Disabled" Padding="0" Style="{StaticResource buttonRadius}">프로그램 종료</Button>
+            </DockPanel>
         </StackPanel>
     </Grid>
 </Window>
