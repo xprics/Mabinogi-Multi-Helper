@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CPU_Preference_Changer {
     public partial class coreSelectForm : Form {
         private IntPtr selCoreState = IntPtr.Zero;
 
-        public coreSelectForm(int maxCoreCnt,ulong curState)
+        public coreSelectForm(int maxCoreCnt, ulong curState)
         {
             InitializeComponent();
             initChkListBox(maxCoreCnt, curState);
