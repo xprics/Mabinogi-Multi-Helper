@@ -23,4 +23,9 @@ Build : Visual Studio 2019
     - memory GC
     - auto refresh process list
     - check same process is running
+    - Re Draw Program icon
+    - add Program info dialog ( To show Program Version & Download Link, devolper )
+    - When application closing, ask to user whether close or put tray-icon.
+    - Add ReleaseNote.txt for Normal Users.
+    - Source Code relocate ( folder , namespace , ... )
 ```
