@@ -1,8 +1,7 @@
 ﻿<Application x:Class="CPU_Preference_Changer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:CPU_Preference_Changer"
-             StartupUri="MainWindow.xaml">
+             >
     <Application.Resources>
         <ResourceDictionary>
             <Style x:Key="TITLE_STYLE" TargetType="TextBlock">
@@ -15,6 +14,22 @@
                 <Setter Property="FontSize" Value="12" />
                 <Setter Property="Foreground" Value="#FFFF9292"/>
             </Style>
+
+            <Style x:Key="INFO_STR_STYLE" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="Foreground" Value="#FF323232"/>
+            </Style>
+
+            <Style x:Key="ROUND_BORDER_BTN_STYLE" TargetType="Button">
+                <Style.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="3"/>
+                    </Style>
+                </Style.Resources>
+                <!-- 흰색 버튼이 더 깔끔한것 같다. (배경이 흰색이다 보니) -->
+                <Setter Property="Background" Value="White"/>
+            </Style>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -62,7 +62,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;__WIN__64__DBG__</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
@@ -108,20 +108,34 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="coreSelectForm.cs">
+    <Compile Include="UI\InfoForm\ProgramInfo.xaml.cs">
+      <DependentUpon>ProgramInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OptionForm\CloseAskForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="coreSelectForm.Designer.cs">
+    <Compile Include="UI\OptionForm\CloseAskForm.Designer.cs">
+      <DependentUpon>CloseAskForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OptionForm\coreSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\OptionForm\coreSelectForm.Designer.cs">
       <DependentUpon>coreSelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MabiProcess.cs" />
-    <Compile Include="SystemInfo.cs" />
-    <Compile Include="TimerMainWindow.cs" />
+    <Compile Include="Core\MabiProcess.cs" />
+    <Compile Include="Core\SystemInfo.cs" />
+    <Compile Include="UI\MainUI\TimerMainWindow.cs" />
+    <Compile Include="WinAPI\WinAPI.cs" />
     <Page Include="MabiProcessListView\LV_MabiProcess.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="UI\InfoForm\ProgramInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\MainUI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -133,7 +147,7 @@
       <DependentUpon>LV_MabiProcess.xaml</DependentUpon>
     </Compile>
     <Compile Include="MabiProcessListView\LV_MabiProcessData.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="UI\MainUI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -152,7 +166,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="coreSelectForm.resx">
+    <EmbeddedResource Include="UI\OptionForm\CloseAskForm.resx">
+      <DependentUpon>CloseAskForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\OptionForm\coreSelectForm.resx">
       <DependentUpon>coreSelectForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -182,6 +199,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\TrayIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ReleaseNote.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

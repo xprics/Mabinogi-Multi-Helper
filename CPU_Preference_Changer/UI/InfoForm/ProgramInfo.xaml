@@ -1,0 +1,66 @@
+﻿<Window x:Class="CPU_Preference_Changer.UI.InfoForm.ProgramInfo"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CPU_Preference_Changer.UI.InfoForm"
+        mc:Ignorable="d"
+        Title="프로그램 정보" Height="176.159" Width="367.43" WindowStartupLocation="CenterOwner">
+
+    <Grid  Margin="10">
+        <Grid.RowDefinitions>
+            <!-- 프로그램 다운로드(마도카링크) 링크 출력용-->
+            <RowDefinition Height="60"/>
+            <!-- 오픈소스 개발자 목록 -->
+            <RowDefinition Height="45*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <StackPanel>
+                <TextBlock Style="{StaticResource TITLE_STYLE}">
+                            프로그램 정보
+                </TextBlock>
+                <StackPanel Margin="10 0 0 0">
+                    <!-- 버전을 빡세게 관리할 필요는 없으니까... 그냥 여기서 타이핑해서 올리세요. -->
+                    <TextBlock Style="{StaticResource INFO_STR_STYLE}">
+                                프로그램 버전 - 2021.06.09_REV_1.001
+                    </TextBlock>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource INFO_STR_STYLE}">
+                                    다운로드 링크 -
+                        </TextBlock>
+                        <TextBlock Margin="5 0 0 0">
+                            <Hyperlink NavigateUri="https://cafe.naver.com/mabinogidsg/642329" RequestNavigate="Hyperlink_RequestNavigate">
+                                https://cafe.naver.com/mabinogidsg/642329
+                            </Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        
+        <Grid Grid.Row="1">
+            <StackPanel>
+                <TextBlock Style="{StaticResource TITLE_STYLE}">
+                            개발자
+                </TextBlock>
+
+                <StackPanel Margin="10 0 0 0">
+                    <!-- 
+                    2021.06.09 by LT인척하는엘프.
+                    리스트뷰라도 만들고싶은데 귀찮다~~~~!!!  그냥 Text만 찍읍시다.
+                    설마 싶은데 이름 찍을 공간 없어지면.. 없어진 사람이 알아서 가로 2열로 늘리기 ㅎㅎ ㅈㅅ; 
+                    -->
+                    <TextBlock Style="{StaticResource AUTHOR_STYLE}">
+                                LT인척하는엘프
+                    </TextBlock>
+            
+                    <TextBlock Style="{StaticResource AUTHOR_STYLE}">
+                                LT골든힐트
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

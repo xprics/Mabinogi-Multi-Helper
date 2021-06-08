@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using CPU_Preference_Changer.WinAPI_Wrapper;
+using System.Windows;
 
 namespace CPU_Preference_Changer
 {
@@ -9,21 +10,14 @@ namespace CPU_Preference_Changer
     {
         System.Threading.Mutex mutex;
 
-        [System.Runtime.InteropServices.DllImport("User32", EntryPoint = "FindWindow")]
-        private static extern System.IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        public static extern bool SetForegroundWindow(System.IntPtr hWnd);
-
-        [System.Runtime.InteropServices.DllImport("user32")]
-        public static extern bool ShowWindow(System.IntPtr hwnd, int nCmdShow);
-
         /// <summary>
         /// Check My Process having run
         /// </summary>
         /// <param name="e"></param>
         protected override void OnStartup(StartupEventArgs e)
         {
+            //소스 코드 위치 이동으로 인해.. Main파일 위치를 상대경로로 지정해주었음.
+            this.StartupUri = new System.Uri("UI/MainUI/MainWindow.xaml", System.UriKind.Relative);
             base.OnStartup(e);
 
             bool createNew;
@@ -31,9 +25,9 @@ namespace CPU_Preference_Changer
             mutex = new System.Threading.Mutex(true, myProcessName, out createNew);
             if (createNew == false)
             {
-                System.IntPtr wHandle = FindWindow(null, myProcessName);
-                ShowWindow(wHandle, 1);
-                SetForegroundWindow(wHandle);
+                System.IntPtr wHandle = WinAPI.FindWindow(null, myProcessName);
+                WinAPI.ShowWindow(wHandle, SwindOp.SW_SHOWNORMAL);
+                WinAPI.SetForegroundWindow(wHandle);
                 Shutdown();
             }
         }
