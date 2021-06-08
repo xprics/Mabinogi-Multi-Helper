@@ -19,6 +19,9 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// </summary>
         private LvMabiDataCollection lvItms;
 
+        /// <summary>
+        /// 새로고침 시 목록이 새로 만들어지기 때문에 이전 본캐 선택 값(PID) 보관을 위해 필요
+        /// </summary>
         private int? iMainCharacterPID = null;
 
         private OnProcessNameClicked onProcessNameClick;
