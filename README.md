@@ -1,6 +1,12 @@
-# Mabi_CPU_Preference_Changer
+# Mabinogi Multi Helper
 
 마비노기 클라이언트를 CPU 분배로 다클라 성능 향상
+
+- 이 프로그램은 다중 클라이언트 환경에서 마비노기의 CPU자원을 조절하여
+- 좀 더 낮은 CPU사용량과 낮은 전력을 사용하도록 도와주는 프로그램입니다.
+
+(Mabinogi CPU preferrence divider for lower usage of CPU and more less power consumption. )
+
 
 refer : <https://cafe.naver.com/mabinogidsg/642329>
 
