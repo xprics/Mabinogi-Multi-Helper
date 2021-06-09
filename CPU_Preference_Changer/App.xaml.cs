@@ -8,8 +8,6 @@ namespace CPU_Preference_Changer
     /// </summary>
     public partial class App : Application
     {
-        System.Threading.Mutex mutex;
-
         /// <summary>
         /// Check My Process having run
         /// </summary>
@@ -22,7 +20,7 @@ namespace CPU_Preference_Changer
 
             bool createNew;
             string myProcessName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
-            mutex = new System.Threading.Mutex(true, myProcessName, out createNew);
+            new System.Threading.Mutex(true, myProcessName, out createNew);
             if (createNew == false)
             {
                 System.IntPtr wHandle = WinAPI.FindWindow(null, myProcessName);

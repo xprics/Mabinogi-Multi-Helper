@@ -34,8 +34,15 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
 
     public class WinAPI {
 
+        /// <summary>
+        /// Win32 API Window process handler 가져오기.
+        /// 대부분 첫 번째 파라미터를 null 설정, 두 번째 파라미터로 프로세스 이름을 넣어 호출.
+        /// </summary>
+        /// <param name="lpClassName"></param>
+        /// <param name="lpWindowName"></param>
+        /// <returns></returns>
         [DllImport("User32", EntryPoint = "FindWindow")]
-        public static extern System.IntPtr FindWindow(string lpClassName, string lpWindowName);
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
         /// <summary>
         /// Win32 API SetForegroundWindow 선언,, 이걸로해보고 잘안되면 ShowWindow를 써보던가 한다...

@@ -34,9 +34,12 @@ namespace CPU_Preference_Changer.UI.OptionForm {
             // 
             // bt_GoTray
             // 
-            this.bt_GoTray.Location = new System.Drawing.Point(29, 47);
+            this.bt_GoTray.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.bt_GoTray.Location = new System.Drawing.Point(81, 47);
             this.bt_GoTray.Name = "bt_GoTray";
-            this.bt_GoTray.Size = new System.Drawing.Size(193, 25);
+            this.bt_GoTray.Size = new System.Drawing.Size(176, 38);
             this.bt_GoTray.TabIndex = 0;
             this.bt_GoTray.Text = "Tray로 이동~";
             this.bt_GoTray.UseVisualStyleBackColor = true;
@@ -44,18 +47,25 @@ namespace CPU_Preference_Changer.UI.OptionForm {
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(26, 18);
+            this.label1.Location = new System.Drawing.Point(21, 18);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(202, 14);
+            this.label1.Size = new System.Drawing.Size(287, 20);
             this.label1.TabIndex = 2;
             this.label1.Text = "프로그램을 종료하시겠습니까?";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // bt_Close
             // 
-            this.bt_Close.Location = new System.Drawing.Point(29, 92);
+            this.bt_Close.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.bt_Close.Location = new System.Drawing.Point(81, 92);
             this.bt_Close.Name = "bt_Close";
-            this.bt_Close.Size = new System.Drawing.Size(193, 25);
+            this.bt_Close.Size = new System.Drawing.Size(176, 38);
             this.bt_Close.TabIndex = 0;
             this.bt_Close.Text = "종료~~!";
             this.bt_Close.UseVisualStyleBackColor = true;
@@ -63,9 +73,9 @@ namespace CPU_Preference_Changer.UI.OptionForm {
             // 
             // CloseAskForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(251, 135);
+            this.ClientSize = new System.Drawing.Size(316, 144);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.bt_Close);
             this.Controls.Add(this.bt_GoTray);
