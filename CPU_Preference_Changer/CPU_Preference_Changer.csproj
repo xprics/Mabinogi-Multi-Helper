@@ -108,6 +108,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\SystemProcess.cs" />
     <Compile Include="UI\InfoForm\ProgramInfo.xaml.cs">
       <DependentUpon>ProgramInfo.xaml</DependentUpon>
     </Compile>
