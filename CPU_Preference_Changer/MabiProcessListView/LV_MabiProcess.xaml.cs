@@ -96,6 +96,10 @@ namespace CPU_Preference_Changer.MabiProcessListView
             return false;
         }
 
+        /// <summary>
+        /// 프로세스 재갱신하면서 본캐릭 설정 유지
+        /// </summary>
+        /// <param name="items">재갱신 프로세스 컬렉션</param>
         private void ComposeMainCharacter(ref LvMabiDataCollection items)
         {
             bool checkMain = false;

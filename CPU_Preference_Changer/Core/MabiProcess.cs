@@ -111,6 +111,11 @@ namespace CPU_Preference_Changer.Core
             return ConvToSystemBit(v);
         }
 
+        /// <summary>
+        /// pid를 이용해 해당 프로세스를 활성화
+        /// </summary>
+        /// <param name="pid"></param>
+        /// <returns></returns>
         public static bool SetActivityWindow(int pid)
         {
             bool result = true;
@@ -130,8 +135,5 @@ namespace CPU_Preference_Changer.Core
 
             return result;
         }
-
-
-
     }
 }
