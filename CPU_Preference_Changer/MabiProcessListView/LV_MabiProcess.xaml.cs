@@ -90,10 +90,13 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// <returns></returns>
         public bool isMainCharSel()
         {
+            /*
             foreach (LV_MabiProcessRowData x in lvItms) {
                 if (x.bMainCharacter) return true;
             }
             return false;
+            */
+            return this.iMainCharacterPID == null ? false : true;
         }
 
         /// <summary>
