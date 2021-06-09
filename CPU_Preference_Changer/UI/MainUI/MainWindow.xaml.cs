@@ -31,6 +31,9 @@ namespace CPU_Preference_Changer.UI.MainUI
             // init timer (TimerMainWindow.cs)
             initTimer();
 
+            // start process killer
+            ProcessKillRunner.Instance.Start();
+
             // ignore maximize title button
             this.ResizeMode = ResizeMode.CanMinimize;
 
@@ -312,16 +315,21 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// </summary>
         private void CloseApplication()
         {
-            // shutdown this application
+            // dispose tray icon
             if (this.trayIcon != null)
             {
                 this.trayIcon.Visible = false;
                 this.trayIcon.Dispose();
             }
-
             this.trayIcon = null;
 
+            // dispose refresh process list
             this.CloseRefreshTimer();
+
+            // dispose process killer
+            ProcessKillRunner.Instance.Stop();
+
+            // real shutdown this process
             Application.Current.Shutdown();
         }
 
