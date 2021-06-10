@@ -47,6 +47,8 @@
                                        TextAlignment="Center"
                                        MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
                                        MouseLeftButtonUp="TextBlock_MouseLeftButtonUp"
+                                       MouseRightButtonDown="TextBlock_MouseRightButtonDown"
+                                       MouseRightButtonUp="TextBlock_MouseRightButtonUp"
                                        MouseLeave="TextBlock_MouseLeave"
                                        Tag="{Binding Path=tbCoreStateIdxTag}"
                                        />

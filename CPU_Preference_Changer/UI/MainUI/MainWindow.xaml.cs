@@ -71,7 +71,8 @@ namespace CPU_Preference_Changer.UI.MainUI
         {
             //lv 클릭 이벤트 등록
             lvMabiProcess.setClickEvt(MabiLv_OnProcessNameClicked,
-                                      MabiLv_OnCoreClicked);
+                                      MabiLv_OnCoreClicked,
+                                      MabiLv_OnProcessNameRightClicked);
 
             this.tb_CpuName.Text = SystemInfo.GetCpuName();
             this.tb_CpuCoreCnt.Text = SystemInfo.GetCpuCoreCntStr();
@@ -189,6 +190,20 @@ namespace CPU_Preference_Changer.UI.MainUI
                 rowData.coreState = newVal + "";
                 showMessage("설정 완료");
             }
+        }
+
+        /// <summary>
+        /// 리스트 뷰에서 프로세스 이름을 오른쪽 클릭 했을 때
+        /// </summary>
+        /// <param name="rowData"></param>
+        private void MabiLv_OnProcessNameRightClicked(LV_MabiProcessRowData rowData)
+        {
+            // minimize window
+            //MabiProcess.SetMinimizeWindow((int)rowData.userParam);
+
+            // hide window
+            rowData.isHide = true;
+            MabiProcess.SetHideWindow((int)rowData.userParam);
         }
 
         /// <summary>
