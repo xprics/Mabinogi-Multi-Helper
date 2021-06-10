@@ -51,7 +51,7 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// <param name="coreState"></param>
         /// <param name="runPath"></param>
         /// <param name="usrParam"></param>
-        private void CB_FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, ref object usrParam)
+        private void CB_FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, bool isHide, ref object usrParam)
         {
             LvMabiDataCollection lvItm = (LvMabiDataCollection)usrParam;
             var newData = new LV_MabiProcessRowData(pName,
@@ -60,6 +60,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                                                 coreState + "",
                                                 runPath);
             newData.userParam = PID; //찾았던 프로세스 정보 보관해서 나중에 써먹기위함
+            newData.isHide = isHide;
             lvItm.Add(newData);
         }
 
@@ -154,7 +155,8 @@ namespace CPU_Preference_Changer.UI.MainUI
         private void MabiLv_OnProcessNameClicked(LV_MabiProcessRowData rowData)
         {
             /*이 프로세스를 가장 앞으로 옮긴다!*/
-            MabiProcess.SetActivityWindow((int)rowData.userParam);
+            if (MabiProcess.SetActivityWindow((int)rowData.userParam))
+                rowData.isHide = false;
 
             //MabiProcess.ShowWindow(p.MainWindowHandle, MabiProcess.WindowState.SW_SHOWNORMAL);
             //MabiProcess.SetForegroundWindow(p.MainWindowHandle);

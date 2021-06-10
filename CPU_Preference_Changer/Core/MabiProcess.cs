@@ -6,7 +6,7 @@ namespace CPU_Preference_Changer.Core
 {
     class MabiProcess
     {
-        public delegate void FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, ref object usrParam);
+        public delegate void FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, bool isHide, ref object usrParam);
 
         /// <summary>
         /// 마비노기로 추정되는 프로세스 목록 얻기
@@ -32,6 +32,7 @@ namespace CPU_Preference_Changer.Core
                                       p.StartTime.ToString(),
                                       p.ProcessorAffinity,
                                       p.MainModule.FileName,
+                                      p.MainWindowHandle == IntPtr.Zero ? true : false,
                                       ref usrParam);
                         }
                     }
@@ -123,9 +124,18 @@ namespace CPU_Preference_Changer.Core
             {
                 try
                 {
-                    WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_SHOWNORMAL);
-                    WinAPI.SetForegroundWindow(p.MainWindowHandle);
-                    result = true;
+                    IntPtr windowHandle = IntPtr.Zero;
+
+                    // MainWindowHandle == InPtr.Zero : this process is hide
+                    if (p.MainWindowHandle != IntPtr.Zero)
+                        windowHandle = p.MainWindowHandle;
+                    else
+                        windowHandle = WinAPI.FindWindow(p.ProcessName, null); // find from process name
+                    
+                    // default show window as show and no activate window
+                    result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOWNOACTIVATE);
+                    if (result)
+                        WinAPI.SetForegroundWindow(windowHandle);
                 }
                 catch
                 {
@@ -133,6 +143,51 @@ namespace CPU_Preference_Changer.Core
                 }
             }
 
+            return result;
+        }
+
+        /// <summary>
+        /// pid를 이용해 해당 프로세스를 최소화
+        /// </summary>
+        /// <param name="pid"></param>
+        /// <returns></returns>
+        public static bool SetMinimizeWindow(int pid)
+        {
+            bool result = true;
+            using (Process p = Process.GetProcessById(pid))
+            {
+                try
+                {
+                    WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_FORCEMINIMIZE);
+                    result = true;
+                }
+                catch
+                {
+                    result = false;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// pid를 이용해 해당 프로세스를 숨기기 (작업 표시줄에서 사라짐)
+        /// </summary>
+        /// <param name="pid"></param>
+        /// <returns></returns>
+        public static bool SetHideWindow(int pid)
+        {
+            bool result = true;
+            using (Process p = Process.GetProcessById(pid))
+            {
+                try
+                {
+                    result = WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_HIDE);
+                }
+                catch
+                {
+                    result = false;
+                }
+            }
             return result;
         }
     }

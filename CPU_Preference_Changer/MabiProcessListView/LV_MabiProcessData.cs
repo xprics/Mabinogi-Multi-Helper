@@ -63,6 +63,11 @@ namespace CPU_Preference_Changer.MabiProcessListView
         public object userParam { get; set; }
 
         /// <summary>
+        /// 숨김 처리
+        /// </summary>
+        public bool isHide { get; set; }
+
+        /// <summary>
         /// 리스트 뷰 아이템 구조 생성자
         /// </summary>
         /// <param name="prName">프로세스 명</param>
@@ -78,7 +83,8 @@ namespace CPU_Preference_Changer.MabiProcessListView
             this.processFilePath = processFilePath;
             this.startTime = sTime;
             this.coreState = coreState;
-            bMainCharacter = false;
+            this.bMainCharacter = false;
+            this.isHide = false;
         }
 
         public LV_MabiProcessRowData() { }
