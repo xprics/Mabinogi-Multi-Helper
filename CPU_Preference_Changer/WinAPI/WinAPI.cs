@@ -18,7 +18,7 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         *  SW_FORCEMINIMIZE	 11	 최소화 합니다.
         */
     public enum SwindOp : uint {
-        SW_HODE = 0
+        SW_HIDE = 0
            , SW_SHOWNORMAL = 1
            , SW_SHOWMINIMIZED = 2
            , SW_MAXIMIZE = 3
@@ -36,13 +36,14 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
 
         /// <summary>
         /// Win32 API Window process handler 가져오기.
-        /// 대부분 첫 번째 파라미터를 null 설정, 두 번째 파라미터로 프로세스 이름을 넣어 호출.
+        /// 첫 파라미터는 프로세스 이름(null으로 생략 가능), 두 번째 파라미터는 타이틀 이름(null으로 생략 가능).
+        /// 파라미터 2개 중 1개는 반드시 입력해주셔야 됩니다.
         /// </summary>
-        /// <param name="lpClassName"></param>
-        /// <param name="lpWindowName"></param>
+        /// <param name="strProcessName"></param>
+        /// <param name="strWindowTitleName"></param>
         /// <returns></returns>
         [DllImport("User32", EntryPoint = "FindWindow")]
-        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+        public static extern IntPtr FindWindow(string strProcessName, string strWindowTitleName);
 
         /// <summary>
         /// Win32 API SetForegroundWindow 선언,, 이걸로해보고 잘안되면 ShowWindow를 써보던가 한다...
