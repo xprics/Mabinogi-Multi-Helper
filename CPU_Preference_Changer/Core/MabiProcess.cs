@@ -6,7 +6,7 @@ namespace CPU_Preference_Changer.Core
 {
     class MabiProcess
     {
-        public delegate void FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, ref object usrParam);
+        public delegate void FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, bool isHide, ref object usrParam);
 
         /// <summary>
         /// 마비노기로 추정되는 프로세스 목록 얻기
@@ -32,6 +32,7 @@ namespace CPU_Preference_Changer.Core
                                       p.StartTime.ToString(),
                                       p.ProcessorAffinity,
                                       p.MainModule.FileName,
+                                      p.MainWindowHandle == IntPtr.Zero ? true : false,
                                       ref usrParam);
                         }
                     }
