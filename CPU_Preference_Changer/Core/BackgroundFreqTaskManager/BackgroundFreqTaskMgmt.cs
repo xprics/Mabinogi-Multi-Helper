@@ -28,7 +28,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
     /// by LT인척하는엘프 2021.06.11
     /// 백그라운드에서 주기적으로 작업을 실행할 관리자 클래스
     /// </summary>
-    class BackgroundFreqTaskMgmt : IMMHGlobalInstance{
+    class BackgroundFreqTaskMgmt {
         /// <summary>
         /// 작업 정보 클래스
         /// </summary>
@@ -62,8 +62,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         private Dictionary<int, TaskInfo> taskDict;
         private Mutex dickLock;
         private bool bRun = false;
-        private bool bManagerStop;;
-
+        private bool bManagerStop;
 
         public BackgroundFreqTaskMgmt()
         {

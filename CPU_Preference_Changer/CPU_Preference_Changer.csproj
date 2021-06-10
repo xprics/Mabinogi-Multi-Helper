@@ -110,6 +110,7 @@
     </ApplicationDefinition>
     <Compile Include="Core\BackgroundFreqTaskManager\BackgroundFreqTaskMgmt.cs" />
     <Compile Include="Core\BackgroundFreqTaskManager\IBackgroundFreqTask.cs" />
+    <Compile Include="Core\MMHGlobal.cs" />
     <Compile Include="Core\SingleTonTemplate\MMHGlobalInstance.cs" />
     <Compile Include="Core\SystemProcess.cs" />
     <Compile Include="UI\InfoForm\ProgramInfo.xaml.cs">

@@ -45,7 +45,7 @@ namespace CPU_Preference_Changer.UI.MainUI
             */
 
             //백그라운드 Task Manager 시작
-            BackgroundFreqTaskMgmt backMgmt = MMHGlobalInstance<BackgroundFreqTaskMgmt>.GetInstance();
+            BackgroundFreqTaskMgmt backMgmt = MMHGlobalInstance<MMHGlobal>.GetInstance().backgroundFreqTaskManager;
             backMgmt.startTaskManager();
             backMgmt.addFreqTask(new ProcessListRefreshTask(this));
 
@@ -233,7 +233,7 @@ namespace CPU_Preference_Changer.UI.MainUI
             // dispose process killer
             ProcessKillRunner.Instance.Stop();
 #else
-            MMHGlobalInstance<BackgroundFreqTaskMgmt>.GetInstance().Release();
+            MMHGlobalInstance<MMHGlobal>.GetInstance().Release();
 #endif
             // real shutdown this process
             Application.Current.Shutdown();
