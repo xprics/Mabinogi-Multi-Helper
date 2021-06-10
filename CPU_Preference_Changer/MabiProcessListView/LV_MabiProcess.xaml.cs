@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -7,7 +6,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
 {
     public delegate void OnProcessNameClicked(LV_MabiProcessRowData rowData);
     public delegate void OnPCoreStateClicked(LV_MabiProcessRowData rowData);
-
+    public delegate void OnProcessNameRightCLick(LV_MabiProcessRowData rowData);
 
     /// <summary>
     /// LV_MabiProcess.xaml에 대한 상호 작용 논리
@@ -27,6 +26,9 @@ namespace CPU_Preference_Changer.MabiProcessListView
         private OnProcessNameClicked onProcessNameClick;
         private OnPCoreStateClicked onCoreStateClick;
 
+        // process name right click
+        private OnProcessNameRightCLick onProcessNameRightClick;
+
         public LV_MabiProcess()
         {
             InitializeComponent();
@@ -36,10 +38,12 @@ namespace CPU_Preference_Changer.MabiProcessListView
         }
 
         public void setClickEvt(OnProcessNameClicked evtNameClick,
-                                OnPCoreStateClicked evtCoreStatusClick)
+                                OnPCoreStateClicked evtCoreStatusClick,
+                                OnProcessNameRightCLick evtNameRightClick)
         {
             this.onProcessNameClick = evtNameClick;
             this.onCoreStateClick = evtCoreStatusClick;
+            this.onProcessNameRightClick = evtNameRightClick;
         }
 
         /// <summary>
@@ -106,19 +110,22 @@ namespace CPU_Preference_Changer.MabiProcessListView
         private void ComposeMainCharacter(ref LvMabiDataCollection items)
         {
             bool checkMain = false;
+
             if (this.iMainCharacterPID != null)
             {
                 foreach (LV_MabiProcessRowData data in items)
                 {
+                    // check main character pid
                     if ((int)data.userParam == this.iMainCharacterPID)
                     {
                         data.bMainCharacter = true;
                         checkMain = true;
+                        break; // main character is only one
                     }
                 }
-            }
-
-            if (checkMain == false)
+            } 
+            
+            if (!checkMain)
                 this.iMainCharacterPID = null;
         }
 
@@ -210,6 +217,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
         private void TextBlock_MouseLeave(object sender, MouseEventArgs e)
         {
             if (bProcessNameClick) bProcessNameClick = false;
+            if (bProcessNameRightClick) bProcessNameRightClick = false;
         }
         #endregion
 
@@ -241,5 +249,25 @@ namespace CPU_Preference_Changer.MabiProcessListView
         }
         #endregion
 
+        #region 프로세스명 오른쪽 클릭 이벤트 처리
+        private bool bProcessNameRightClick = false;
+
+        private void TextBlock_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            bProcessNameRightClick = true;
+        }
+
+        private void TextBlock_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (bProcessNameRightClick)
+            {
+                /*이벤트 처리 콜백 함수 실행*/
+                if (this.onProcessNameRightClick != null)
+                    this.onProcessNameRightClick(GetLvRowItmData(ctlTagStrToInt(sender)));
+                bProcessNameRightClick = false;
+            }
+        }
+
+        #endregion
     }
 }
