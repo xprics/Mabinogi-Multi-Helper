@@ -5,8 +5,8 @@ using CPU_Preference_Changer.Core;
 using System.Windows;
 using System.Windows.Controls;
 using CPU_Preference_Changer.UI.OptionForm;
-using static CPU_Preference_Changer.UI.OptionForm.CloseAskForm;
-using CPU_Preference_Changer.UI.InfoForm;
+using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
+using CPU_Preference_Changer.Core.SingleTonTemplate;
 
 namespace CPU_Preference_Changer.UI.MainUI
 {
@@ -19,25 +19,41 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// 트레이 아이콘 변수
         /// </summary>
         public System.Windows.Forms.NotifyIcon trayIcon = null;
+        private object lockObj = new object();
 
         public MainWindow()
         {
             InitializeComponent();
+
+            //윈도우 글자, 이벤트 초기화
             initWindow();
 
             // init trayicon
             initTrayIcon();
 
-            // init timer (TimerMainWindow.cs)
+            /*
+             * init timer (TimerMainWindow.cs)
             initTimer();
+            2021.06.11 by LT인척하는엘프;
+                ==> 타이머를 이용하지 않고 백그라운드 Task 매니저를 이용하게 함
+            */
 
-            // start process killer
-            ProcessKillRunner.Instance.Start();
+            /*
+            ProcessKillRunner.Instance.Start(); //start process killer
+            2021.06.11 by LT인척하는엘프; 
+                ==>백그라운드 Task 매니저를 구현하여 Task매니저가 Task단위로 관리하게 함
+            */
+
+            //백그라운드 Task Manager 시작
+            BackgroundFreqTaskMgmt backMgmt = MMHGlobalInstance<MMHGlobal>.GetInstance().backgroundFreqTaskManager;
+            backMgmt.startTaskManager();
+            backMgmt.addFreqTask(new ProcessListRefreshTask(this));
 
             // ignore maximize title button
             this.ResizeMode = ResizeMode.CanMinimize;
 
 #if __WIN__64__DBG__
+            /*디버그 모드에서만 보이도록 한다!*/
             dbgPanel.Visibility = Visibility.Visible;
 #endif
         }
@@ -76,7 +92,6 @@ namespace CPU_Preference_Changer.UI.MainUI
 
             this.tb_CpuName.Text = SystemInfo.GetCpuName();
             this.tb_CpuCoreCnt.Text = SystemInfo.GetCpuCoreCntStr();
-
             /*
              * 별도 타이머에서 작업하게되어 필요없어짐.
             LvMabiDataCollection lvItm = new LvMabiDataCollection();
@@ -98,126 +113,6 @@ namespace CPU_Preference_Changer.UI.MainUI
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
         }
-
-        /// <summary>
-        /// 자동 할당 클릭
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btAutoSet_Click(object sender, RoutedEventArgs e)
-        {
-            if (lvMabiProcess.isMainCharSel() == false) {
-                showMessage("어떤 클라이언트가 본캐인지 선택하세요!\n프로세스 명을 클릭하면 마비노기 화면으로 전환됩니다!");
-                return;
-            }
-
-            /*본캐 체크된 것만... 최대한 코어 사용하게 하고 나머지는 하나로 몰아 넣는다!*/
-            var lst = lvMabiProcess.getLvItems();
-            IntPtr val = MabiProcess.GetMaxAffinityVal();
-            foreach (var x in lst)
-            {
-                if( x.bMainCharacter) {
-                    ulong max,min;
-                    max = (ulong)MabiProcess.GetMaxAffinityVal();
-                    min = (ulong)MabiProcess.GetMinAffinityVal();
-                    /* 부캐가 점유하고있는 CPU를 제외하고 활성화 함*/
-                    val = MabiProcess.ConvToSystemBit(max & (~min));
-                } else {
-                    val = MabiProcess.GetMinAffinityVal();
-                }
-                MabiProcess.setTargetCoreState((int)x.userParam, val);
-                x.coreState = val + "";
-            }
-            lvMabiProcess.setDataSoure(lst);
-            showMessage("설정 완료");
-        }
-
-        /// <summary>
-        /// 새로고침 버튼을 클릭했을 때
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btReset_Click(object sender, RoutedEventArgs e)
-        {
-            /*모든 프로세스에 대하여 초기화 수행!*/
-            var lst = lvMabiProcess.getLvItems();
-            IntPtr resetVal = MabiProcess.GetMaxAffinityVal();
-            foreach(var x in lst) {
-                MabiProcess.setTargetCoreState((int)x.userParam, resetVal);
-                x.coreState = resetVal + "";
-            }
-            showMessage("설정 완료");
-        }
-
-        /// <summary>
-        /// 리스트 뷰에서 프로세스 명을 클릭 했을 때...
-        /// </summary>
-        /// <param name="rowData">클릭된 리스트뷰 Row 정보</param>
-        private void MabiLv_OnProcessNameClicked(LV_MabiProcessRowData rowData)
-        {
-            /*이 프로세스를 가장 앞으로 옮긴다!*/
-            if (MabiProcess.SetActivityWindow((int)rowData.userParam))
-                rowData.isHide = false;
-
-            //MabiProcess.ShowWindow(p.MainWindowHandle, MabiProcess.WindowState.SW_SHOWNORMAL);
-            //MabiProcess.SetForegroundWindow(p.MainWindowHandle);
-            
-            /*딜레이 없이하면 자기자신(이 프로그램)만 활성화 됨
-             * 문제는 PC마다 딜레이 시간이 다를 수 있고,, 알트탭으로 하면 더빨리
-             * 작업가능해서 필요없을수있다. 그냥 막음.
-            Thread.Sleep(1000);
-            MabiProcess.SetForegroundWindow(new WindowInteropHelper(this).Handle);
-            */
-        }
-
-        /// <summary>
-        /// 리스트 뷰에서 코어 할당 정보 클릭했을 때...
-        /// </summary>
-        /// <param name="rowData">클릭된 리스트뷰 Row 정보</param>
-        private void MabiLv_OnCoreClicked(LV_MabiProcessRowData rowData)
-        {
-            ulong val;
-
-            if (ulong.TryParse(rowData.coreState, out val) == false) return;
-
-            //코어 선택 화면 띄우고...
-            coreSelectForm selForm = new coreSelectForm(SystemInfo.GetCpuCoreCnt(), val);
-
-            //확인을 누른 경우 해당 Process에 대하여 유저가 설정한 값으로 설정한다!
-            if(System.Windows.Forms.DialogResult.OK == selForm.ShowDialog()) {
-                IntPtr newVal = selForm.GetDlgResultValue();
-                MabiProcess.setTargetCoreState((int)rowData.userParam, newVal);
-                rowData.coreState = newVal + "";
-                showMessage("설정 완료");
-            }
-        }
-
-        /// <summary>
-        /// 리스트 뷰에서 프로세스 이름을 오른쪽 클릭 했을 때
-        /// </summary>
-        /// <param name="rowData"></param>
-        private void MabiLv_OnProcessNameRightClicked(LV_MabiProcessRowData rowData)
-        {
-            // minimize window
-            //MabiProcess.SetMinimizeWindow((int)rowData.userParam);
-
-            // hide window
-            rowData.isHide = true;
-            MabiProcess.SetHideWindow((int)rowData.userParam);
-        }
-
-        /// <summary>
-        /// 새로고침 눌렀음..
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btRefresh_Click(object sender, RoutedEventArgs e)
-        {
-            initWindow();
-            showMessage("새로고침 완료");
-        }
-
-        // added function
 
         /// <summary>
         /// 트레이 아이콘
@@ -317,15 +212,6 @@ namespace CPU_Preference_Changer.UI.MainUI
             }
         }
 
-        /// <summary>
-        /// 프로그램 종료 버튼 이벤트
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btExit_Click(object sender, RoutedEventArgs e)
-        {
-            this.CloseApplication();
-        }
 
         /// <summary>
         /// 찐탱 프로그램 종료하는 코드
@@ -342,10 +228,13 @@ namespace CPU_Preference_Changer.UI.MainUI
 
             // dispose refresh process list
             this.CloseRefreshTimer();
-
+#if __OLD__CODE__
+    2021.06.11 by LT인척하는엘프; 백그라운드 Task 매니저를 구현하여 Task매니저거 관리하게 함
             // dispose process killer
             ProcessKillRunner.Instance.Stop();
-
+#else
+            MMHGlobalInstance<MMHGlobal>.GetInstance().Release();
+#endif
             // real shutdown this process
             Application.Current.Shutdown();
         }
@@ -359,7 +248,7 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// CROSS THREAD 에러를 방지하면서 LABEL 내용 업데이트.
         /// </summary>
         /// <param name="c"></param>
-        private void ControlTextUpdateInvoke(object c,string str)
+         void ControlTextUpdateInvoke(object c,string str)
         {
             var type = c.GetType();
             
@@ -374,15 +263,31 @@ namespace CPU_Preference_Changer.UI.MainUI
             }));
         }
 
-        private void menu_Close_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// 프로세스 목록 다시 가져오기
+        /// </summary>
+        public void RefresMabiProcess()
         {
-            CloseApplication();
+            // lock
+            lock (this.lockObj) {
+                // work thread invoke UI thread
+                UI_DispatchEvt(new Action(delegate {
+                    MabiProcessListView.LvMabiDataCollection lvItm = new MabiProcessListView.LvMabiDataCollection();
+                    object param = lvItm; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
+                    MabiProcess.getAllTargets(CB_FindMabiProcess, ref param);
+                    lvMabiProcess.setDataSoure(lvItm);
+                }));
+            }
         }
 
-        private void menu_Info_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// refresh Time 보여주는 Label의 텍스트 변경하는 함수.
+        /// </summary>
+        /// <param name="str"></param>
+        public void updateRefreshTimeLabelText(string str)
         {
-            ProgramInfo pi = new ProgramInfo(this);
-            pi.ShowDialog();
+            ControlTextUpdateInvoke(refreshTimeLabel, str);
         }
+
     }
 }

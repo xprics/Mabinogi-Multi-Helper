@@ -2,14 +2,19 @@
 using System.Windows.Forms;
 
 namespace CPU_Preference_Changer.UI.OptionForm {
+    /// <summary>
+    /// 선택 화면에서 선택한 정보..
+    /// </summary>
+    public enum CloseAskFormResult {
+        eClose = 1,
+        eGoTray = 2,
+        eCancel = 3
+    }
+
+    /// <summary>
+    /// 종료할지 Task로 옮길지 묻는 화면
+    /// </summary>
     public partial class CloseAskForm : Form {
-
-        public enum CloseAskFormResult {
-            eClose=1,
-            eGoTray=2,
-            eCancel=3
-        }
-
         /// <summary>
         /// default value = 취소로 냅둠. (아무것도 안하고 창 닫으면 아무것도 안하게 함)
         /// </summary>
