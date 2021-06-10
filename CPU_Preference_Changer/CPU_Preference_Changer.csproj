@@ -108,10 +108,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\BackgroundFreqTaskManager\BackgroundFreqTaskMgmt.cs" />
+    <Compile Include="Core\BackgroundFreqTaskManager\IBackgroundFreqTask.cs" />
+    <Compile Include="Core\SingleTonTemplate\MMHGlobalInstance.cs" />
     <Compile Include="Core\SystemProcess.cs" />
     <Compile Include="UI\InfoForm\ProgramInfo.xaml.cs">
       <DependentUpon>ProgramInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\MainUI\MainWindowClickEvt.cs" />
+    <Compile Include="UI\MainUI\ProcessListRefreshTask.cs" />
     <Compile Include="UI\OptionForm\CloseAskForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -62,5 +62,12 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         [DllImport("user32")]
         public static extern bool ShowWindow(IntPtr hwnd, SwindOp nCmdShow);
 
+
+        /// <summary>
+        /// Win32 Api GetTickCount64  =-시간반환 (부팅 후 지금까지 밀리초단위로)
+        /// </summary>
+        /// <returns></returns>
+        [DllImport("kernel32.dll")]
+        public static extern ulong GetTickCount64();
     }
 }

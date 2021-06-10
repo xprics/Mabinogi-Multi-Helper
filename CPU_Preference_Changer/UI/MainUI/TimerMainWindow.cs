@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Threading;
 using System.Windows;
-using CPU_Preference_Changer.Core;
 
 namespace CPU_Preference_Changer.UI.MainUI 
 {
+    /// <summary>
+    /// by LT골든힐트
+    /// 메인화면의 클라이언트 목록을 주기적으로 갱신시킨다.
+    /// 현재 값은 5초마다 갱신, 타이머를 이용하여 작동한다!
+    /// </summary>
     public partial class MainWindow : Window
     {
-        private object lockObj = new object();
         private const int refreshTerm = 5; // 5 second
         private Timer timer = null;
 
@@ -38,31 +41,11 @@ namespace CPU_Preference_Changer.UI.MainUI
                     ControlTextUpdateInvoke(refreshTimeLabel, refreshTick.ToString() + "초 후 새로고침");
                     refreshTick--;
                 }
-
                 return 0;
             };
             //타이머 실행까지 최초 글자가 없음... 일단 5초후 찍어주고 시작.
             ControlTextUpdateInvoke(refreshTimeLabel, refreshTick.ToString() + "초 후 새로고침");
             timer = new Timer((object state) => { (state as Func<int>)?.Invoke(); }, localCallback, 0, interval);
-        }
-
-        /// <summary>
-        /// 프로세스 목록 다시 가져오기
-        /// </summary>
-        private void RefresMabiProcess()
-        {
-            // lock
-            lock(this.lockObj)
-            {
-                // work thread invoke UI thread
-                UI_DispatchEvt(new Action(delegate
-                {
-                    MabiProcessListView.LvMabiDataCollection lvItm = new MabiProcessListView.LvMabiDataCollection();
-                    object param = lvItm; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
-                    MabiProcess.getAllTargets(CB_FindMabiProcess, ref param);
-                    lvMabiProcess.setDataSoure(lvItm);
-                }));
-            }
         }
 
         /// <summary>

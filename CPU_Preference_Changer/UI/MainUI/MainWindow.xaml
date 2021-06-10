@@ -26,6 +26,9 @@
                     <Separator/>
                     <MenuItem Header="종료" x:Name="menu_Close" Click="menu_Close_Click"/>
                 </MenuItem>
+                <MenuItem Header="도구">
+                    <MenuItem Header="시스템 예약종료" x:Name="menu_SystemPowerOff" Click="menu_SystemPowerOff_Click"></MenuItem>
+                </MenuItem>
             </Menu>
         </Grid>
 
