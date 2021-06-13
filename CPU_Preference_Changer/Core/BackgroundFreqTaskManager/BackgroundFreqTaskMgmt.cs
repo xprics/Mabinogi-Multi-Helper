@@ -63,6 +63,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         private Mutex dickLock;
         private bool bRun = false;
         private bool bManagerStop;
+        private Thread th = null;
 
         public BackgroundFreqTaskMgmt()
         {
@@ -117,7 +118,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         public void startTaskManager()
         {
             if (bRun) return;
-            Thread th = new Thread(taskManagerWorkThread);
+            th = new Thread(taskManagerWorkThread);
             th.Start();
             bRun = true;
         }
@@ -182,6 +183,9 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                     Debug.WriteLine(err.StackTrace.ToString());
                     Debug.WriteLine("######################################################");
                 }
+
+                // 이거 안넣으면 CPU 사용률 폭발함
+                Thread.Sleep(1);
             }
             bManagerStop = false;
         }
@@ -193,6 +197,12 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         {
             stopFreqTaskManager();
             while (bManagerStop) Thread.Sleep(100);
+
+            // thread exit 안전 장치
+            if (this.th != null && this.th.IsAlive)
+                this.th.Join();
+            this.th = null;
+
             taskDict.Clear();
             dickLock.Close();
         }

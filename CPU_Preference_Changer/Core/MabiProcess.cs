@@ -23,18 +23,20 @@ namespace CPU_Preference_Changer.Core
                 {
                     try
                     {
+                        // fixed 2021-06-14 : 숨김 처리 되었을때 MainWindowTitle가 ""으로 설정되네요
+
                         /*창 이름이 "마비노기"인 것 찾는다*/
-                        if (string.Compare(p.MainWindowTitle, "마비노기") == 0)
-                        {
+                        //if (string.Compare(p.MainWindowTitle, "마비노기") == 0)
+                        //{
                             /*콜백함수 실행*/
                             fnFindMabiProcess(p.ProcessName,
-                                      p.Id,
-                                      p.StartTime.ToString(),
-                                      p.ProcessorAffinity,
-                                      p.MainModule.FileName,
-                                      p.MainWindowHandle == IntPtr.Zero ? true : false,
-                                      ref usrParam);
-                        }
+                                              p.Id,
+                                              p.StartTime.ToString(),
+                                              p.ProcessorAffinity,
+                                              p.MainModule.FileName,
+                                              p.MainWindowHandle == IntPtr.Zero ? true : false,
+                                              ref usrParam);
+                        //}
                     }
                     catch
                     {
@@ -133,7 +135,7 @@ namespace CPU_Preference_Changer.Core
                         windowHandle = WinAPI.FindWindow(p.ProcessName, null); // find from process name
                     
                     // default show window as show and no activate window
-                    result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOWNOACTIVATE);
+                    result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOWNORMAL);
                     if (result)
                         WinAPI.SetForegroundWindow(windowHandle);
                 }
@@ -158,7 +160,7 @@ namespace CPU_Preference_Changer.Core
             {
                 try
                 {
-                    WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_FORCEMINIMIZE);
+                    WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_MINIMIZE);
                     result = true;
                 }
                 catch
@@ -171,6 +173,7 @@ namespace CPU_Preference_Changer.Core
 
         /// <summary>
         /// pid를 이용해 해당 프로세스를 숨기기 (작업 표시줄에서 사라짐)
+        /// 마비노기를 이걸로 숨기면 복원이 안되는 현상 발생
         /// </summary>
         /// <param name="pid"></param>
         /// <returns></returns>

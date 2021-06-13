@@ -112,11 +112,11 @@ namespace CPU_Preference_Changer.UI.MainUI {
         private void MabiLv_OnProcessNameRightClicked(LV_MabiProcessRowData rowData)
         {
             // minimize window
-            //MabiProcess.SetMinimizeWindow((int)rowData.userParam);
+            MabiProcess.SetMinimizeWindow((int)rowData.userParam);
 
             // hide window
-            rowData.isHide = true;
-            MabiProcess.SetHideWindow((int)rowData.userParam);
+            //rowData.isHide = true;
+            //MabiProcess.SetHideWindow((int)rowData.userParam);
         }
 
         /// <summary>

@@ -31,23 +31,13 @@ namespace CPU_Preference_Changer.UI.MainUI
             // init trayicon
             initTrayIcon();
 
-            /*
-             * init timer (TimerMainWindow.cs)
-            initTimer();
-            2021.06.11 by LT인척하는엘프;
-                ==> 타이머를 이용하지 않고 백그라운드 Task 매니저를 이용하게 함
-            */
-
-            /*
-            ProcessKillRunner.Instance.Start(); //start process killer
-            2021.06.11 by LT인척하는엘프; 
-                ==>백그라운드 Task 매니저를 구현하여 Task매니저가 Task단위로 관리하게 함
-            */
-
             //백그라운드 Task Manager 시작
             BackgroundFreqTaskMgmt backMgmt = MMHGlobalInstance<MMHGlobal>.GetInstance().backgroundFreqTaskManager;
             backMgmt.startTaskManager();
             backMgmt.addFreqTask(new ProcessListRefreshTask(this));
+
+            // 백그라운드 Task Manager에 Process kill task 추가
+            backMgmt.addFreqTask(MMHGlobalInstance<ProcessKillTask>.GetInstance());
 
             // ignore maximize title button
             this.ResizeMode = ResizeMode.CanMinimize;
@@ -226,15 +216,8 @@ namespace CPU_Preference_Changer.UI.MainUI
             }
             this.trayIcon = null;
 
-            // dispose refresh process list
-            this.CloseRefreshTimer();
-#if __OLD__CODE__
-    2021.06.11 by LT인척하는엘프; 백그라운드 Task 매니저를 구현하여 Task매니저거 관리하게 함
-            // dispose process killer
-            ProcessKillRunner.Instance.Stop();
-#else
             MMHGlobalInstance<MMHGlobal>.GetInstance().Release();
-#endif
+
             // real shutdown this process
             Application.Current.Shutdown();
         }
@@ -272,7 +255,7 @@ namespace CPU_Preference_Changer.UI.MainUI
             lock (this.lockObj) {
                 // work thread invoke UI thread
                 UI_DispatchEvt(new Action(delegate {
-                    MabiProcessListView.LvMabiDataCollection lvItm = new MabiProcessListView.LvMabiDataCollection();
+                    LvMabiDataCollection lvItm = new LvMabiDataCollection();
                     object param = lvItm; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
                     MabiProcess.getAllTargets(CB_FindMabiProcess, ref param);
                     lvMabiProcess.setDataSoure(lvItm);
