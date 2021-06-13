@@ -23,6 +23,10 @@ Build : Visual Studio 2019
 ## Change Log
 
 ```Text
+2021-06-14
+    - SetHideWindow has problems
+2021-06-11
+    - add background task manager
 2021-06-10
     - process hide
     - process minimize
