@@ -137,7 +137,6 @@
     </Compile>
     <Compile Include="Core\MabiProcess.cs" />
     <Compile Include="Core\SystemInfo.cs" />
-    <Compile Include="UI\MainUI\TimerMainWindow.cs" />
     <Compile Include="UI\OptionForm\SysShutdownAskForm.xaml.cs">
       <DependentUpon>SysShutdownAskForm.xaml</DependentUpon>
     </Compile>
