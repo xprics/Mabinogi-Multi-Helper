@@ -22,7 +22,17 @@ Build : Visual Studio 2019
 
 ## Change Log
 
+
 ```Text
+2021-06-14
+    - 프로세스 숨김/보이기 기능
+    - 프로세스 예약 종료 기능 추가
+    - 시스템 예약 종료 기능 추가
+    - 소스코드 최적화
+    - BackgroundTaskManager 버그 수정
+    
+2021-06-11
+    - add background task manager
 2021-06-08
     - add trayicon
     - set activity window
@@ -34,4 +44,10 @@ Build : Visual Studio 2019
     - When application closing, ask to user whether close or put tray-icon.
     - Add ReleaseNote.txt for Normal Users.
     - Source Code relocate ( folder , namespace , ... )
+    
+    
+    
+##############이 아래 글자 수정 금지####################    
+^^#$[TestValue]^^#$[3]
+    
 ```
