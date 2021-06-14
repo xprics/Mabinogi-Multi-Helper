@@ -1,13 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace CPU_Preference_Changer.MabiProcessListView
 {
-    public delegate void OnProcessNameClicked(LV_MabiProcessRowData rowData);
-    public delegate void OnPCoreStateClicked(LV_MabiProcessRowData rowData);
-    public delegate void OnProcessNameRightCLick(LV_MabiProcessRowData rowData);
-
     /// <summary>
     /// LV_MabiProcess.xaml에 대한 상호 작용 논리
     /// </summary>
@@ -18,43 +15,36 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// </summary>
         private LvMabiDataCollection lvItms;
 
-        /// <summary>
-        /// 새로고침 시 목록이 새로 만들어지기 때문에 이전 본캐 선택 값(PID) 보관을 위해 필요
-        /// </summary>
-        private int? iMainCharacterPID = null;
+        /*귀찮아서 콜백받아서 쓰던것들 이벤트로 만들어 주기 위해 클래스 안으로 옮겼다...*/
+        public delegate void OnProcessNameClicked(LV_MabiProcessRowData rowData);
+        public delegate void OnPCoreStateClicked(LV_MabiProcessRowData rowData);
+        public delegate void OnProcessNameRightCLick(LV_MabiProcessRowData rowData);
+        public delegate void OnCbHideClicked(LV_MabiProcessRowData rowData);
+        public delegate void OnCbRkClicked(LV_MabiProcessRowData rowData);
 
-        private OnProcessNameClicked onProcessNameClick;
-        private OnPCoreStateClicked onCoreStateClick;
+        public event OnProcessNameClicked onProcessNameClick;
+        public event OnPCoreStateClicked onCoreStateClick;
+        public event OnCbRkClicked onCbRkClicked;
+        public event OnCbHideClicked onCbHideClicked;
 
         // process name right click
-        private OnProcessNameRightCLick onProcessNameRightClick;
+        public event OnProcessNameRightCLick onProcessNameRightClick;
 
         public LV_MabiProcess()
         {
             InitializeComponent();
-            this.iMainCharacterPID = null;
             this.onProcessNameClick = null;
             this.onCoreStateClick = null;
-        }
-
-        public void setClickEvt(OnProcessNameClicked evtNameClick,
-                                OnPCoreStateClicked evtCoreStatusClick,
-                                OnProcessNameRightCLick evtNameRightClick)
-        {
-            this.onProcessNameClick = evtNameClick;
-            this.onCoreStateClick = evtCoreStatusClick;
-            this.onProcessNameRightClick = evtNameRightClick;
         }
 
         /// <summary>
         /// idx번째 아이템 얻기
         /// </summary>
-        /// <param name="idx"></param>
+        /// <param name="tagIdx"></param>
         /// <returns></returns>
-        private LV_MabiProcessRowData GetLvRowItmData(int idx)
+        private LV_MabiProcessRowData GetLvRowItmData(int tagIdx)
         {
-            if (idx < 0 || idx >= lvItms.Count) return null;
-            return lvItms[idx];
+            return lvItms.findItmFromTagIndex(tagIdx);
         }
 
         /// <summary>
@@ -94,39 +84,10 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// <returns></returns>
         public bool isMainCharSel()
         {
-            /*
             foreach (LV_MabiProcessRowData x in lvItms) {
                 if (x.bMainCharacter) return true;
             }
             return false;
-            */
-            return this.iMainCharacterPID == null ? false : true;
-        }
-
-        /// <summary>
-        /// 프로세스 재갱신하면서 본캐릭 설정 유지
-        /// </summary>
-        /// <param name="items">재갱신 프로세스 컬렉션</param>
-        private void ComposeMainCharacter(ref LvMabiDataCollection items)
-        {
-            bool checkMain = false;
-
-            if (this.iMainCharacterPID != null)
-            {
-                foreach (LV_MabiProcessRowData data in items)
-                {
-                    // check main character pid
-                    if ((int)data.userParam == this.iMainCharacterPID)
-                    {
-                        data.bMainCharacter = true;
-                        checkMain = true;
-                        break; // main character is only one
-                    }
-                }
-            } 
-            
-            if (!checkMain)
-                this.iMainCharacterPID = null;
         }
 
         /// <summary>
@@ -147,12 +108,9 @@ namespace CPU_Preference_Changer.MabiProcessListView
         public void setDataSoure(LvMabiDataCollection items)
         {
             if (items == null) return;
-            ComposeMainCharacter(ref items);
-            DisposeAllResourece();
             lvItms = items;
             MabiProcessListView.ItemsSource = items;
         }
-
 
         /// <summary>
         /// 컨트롤의 Tag를 찾아서 int로 변환
@@ -169,6 +127,8 @@ namespace CPU_Preference_Changer.MabiProcessListView
                 tagStr = (obj as TextBlock).Tag.ToString();
             } else if (type == typeof(RadioButton)) {
                 tagStr = (obj as RadioButton).Tag.ToString();
+            } else if (type == typeof(CheckBox)) {
+                tagStr = (obj as CheckBox).Tag.ToString();
             } else {
                 return -1;
             }
@@ -186,14 +146,15 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// <param name="e"></param>
         private void RadioButton_Click(object sender, RoutedEventArgs e)
         {
-            int selIdx = ctlTagStrToInt(sender);
-            var data = GetLvRowItmData(selIdx);
+            int tagIdx = ctlTagStrToInt(sender);
+            var data = GetLvRowItmData(tagIdx);
             if (data == null) return;
             ResetMainCharFlag();
             data.bMainCharacter = true;
-            this.iMainCharacterPID = (int)data.userParam;
+            
+            int rowIdx = lvItms.findItmIdxFromTagIndex(tagIdx);
             MabiProcessListView.SelectedItem = data;
-            MabiProcessListView.SelectedIndex = selIdx;
+            MabiProcessListView.SelectedIndex = rowIdx;
         }
 
         #region 프로세스명 클릭 이벤트 처리
@@ -267,7 +228,78 @@ namespace CPU_Preference_Changer.MabiProcessListView
                 bProcessNameRightClick = false;
             }
         }
-
         #endregion
+
+        #region 숨김 클릭 이벤트 처리
+        private bool bCbHideClick = false;
+
+        private void cbHide_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            bCbHideClick = true;
+        }
+
+        private void cbHide_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (bCbHideClick) {
+                /*이벤트 처리 콜백 함수 실행*/
+                if (onCbHideClicked != null)
+                    onCbHideClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+                bCbHideClick = false;
+            }
+        }
+
+        private void cbHide_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (bCbHideClick) bCbHideClick = false;
+        }
+        #endregion
+
+        #region 예약종료 체크박스 클릭 이벤트 처리
+        private bool bCbRkClick = false;
+
+        private void cbRK_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            bCbRkClick = true;
+        }
+
+        private void cbRK_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (bCbRkClick) {
+                /*이벤트 처리 콜백 함수 실행*/
+                if (onCbRkClicked != null)
+                    onCbRkClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+                bCbRkClick = false;
+            }
+        }
+
+        private void cbRK_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (bCbRkClick) bCbRkClick = false;
+        }
+        #endregion
+
+        private void cbRK_Checked(object sender, RoutedEventArgs e)
+        {
+            if (onCbRkClicked != null)
+                onCbRkClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+        }
+
+        private void cbRK_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (onCbRkClicked != null)
+                onCbRkClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+        }
+
+        private void cbHide_Checked(object sender, RoutedEventArgs e)
+        {
+            if (onCbHideClicked != null)
+                onCbHideClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+        }
+
+        private void cbHide_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (onCbHideClicked != null)
+                onCbHideClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+        }
     }
 }

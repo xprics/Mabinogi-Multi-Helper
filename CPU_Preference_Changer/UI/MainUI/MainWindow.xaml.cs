@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using CPU_Preference_Changer.UI.OptionForm;
 using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
 using CPU_Preference_Changer.Core.SingleTonTemplate;
+using CPU_Preference_Changer.BackgroundTask;
 
 namespace CPU_Preference_Changer.UI.MainUI
 {
@@ -31,16 +32,23 @@ namespace CPU_Preference_Changer.UI.MainUI
             // init trayicon
             initTrayIcon();
 
+            /*
+             * init timer (TimerMainWindow.cs)
+            initTimer();
+            2021.06.11 by LT인척하는엘프;
+                ==> 타이머를 이용하지 않고 백그라운드 Task 매니저를 이용하게 함
+            */
+
+            /*
+            ProcessKillRunner.Instance.Start(); //start process killer
+            2021.06.11 by LT인척하는엘프; 
+                ==>백그라운드 Task 매니저를 구현하여 Task매니저가 Task단위로 관리하게 함
+            */
+
             //백그라운드 Task Manager 시작
             BackgroundFreqTaskMgmt backMgmt = MMHGlobalInstance<MMHGlobal>.GetInstance().backgroundFreqTaskManager;
             backMgmt.startTaskManager();
             backMgmt.addFreqTask(new ProcessListRefreshTask(this));
-
-            // 백그라운드 Task Manager에 Process kill task 추가
-            backMgmt.addFreqTask(MMHGlobalInstance<ProcessKillTask>.GetInstance());
-
-            // ignore maximize title button
-            this.ResizeMode = ResizeMode.CanMinimize;
 
 #if __WIN__64__DBG__
             /*디버그 모드에서만 보이도록 한다!*/
@@ -60,12 +68,15 @@ namespace CPU_Preference_Changer.UI.MainUI
         private void CB_FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, bool isHide, ref object usrParam)
         {
             LvMabiDataCollection lvItm = (LvMabiDataCollection)usrParam;
-            var newData = new LV_MabiProcessRowData(pName,
+
+             var newData = new LV_MabiProcessRowData(pName,
                                                 PID + "",
                                                 startTime,
                                                 coreState + "",
                                                 runPath);
-            newData.userParam = PID; //찾았던 프로세스 정보 보관해서 나중에 써먹기위함
+            LvRowParam param = new LvRowParam();
+            param.PID = PID; param.hReservedKillTask = null;
+            newData.userParam = param; //찾았던 프로세스 정보 보관해서 나중에 써먹기위함
             newData.isHide = isHide;
             lvItm.Add(newData);
         }
@@ -75,20 +86,15 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// </summary>
         private void initWindow()
         {
-            //lv 클릭 이벤트 등록
-            lvMabiProcess.setClickEvt(MabiLv_OnProcessNameClicked,
-                                      MabiLv_OnCoreClicked,
-                                      MabiLv_OnProcessNameRightClicked);
+            /*리스트 뷰 이벤트 클릭 리스너 등록...*/
+            lvMabiProcess.onProcessNameClick += MabiLv_OnProcessNameClicked;
+            lvMabiProcess.onCoreStateClick += MabiLv_OnCoreClicked;
+            //lvMabiProcess.onProcessNameRightClick += MabiLv_OnProcessNameRightClicked;
+            lvMabiProcess.onCbHideClicked += LvMabiProcess_onCbHideClicked;
+            lvMabiProcess.onCbRkClicked += LvMabiProcess_onCbRkClicked;
 
             this.tb_CpuName.Text = SystemInfo.GetCpuName();
             this.tb_CpuCoreCnt.Text = SystemInfo.GetCpuCoreCntStr();
-            /*
-             * 별도 타이머에서 작업하게되어 필요없어짐.
-            LvMabiDataCollection lvItm = new LvMabiDataCollection();
-            object param = lvItm; 함수인자에서 바로 object로 캐스팅하면 에러 발생한다.
-            MabiProcess.getAllTargets(CB_FindMabiProcess, ref param);
-            lvMabiProcess.setDataSoure(lvItm);
-            */
         }
 
         /// <summary>
@@ -216,8 +222,13 @@ namespace CPU_Preference_Changer.UI.MainUI
             }
             this.trayIcon = null;
 
+#if __OLD__CODE__
+    2021.06.11 by LT인척하는엘프; 백그라운드 Task 매니저를 구현하여 Task매니저거 관리하게 함
+            // dispose process killer
+            ProcessKillRunner.Instance.Stop();
+#else
             MMHGlobalInstance<MMHGlobal>.GetInstance().Release();
-
+#endif
             // real shutdown this process
             Application.Current.Shutdown();
         }
@@ -247,6 +258,22 @@ namespace CPU_Preference_Changer.UI.MainUI
         }
 
         /// <summary>
+        /// 리스트뷰에서 데이터가 지워지기 전, 초기화해야 할 내용이 있다면 초기화 하는 함수
+        /// </summary>
+        /// <param name="rmData"></param>
+        public void removeReservedInfo(LV_MabiProcessRowData rmData)
+        {
+            LvRowParam lp = (LvRowParam)rmData.userParam;
+            
+            if ( lp.hReservedKillTask != null) {
+                MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
+                BackgroundFreqTaskMgmt backTmgr = gInstance.backgroundFreqTaskManager;
+                backTmgr.removeFreqTask(lp.hReservedKillTask);
+            }
+        }
+
+
+        /// <summary>
         /// 프로세스 목록 다시 가져오기
         /// </summary>
         public void RefresMabiProcess()
@@ -255,10 +282,21 @@ namespace CPU_Preference_Changer.UI.MainUI
             lock (this.lockObj) {
                 // work thread invoke UI thread
                 UI_DispatchEvt(new Action(delegate {
+                    /*계속 할당받지말고,... 기존에 쓰던것을 활용하게 하다!*/
                     LvMabiDataCollection lvItm = new LvMabiDataCollection();
+
                     object param = lvItm; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
                     MabiProcess.getAllTargets(CB_FindMabiProcess, ref param);
-                    lvMabiProcess.setDataSoure(lvItm);
+
+                    /*by LT인척하는엘프 2021.06.13
+                     귀찮아서 무조건 Set하던것을.. 기존 아이템과 비교하여
+                     목록을 적절히 갱신시키게 함!*/
+                    var curList = lvMabiProcess.getLvItems();
+                    if (curList == null) {
+                        lvMabiProcess.setDataSoure(lvItm);
+                    } else {
+                        curList.updateDataCollection(lvItm, removeReservedInfo);
+                    }
                 }));
             }
         }

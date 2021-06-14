@@ -1,6 +1,8 @@
 ﻿using CPU_Preference_Changer.WinAPI_Wrapper;
+using Microsoft.Win32;
 using System;
 using System.Diagnostics;
+using System.Text;
 
 namespace CPU_Preference_Changer.Core
 {
@@ -15,28 +17,27 @@ namespace CPU_Preference_Changer.Core
         public static void getAllTargets(FindMabiProcess fnFindMabiProcess, ref object usrParam)
         {
             // 실행 프로세스 중 Client(마비노기 클라이언트 프로세스 이름) 가져오기
-            Process[] lst = Process.GetProcessesByName("Client");
-            //Process[] lst = Process.GetProcesses();
+            const string mabiClientName = "Client";
+            Process[] lst = Process.GetProcessesByName(mabiClientName);
+            string runFilePath = string.Format(@"{0}\{1}.exe",getMabinogiInstallPathFromReg(), mabiClientName);
             foreach (Process p in lst)
             {
                 using (p)
                 {
                     try
                     {
-                        // fixed 2021-06-14 : 숨김 처리 되었을때 MainWindowTitle가 ""으로 설정되네요
-
-                        /*창 이름이 "마비노기"인 것 찾는다*/
-                        //if (string.Compare(p.MainWindowTitle, "마비노기") == 0)
-                        //{
+                        /*마비노기 폴더에서 실행 된 client.exe라면 마비노기다.
+                          toupper를 이용 대문자로 바꿔서 비교한다...*/
+                        if( string.Compare(p.MainModule.FileName.ToUpper(), runFilePath.ToUpper()) == 0) {
                             /*콜백함수 실행*/
                             fnFindMabiProcess(p.ProcessName,
-                                              p.Id,
-                                              p.StartTime.ToString(),
-                                              p.ProcessorAffinity,
-                                              p.MainModule.FileName,
-                                              p.MainWindowHandle == IntPtr.Zero ? true : false,
-                                              ref usrParam);
-                        //}
+                                      p.Id,
+                                      p.StartTime.ToString(),
+                                      p.ProcessorAffinity,
+                                      p.MainModule.FileName,
+                                      p.MainWindowHandle == IntPtr.Zero ? true : false,
+                                      ref usrParam);
+                        }
                     }
                     catch
                     {
@@ -132,38 +133,10 @@ namespace CPU_Preference_Changer.Core
                     if (p.MainWindowHandle != IntPtr.Zero)
                         windowHandle = p.MainWindowHandle;
                     else
-                    {
-                        int getPid;
-
-
-                        /*
-                         출처 : http://www.borlandforum.com/impboard/impboard.dll?action=read&db=bcb_tip&no=895
-                        */
-
-                        // get root window handle
-                        windowHandle = WinAPI.FindWindow(null, null);
-                        while (windowHandle != IntPtr.Zero)
-                        {
-                            // check this is parents window
-                            if (WinAPI.GetParent(windowHandle) == IntPtr.Zero)
-                            {
-                                // get pid
-                                WinAPI.GetWindowThreadProcessId(windowHandle, out getPid);
-                                
-                                // check pid
-                                if (pid == getPid)
-                                    break;
-                            }
-                            
-                            // get next window
-                            windowHandle = WinAPI.GetWindow(windowHandle, GetWindowCmd.GW_HWNDNEXT);
-                        }
-                    }
-
+                        windowHandle = WinAPI.FindWindow(p.ProcessName, null); // find from process name
+                    
                     // default show window as show and no activate window
-                    result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
-                    if (!result)
-                        result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
+                    result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOWNOACTIVATE);
                     if (result)
                         WinAPI.SetForegroundWindow(windowHandle);
                 }
@@ -188,7 +161,7 @@ namespace CPU_Preference_Changer.Core
             {
                 try
                 {
-                    WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_MINIMIZE);
+                    WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_FORCEMINIMIZE);
                     result = true;
                 }
                 catch
@@ -201,7 +174,6 @@ namespace CPU_Preference_Changer.Core
 
         /// <summary>
         /// pid를 이용해 해당 프로세스를 숨기기 (작업 표시줄에서 사라짐)
-        /// 마비노기를 이걸로 숨기면 복원이 안되는 현상 발생
         /// </summary>
         /// <param name="pid"></param>
         /// <returns></returns>
@@ -220,6 +192,64 @@ namespace CPU_Preference_Changer.Core
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// 마비노기가 설치되어있다면 컴퓨터마다 REG값이 등록되어있을것이다. 그 값을 읽어온다.
+        /// </summary>
+        /// <returns></returns>
+        public static string getMabinogiInstallPathFromReg()
+        {
+            using (var HKCU = Registry.CurrentUser) {
+                using (var mabiRegKey = HKCU.OpenSubKey(@"SOFTWARE\Nexon\Mabinogi")) {
+                    return mabiRegKey.GetValue("ExecutablePath").ToString();
+                }
+            }
+        }
+
+        /// <summary>
+        /// EnumWindows에 들어 갈 콜백함수
+        /// </summary>
+        /// <param name="hwnd">현재 ENUM중인 핸들 값</param>
+        /// <param name="lParam">유저 Param</param>
+        /// <returns></returns>
+        private static bool CB_FindTargetHwndFromPID(IntPtr hwnd, int lParam)
+        {
+            uint curPID;
+
+            /* HWND를 통해 이 HWND가 어느 PID에 소속되어있는지 PID값을 얻어낸다. */
+            WinAPI.GetWindowThreadProcessId(hwnd, out curPID);
+            if (curPID == (uint)lParam) {
+                /*PID가 동일한 대상을 찾았다.*/
+                StringBuilder sb=new StringBuilder();
+                WinAPI.GetWindowText(hwnd, sb, 256);
+                /*
+                 * return false를 제거하고 ( 항상 return true;처리 )
+                 * pParam이 지정한 모든 윈도우 핸들을 SW_SHOW 시켜보면
+                 * 마비노기 창 이외에도, 플레이오네 출력창, 디버그용 출력창 등
+                 * 여러가지 창들이 활성화된다...
+                 * 
+                 * (하나의 프로세스안에 여러 윈도우(컨트롤 말고 창)가 있어서 여러 핸들이 존재하는 경우임!)
+                 * 
+                 * 마비노기 창만 관심있으므로 마비노기가 아니면 암것도 안하고
+                 * 마비노기 라면 SHOW처리하고 중단한다...
+                 * 그런데 테스트 결과 보통은 Enum첫번째 들어오자마자 만나는 윈도우 한들이 마비노기 창이다.
+                 * Debug.WriteLine("WINDOW TITLE = [" + sb.ToString() + "]");*/
+                if( sb.ToString().Equals("마비노기")) {
+                    WinAPI.ShowWindow(hwnd, SwindOp.SW_SHOW);
+                    return false; /*ENUM중단.*/
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 주어진 PID를 통해 숨겨졌던 창을 다시 활성화 시킨다..
+        /// </summary>
+        /// <param name="pid"></param>
+        public static void UnSetHideWindow(int pid)
+        {
+            WinAPI.EnumWindows(CB_FindTargetHwndFromPID, pid);
         }
     }
 }
