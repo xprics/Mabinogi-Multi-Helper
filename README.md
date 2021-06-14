@@ -23,6 +23,8 @@ Build : Visual Studio 2019
 ## Change Log
 
 ```Text
+2021-06-15
+    - fixed get background process window handle (refer : <http://www.borlandforum.com/impboard/impboard.dll?action=read&db=bcb_tip&no=895>)
 2021-06-14
     - SetHideWindow has problems
 2021-06-11

@@ -132,10 +132,38 @@ namespace CPU_Preference_Changer.Core
                     if (p.MainWindowHandle != IntPtr.Zero)
                         windowHandle = p.MainWindowHandle;
                     else
-                        windowHandle = WinAPI.FindWindow(p.ProcessName, null); // find from process name
-                    
+                    {
+                        int getPid;
+
+
+                        /*
+                         출처 : http://www.borlandforum.com/impboard/impboard.dll?action=read&db=bcb_tip&no=895
+                        */
+
+                        // get root window handle
+                        windowHandle = WinAPI.FindWindow(null, null);
+                        while (windowHandle != IntPtr.Zero)
+                        {
+                            // check this is parents window
+                            if (WinAPI.GetParent(windowHandle) == IntPtr.Zero)
+                            {
+                                // get pid
+                                WinAPI.GetWindowThreadProcessId(windowHandle, out getPid);
+                                
+                                // check pid
+                                if (pid == getPid)
+                                    break;
+                            }
+                            
+                            // get next window
+                            windowHandle = WinAPI.GetWindow(windowHandle, GetWindowCmd.GW_HWNDNEXT);
+                        }
+                    }
+
                     // default show window as show and no activate window
-                    result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOWNORMAL);
+                    result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
+                    if (!result)
+                        result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
                     if (result)
                         WinAPI.SetForegroundWindow(windowHandle);
                 }
