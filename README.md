@@ -19,6 +19,9 @@ Build : Visual Studio 2019
 
 .Net Framework : 4.0
 ```
+## TODO
+  - 예약종료 된 후 화면에 출력중인 프로세스 목록을 즉시 갱신하기 (운 나쁘면 종료 후 최대 5초 뒤 반영 됨)
+
 
 ## Change Log
 
