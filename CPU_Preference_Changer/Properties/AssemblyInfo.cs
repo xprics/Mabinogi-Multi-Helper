@@ -6,11 +6,11 @@ using System.Windows;
 // 어셈블리에 대한 일반 정보는 다음 특성 집합을 통해 
 // 제어됩니다. 어셈블리와 관련된 정보를 수정하려면
 // 이러한 특성 값을 변경하세요.
-[assembly: AssemblyTitle("CPU_Preference_Changer")]
-[assembly: AssemblyDescription("마비노기 클라이언트를 CPU 분배로 다클라 성능 향상")]
+[assembly: AssemblyTitle("MMH - Mabinogi Multi Helper")]
+[assembly: AssemblyDescription("마비노기 다클라 도우미")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CPU_Preference_Changer")]
+[assembly: AssemblyProduct("MMH - Mabinogi Multi Helper")]
 [assembly: AssemblyCopyright("Copyright © 2021. LT인척하는엘프. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

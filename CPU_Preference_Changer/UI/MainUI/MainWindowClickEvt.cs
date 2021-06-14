@@ -1,10 +1,11 @@
-﻿using CPU_Preference_Changer.Core;
+﻿using CPU_Preference_Changer.BackgroundTask;
+using CPU_Preference_Changer.Core;
+using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
+using CPU_Preference_Changer.Core.SingleTonTemplate;
 using CPU_Preference_Changer.MabiProcessListView;
 using CPU_Preference_Changer.UI.InfoForm;
+using CPU_Preference_Changer.UI.OptionForm;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 /// <summary>
@@ -38,10 +39,9 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 } else {
                     val = MabiProcess.GetMinAffinityVal();
                 }
-                MabiProcess.setTargetCoreState((int)x.userParam, val);
+                MabiProcess.setTargetCoreState(((LvRowParam)x.userParam).PID, val);
                 x.coreState = val + "";
             }
-            lvMabiProcess.setDataSoure(lst);
             showMessage("설정 완료");
         }
 
@@ -56,7 +56,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
             var lst = lvMabiProcess.getLvItems();
             IntPtr resetVal = MabiProcess.GetMaxAffinityVal();
             foreach (var x in lst) {
-                MabiProcess.setTargetCoreState((int)x.userParam, resetVal);
+                MabiProcess.setTargetCoreState(((LvRowParam)x.userParam).PID, resetVal);
                 x.coreState = resetVal + "";
             }
             showMessage("설정 완료");
@@ -69,7 +69,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
         private void MabiLv_OnProcessNameClicked(LV_MabiProcessRowData rowData)
         {
             /*이 프로세스를 가장 앞으로 옮긴다!*/
-            if (MabiProcess.SetActivityWindow((int)rowData.userParam))
+            if (MabiProcess.SetActivityWindow(((LvRowParam)rowData.userParam).PID))
                 rowData.isHide = false;
 
             //MabiProcess.ShowWindow(p.MainWindowHandle, MabiProcess.WindowState.SW_SHOWNORMAL);
@@ -99,7 +99,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
             //확인을 누른 경우 해당 Process에 대하여 유저가 설정한 값으로 설정한다!
             if (System.Windows.Forms.DialogResult.OK == selForm.ShowDialog()) {
                 IntPtr newVal = selForm.GetDlgResultValue();
-                MabiProcess.setTargetCoreState((int)rowData.userParam, newVal);
+                MabiProcess.setTargetCoreState(((LvRowParam)rowData.userParam).PID, newVal);
                 rowData.coreState = newVal + "";
                 showMessage("설정 완료");
             }
@@ -116,7 +116,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
 
             // hide window
             rowData.isHide = true;
-            MabiProcess.SetHideWindow((int)rowData.userParam);
+            MabiProcess.SetHideWindow(((LvRowParam)rowData.userParam).PID);
         }
 
         /// <summary>
@@ -152,6 +152,85 @@ namespace CPU_Preference_Changer.UI.MainUI {
         {
             /*TODO : 1)시스템 예약 종료시간을 입력받고, 예약종료 걸어두기.
                      2)만약 이미 예약종료를 걸어두었다면?? 취소할 수 있게 취소 걸어두기 */
+            TimeSelectForm tsf = new TimeSelectForm("시스템 종료 시간을 선택하세요?");
+            tsf.ShowDialog();
+            if (tsf.DialogResult == System.Windows.Forms.DialogResult.OK) {
+                /* shutdown -f -t 1000같은 명령어를 사용하면 편하지만..
+                 1) 이 프로그램이 종료된 이후 유저가 예약 종료 사실을 잊어버리거나,
+                 2) 프로그램을 종료하고 다시 켠 후 예약 종료를 취소하고 싶을 때
+                두가지 경우에서 좀 프로그램에서 구현할게 많아진다.
+                
+                 따라서 아래와 같은 조건에서 시스템을 종료하게 한다.
+                1) 프로그램은 계속 실행되고 있어야 한다
+                    (예약종료 걸면 종료 불가능하게 하고 강제로 트레이로 보내던가)
+                2) Shutdown의 -t옵션을 쓴 예약이 아닌, 프로그램에서 시간을 확인하다가
+                   해당시간 5분전이 되면 5분 후 시스템이 종료된다는 창을 보여줘서
+                   해당 창에서 5분동안 응답이 없다면 그때가서 실제로 종료하게 한다!*/
+                MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
+                var task = gInstance.shutdownTask;
+                task.modiSysShutdownTime(tsf.selTime);
+
+                if (gInstance.sysShutdownTaskHandle==null) {
+                    /*최초로 종료 예약한 경우 Task매니저에 등록해둔다...*/
+                    var taskMgr = gInstance.backgroundFreqTaskManager;
+                    gInstance.sysShutdownTaskHandle = taskMgr.addFreqTask(task);
+                }
+
+                /*윈도우 Notify 이용하여 알려줌..
+                   => 윈도우7은 안되니까 메세지 박스로 간단하게 한다.*/
+                MessageBox.Show(string.Format("컴퓨터가 [{0}]에 자동 종료 될 예정입니다.",tsf.selTime.ToString("yyyy-MM-dd HH시 mm분")),"안내");
+            }
         }
+
+        /// <summary>
+        /// 리스트 뷰의 예약종료 체크박스 클릭했을 때..
+        /// </summary>
+        /// <param name="rowData"></param>
+        private void LvMabiProcess_onCbRkClicked(LV_MabiProcessRowData rowData)
+        {
+            TimeSelectForm tsf = new TimeSelectForm("종료할 시간을 선택하세요??");
+            MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
+            BackgroundFreqTaskMgmt backTmgr = gInstance.backgroundFreqTaskManager;
+            MabiClientKillTask killTask;
+            LvRowParam rowParam = (LvRowParam)(rowData.userParam);
+
+            if (rowData.isKillReserved == false) {
+                /*예약 종료 취소해야함*/
+                gInstance.backgroundFreqTaskManager.removeFreqTask(((LvRowParam)(rowData.userParam)).hReservedKillTask);
+                rowParam.hReservedKillTask = null;
+                return;
+            }
+
+            tsf.ShowDialog();
+            if (tsf.DialogResult == System.Windows.Forms.DialogResult.OK) {
+                /* PID<->예약시간 쌍으로 맞아야한다! 
+                   => 프로세스 목록 갱신 후 사라지거나 하면 예약종료도 자동 취소해야하니까...*/
+                killTask = new MabiClientKillTask(rowParam.PID,tsf.selTime);
+                rowParam.hReservedKillTask = backTmgr.addFreqTask(killTask);
+
+                rowData.reservedKillTime = tsf.selTime.ToString();
+                /*윈도우 Notify 이용하여 알려줌..
+                   => 윈도우7은 안되니까 메세지 박스로 간단하게 한다.*/
+                return;
+            }
+            /*유저가 취소했으니 체크박스도 다시 해제한다.*/
+            rowData.isKillReserved = false;
+        }
+
+        /// <summary>
+        /// 리스트 뷰의 숨기기 버튼 클릭했을 때..,..
+        /// </summary>
+        /// <param name="rowData"></param>
+        private void LvMabiProcess_onCbHideClicked(LV_MabiProcessRowData rowData)
+        {
+            if (rowData.isHide) {
+                /*보여진 것을 숨겨야하는 케이스*/
+                MabiProcess.SetHideWindow(((LvRowParam)rowData.userParam).PID);
+            } else {
+                /*숨겨진 것을 보이게 만드는 케이스*/
+                MabiProcess.UnSetHideWindow(((LvRowParam)rowData.userParam).PID);
+            }
+        }
+
     }
 }

@@ -99,25 +99,30 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BackgroundTask\MabiClientKillTask.cs" />
     <Compile Include="Core\BackgroundFreqTaskManager\BackgroundFreqTaskMgmt.cs" />
     <Compile Include="Core\BackgroundFreqTaskManager\IBackgroundFreqTask.cs" />
     <Compile Include="Core\MMHGlobal.cs" />
     <Compile Include="Core\SingleTonTemplate\MMHGlobalInstance.cs" />
     <Compile Include="Core\SystemProcess.cs" />
+    <Compile Include="BackgroundTask\SystemShutdownTask.cs" />
     <Compile Include="UI\InfoForm\ProgramInfo.xaml.cs">
       <DependentUpon>ProgramInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\MainUI\LvRowParam.cs" />
     <Compile Include="UI\MainUI\MainWindowClickEvt.cs" />
-    <Compile Include="UI\MainUI\ProcessListRefreshTask.cs" />
+    <Compile Include="BackgroundTask\ProcessListRefreshTask.cs" />
     <Compile Include="UI\OptionForm\CloseAskForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -133,6 +138,15 @@
     <Compile Include="Core\MabiProcess.cs" />
     <Compile Include="Core\SystemInfo.cs" />
     <Compile Include="UI\MainUI\TimerMainWindow.cs" />
+    <Compile Include="UI\OptionForm\SysShutdownAskForm.xaml.cs">
+      <DependentUpon>SysShutdownAskForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OptionForm\TimeSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\OptionForm\TimeSelectForm.Designer.cs">
+      <DependentUpon>TimeSelectForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="WinAPI\WinAPI.cs" />
     <Page Include="MabiProcessListView\LV_MabiProcess.xaml">
       <SubType>Designer</SubType>
@@ -158,6 +172,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\OptionForm\SysShutdownAskForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -182,6 +200,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\OptionForm\TimeSelectForm.resx">
+      <DependentUpon>TimeSelectForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">

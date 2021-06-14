@@ -1,6 +1,7 @@
 ﻿using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
+using CPU_Preference_Changer.UI.MainUI;
 
-namespace CPU_Preference_Changer.UI.MainUI {
+namespace CPU_Preference_Changer.BackgroundTask {
     /// <summary>
     /// by LT인척하는엘프
     /// 프로세스 갱신 작업 클래스...
@@ -43,7 +44,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
         /// (주기 : 함수 실행 주기 1초, 5회 => 5초마다 갱신)
         /// </summary>
         /// <param name="param"></param>
-        public void runFreqWork(object param)
+        public bool runFreqWork(HBFT hTask, object param)
         {
             if (runCount <= 0) {
                 //실제로 5회 실행된 후 목록 갱신
@@ -56,6 +57,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 mainWindow.updateRefreshTimeLabelText(runCount.ToString() + "초 후 새로고침");
                 runCount--;
             }
+            return true;
         }
 
     }

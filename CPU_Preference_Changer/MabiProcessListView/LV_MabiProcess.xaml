@@ -1,4 +1,7 @@
-﻿<UserControl x:Class="CPU_Preference_Changer.MabiProcessListView.LV_MabiProcess"
+﻿
+    
+    
+<UserControl x:Class="CPU_Preference_Changer.MabiProcessListView.LV_MabiProcess"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,6 +9,172 @@
              xmlns:local="clr-namespace:CPU_Preference_Changer.MabiProcessListView"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    
+    <ListView 
+        x:Name="MabiProcessListView" 
+        VerticalContentAlignment="Stretch"
+        HorizontalContentAlignment="Stretch"
+        BorderBrush="Gray"
+        BorderThickness="1" 
+        SelectionMode="Single">
+
+        <ListView.ItemContainerStyle>
+            <Style TargetType="ListViewItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            </Style>
+        </ListView.ItemContainerStyle>
+
+        <ListView.View>
+            <GridView AllowsColumnReorder="False">
+                <GridViewColumn Header="" >
+                    <GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                            <!-- 마지막 데이터만 White컬러로 칠하고 나머지 행 데이터들은 적당한 색으로 출력하여 
+                                 행끼리 구분되도록 표시한다.-->
+                            <Border  BorderThickness="0 0 0 1"  BorderBrush="#99d9ea" Margin="0 -2 0 0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <!-- 더 커져서 뭘 꾸밀게 없으니.. Column width와 별도로 고정 크기로 그려지게
+                                         고의로 Fix시켜두었음! -->
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="390"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Margin값을 해당 Border단위로 부여하기위해... 보더로 감싸다! -->
+                                <Border
+                                    Grid.Column="0"
+                                    BorderThickness="0 0 1 0" 
+                                    Margin="0 5 0 5"
+                                    BorderBrush="#99d9ea">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <RadioButton 
+                                                Content="본캐"
+                                                FontWeight="Bold"
+                                                GroupName="radMainCharacter" 
+                                                Click="RadioButton_Click"
+                                                IsChecked="{Binding Path=bMainCharacter}"
+                                                Tag="{Binding Path=tbCoreStateIdxTag}"/>
+                                        <CheckBox Content="더미!" Visibility="Hidden" />
+                                        <CheckBox Content="숨김"
+                                                  MouseLeftButtonDown="cbHide_MouseLeftButtonDown"
+                                                  MouseLeftButtonUp="cbHide_MouseLeftButtonUp"
+                                                  MouseLeave="cbHide_MouseLeave" 
+                                                  Unchecked="cbHide_Unchecked"
+                                                  Checked="cbHide_Checked"
+                                                  IsChecked="{Binding Path=isHide}"
+                                                  Tag="{Binding Path=tbCoreStateIdxTag}"/>
+                                        <CheckBox Content="예약종료"
+                                                  MouseLeftButtonDown="cbRK_MouseLeftButtonDown"
+                                                  MouseLeftButtonUp="cbRK_MouseLeftButtonUp"
+                                                  MouseLeave="cbRK_MouseLeave" 
+                                                  Checked="cbRK_Checked"
+                                                  Unchecked="cbRK_Unchecked"
+                                                  IsChecked="{Binding Path=isKillReserved}"
+                                                  Tag="{Binding Path=tbCoreStateIdxTag}"
+                                                  />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border
+                                    Grid.Column="1"
+                                    BorderThickness="0 0 1 0"
+                                    Margin="0 5 0 5"
+                                    BorderBrush="#99d9ea">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <Label Content="프로세스" FontWeight="Bold"/>
+                                            <!-- 프로세스 명, PID값을 수평으로 출력하기 위한 Panel -->
+                                            <StackPanel Orientation="Horizontal" Margin="10 -5 0 0">
+                                                <!-- 프로세스 명 출력 -->
+                                                <TextBlock 
+                                                        Foreground="#00a2e8" 
+                                                        TextDecorations="Underline"
+                                                        FontWeight="Bold"
+                                                        FontSize="13" 
+                                                        Text="{Binding Path=processName}"
+                                                        MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
+                                                        MouseLeftButtonUp="TextBlock_MouseLeftButtonUp"
+                                                        MouseLeave="TextBlock_MouseLeave"
+                                                        Tag="{Binding Path=tbCoreStateIdxTag}"/>
+                                                <!-- PID출력 -->
+                                                <TextBlock Foreground="Black" 
+                                                        Margin="10 0 0 0"
+                                                        FontSize="13" 
+                                                        Text="{Binding Path=processID}"/>
+                                            </StackPanel>
+
+                                            <Label Content="코어상태" FontWeight="Bold"/>
+                                            <!-- 혹시모를 미래를 위해 미리 패널로 감싸둔다.. -->
+                                            <StackPanel Orientation="Horizontal" Margin="10 -5 0 0">
+                                                <TextBlock 
+                                                        x:Name="tbCoreState"
+                                                        TextDecorations="Underline"
+                                                        Foreground="#00a2e8" 
+                                                        FontSize="13" 
+                                                        Text="{Binding Path=coreState, Mode=OneWay}"
+                                                        MouseLeftButtonDown="tbCoreState_MouseLeftButtonDown"
+                                                        MouseLeftButtonUp="tbCoreState_MouseLeftButtonUp"
+                                                        MouseLeave="tbCoreState_MouseLeave"
+                                                        Tag="{Binding Path=tbCoreStateIdxTag}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1">
+                                            <Label Content="실행 시간" FontWeight="Bold"/>
+
+                                            <!-- 혹시모를 미래를 위해 미리 패널로 감싸둔다.. -->
+                                            <StackPanel Orientation="Horizontal" Margin="10 -5 0 0">
+                                                <TextBlock Foreground="Black" 
+                                                        FontSize="13" 
+                                                        Text="{Binding Path=startTime}"
+                                                        HorizontalAlignment="Center"
+                                                        TextAlignment="Center"/>
+                                            </StackPanel>
+
+                                            <Label Content="예약 종료" FontWeight="Bold" />
+                                            <!-- 혹시모를 미래를 위해 미리 패널로 감싸둔다.. -->
+                                            <StackPanel Orientation="Horizontal" Margin="10 -5 0 0">
+                                                <TextBlock Foreground="Black"
+                                                                   FontSize="13"
+                                                                   Text="{Binding Path=reservedKillTime, Mode=OneWay}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Border 
+                                    Grid.Column="2"
+                                    Margin="0 5 0 5">
+                                    <StackPanel>
+                                        <Label Content="TMI" FontWeight="Bold"/>
+                                        <!-- 혹시모를 미래를 위해 미리 패널로 감싸둔다.. -->
+                                        <StackPanel Orientation="Horizontal" Margin="10 -5 0 0">
+                                            <TextBlock 
+                                            FontSize="13" 
+                                            Text="{Binding Path=processFilePath}"
+                                            HorizontalAlignment="left"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                            </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+            </GridView>
+        </ListView.View>
+    </ListView>
+    
+    <!--
+    옛 UI버전...
     <ListView 
         x:Name="MabiProcessListView" 
         VerticalContentAlignment="Stretch"
@@ -114,4 +283,5 @@
             </GridView>
         </ListView.View>
     </ListView>
+    -->
 </UserControl>
