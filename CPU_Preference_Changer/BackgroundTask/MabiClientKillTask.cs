@@ -47,16 +47,20 @@ namespace CPU_Preference_Changer.BackgroundTask {
         /// </summary>
         private void killClientProcess()
         {
-            using (Process p = Process.GetProcessById(PID)) {
-                try {
-                    // kill process
-                    if (p != null)
-                        p.Kill();
-                } catch {
-                    // kill exception or access exception
-                    p.Dispose();
-                    killCLientProcess2();
+            try {
+                using (Process p = Process.GetProcessById(PID)) {
+                    try {
+                        // kill process
+                        if (p != null)
+                            p.Kill();
+                    } catch {
+                        // kill exception or access exception
+                        p.Dispose();
+                        killCLientProcess2();
+                    }
                 }
+            } catch {
+                //PID에 해당하는 프로세스 하필 이 순간에 사라져서 없을 경우 예외 발생
             }
         }
 
