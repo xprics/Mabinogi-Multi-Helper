@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace CPU_Preference_Changer.WinAPI_Wrapper {
 
@@ -69,5 +70,43 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         /// <returns></returns>
         [DllImport("kernel32.dll")]
         public static extern ulong GetTickCount64();
+
+
+        /// <summary>
+        /// EnumWindows에 사용 될 콜백 함수 정의
+        /// </summary>
+        /// <param name="hwnd">윈도우 핸들</param>
+        /// <param name="lParam">사용자 Param</param>
+        /// <returns></returns>
+        public delegate bool EnumWindowsProc(IntPtr hwnd, int lParam);
+
+        /// <summary>
+        /// 모든 윈도우를 순회하는 윈도우 API함수.
+        /// </summary>
+        /// <param name="lpEnumFunc"></param>
+        /// <param name="lParam"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, int lParam);
+
+        /// <summary>
+        /// 윈도우 핸들을 통해 PID값을 얻어오는 WIN32 API 함수
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="lpdwProcessId"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        /// <summary>
+        /// GetWindowText Win32 API
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="lpString"></param>
+        /// <param name="nMaxCount"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
     }
 }

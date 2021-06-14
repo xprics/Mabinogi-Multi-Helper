@@ -16,7 +16,13 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         /// <summary>
         /// 특정 주기가 되었을 때 실행 할 작업
         /// </summary>
-        void runFreqWork(object param);
+        /// <param name="taskHandle">TASK 핸들</param>
+        /// <param name="param">유저 파라메터</param>
+        /// <returns>
+        /// true : 계속 실행
+        /// false : 이제 그만 실행해도 됨 (반복 작업에서 제거)
+        /// </returns>
+        bool runFreqWork(HBFT taskHandle, object param);
 
     }
 }

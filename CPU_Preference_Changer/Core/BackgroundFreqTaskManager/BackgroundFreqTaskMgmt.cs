@@ -27,6 +27,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
     /// <summary>
     /// by LT인척하는엘프 2021.06.11
     /// 백그라운드에서 주기적으로 작업을 실행할 관리자 클래스
+    /// 10미리보다 짧은 주기로는 작동 불가능 함.
     /// </summary>
     class BackgroundFreqTaskMgmt {
         /// <summary>
@@ -52,6 +53,11 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
             /// 작업 실행중인지 아닌지 기록해둔다...
             /// </summary>
             public bool runState { get; set; }
+
+            /// <summary>
+            /// Task핸들 보관용도...
+            /// </summary>
+            public HBFT taskHandle { get; set; }
 
             public TaskInfo(IBackgroundFreqTask task,object param) { 
                 this.task = task; this.taskParam = param; this.lastRunTime = 0; 
@@ -89,11 +95,13 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                 return null;
             }
             /*-------------------------------------*/
-            taskDict.Add(taskID, new TaskInfo(task,param));
-            HBFT handle = new HBFT(taskID++);
+            var taskInfo = new TaskInfo(task, param);
+            taskInfo.taskHandle = new HBFT(taskID);
+            taskDict.Add(taskID, taskInfo);
             /*-------------------------------------*/
+            taskID++;
             dickLock.ReleaseMutex();
-            return handle;
+            return taskInfo.taskHandle;
         }
 
         /// <summary>
@@ -141,17 +149,24 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                     /*-------------------------------------------------------*/
                     /*여전히 저번에 실행 했던것이 실행중이라면 아무것도 안한다*/
                     if (curInfo.runState) continue;
+                    curInfo.runState = true;
                     /*-------------------------------------------------------*/
                     /*현재 시간과 비교하여 실행 주기를 초과하였다면 실행시킨다.*/
                     ulong curTime = WinAPI.GetTickCount64();
                     if (curTime >= (curInfo.lastRunTime + curTask.getFreqTick())) {
                         curInfo.lastRunTime = curTime;
                         /*이 작업이 오래걸리면 다른 작업들도 지연되기때문에 Thread로 실행한다...*/
-                        new Thread(() => {
-                            curInfo.runState = true;
-                            curTask.runFreqWork(curInfo.taskParam);
+                        var th = new Thread(() =>
+                        {
+                            if(false==curTask.runFreqWork(curInfo.taskHandle, curInfo.taskParam)) {
+                                removeFreqTask(curInfo.taskHandle);
+                            }
                             curInfo.runState = false;
-                        }).Start();
+                        });
+                        th.SetApartmentState(ApartmentState.STA);
+                        th.Start();
+                    } else {
+                        curInfo.runState = false;
                     }
                 }
                 dickLock.ReleaseMutex();

@@ -35,6 +35,11 @@ namespace CPU_Preference_Changer.Core
         {
             System.Diagnostics.Process.Start("shutdown.exe", "-s -f -t " + seconds);
         }
+
+        public static void ShutdownNow()
+        {
+            System.Diagnostics.Process.Start("shutdown.exe", "-s -f");
+        }
     }
 
     public class ProcessKillRunner
