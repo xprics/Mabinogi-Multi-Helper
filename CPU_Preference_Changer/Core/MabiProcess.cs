@@ -133,10 +133,25 @@ namespace CPU_Preference_Changer.Core
                     if (p.MainWindowHandle != IntPtr.Zero)
                         windowHandle = p.MainWindowHandle;
                     else
-                        windowHandle = WinAPI.FindWindow(p.ProcessName, null); // find from process name
-                    
+                    {
+                        // get root window
+                        windowHandle = WinAPI.FindWindow(null, null);
+                        while(windowHandle != IntPtr.Zero)
+                        {
+                            if (WinAPI.GetParent(windowHandle) == IntPtr.Zero)
+                            {
+                                WinAPI.GetWindowThreadProcessId(windowHandle, out uint getPid);
+                                if (getPid == pid)
+                                    break;
+                            }
+                            windowHandle = WinAPI.GetWindow(windowHandle, GetWindowCmd.GW_HWNDNEXT);
+                        }
+                    }
+                        
                     // default show window as show and no activate window
-                    result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOWNOACTIVATE);
+                    result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
+                    if (!result)
+                        result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
                     if (result)
                         WinAPI.SetForegroundWindow(windowHandle);
                 }
@@ -161,7 +176,7 @@ namespace CPU_Preference_Changer.Core
             {
                 try
                 {
-                    WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_FORCEMINIMIZE);
+                    WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_MINIMIZE);
                     result = true;
                 }
                 catch

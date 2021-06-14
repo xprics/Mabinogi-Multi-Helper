@@ -85,15 +85,6 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCmd wCmd);
 
         /// <summary>
-        /// hWnd의 pid 획득
-        /// </summary>
-        /// <param name="hWnd"></param>
-        /// <param name="pid"></param>
-        /// <returns></returns>
-        [DllImport("user32.dll", EntryPoint = "GetWindowThreadProcessId")]
-        public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int pid);
-
-        /// <summary>
         /// Win32 API SetForegroundWindow 선언,, 이걸로해보고 잘안되면 ShowWindow를 써보던가 한다...
         /// </summary>
         /// <param name="hWnd"></param>
@@ -102,7 +93,7 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         /// <summary>
-        /// Win32 API ShowWindow, 최소화된 프로그램을 강제로 깨우는 함수
+        /// Win32 API ShowWindow
         /// </summary>
         /// <param name="hwnd"></param>
         /// <param name="nCmdShow"></param>
