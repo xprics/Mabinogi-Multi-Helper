@@ -222,8 +222,6 @@ namespace CPU_Preference_Changer.UI.MainUI
             }
             this.trayIcon = null;
 
-            // dispose refresh process list
-            this.CloseRefreshTimer();
 #if __OLD__CODE__
     2021.06.11 by LT인척하는엘프; 백그라운드 Task 매니저를 구현하여 Task매니저거 관리하게 함
             // dispose process killer
