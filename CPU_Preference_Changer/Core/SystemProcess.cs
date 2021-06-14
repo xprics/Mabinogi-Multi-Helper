@@ -1,4 +1,8 @@
-﻿namespace CPU_Preference_Changer.Core
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace CPU_Preference_Changer.Core
 {
     /// <summary>
     /// System Process class

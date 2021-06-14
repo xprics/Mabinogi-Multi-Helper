@@ -72,9 +72,6 @@ namespace CPU_Preference_Changer.UI.MainUI {
             if (MabiProcess.SetActivityWindow(((LvRowParam)rowData.userParam).PID))
                 rowData.isHide = false;
 
-            //MabiProcess.ShowWindow(p.MainWindowHandle, MabiProcess.WindowState.SW_SHOWNORMAL);
-            //MabiProcess.SetForegroundWindow(p.MainWindowHandle);
-
             /*딜레이 없이하면 자기자신(이 프로그램)만 활성화 됨
              * 문제는 PC마다 딜레이 시간이 다를 수 있고,, 알트탭으로 하면 더빨리
              * 작업가능해서 필요없을수있다. 그냥 막음.
@@ -103,20 +100,6 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 rowData.coreState = newVal + "";
                 showMessage("설정 완료");
             }
-        }
-
-        /// <summary>
-        /// 리스트 뷰에서 프로세스 이름을 오른쪽 클릭 했을 때
-        /// </summary>
-        /// <param name="rowData"></param>
-        private void MabiLv_OnProcessNameRightClicked(LV_MabiProcessRowData rowData)
-        {
-            // minimize window
-            //MabiProcess.SetMinimizeWindow((int)rowData.userParam);
-
-            // hide window
-            rowData.isHide = true;
-            MabiProcess.SetHideWindow(((LvRowParam)rowData.userParam).PID);
         }
 
         /// <summary>

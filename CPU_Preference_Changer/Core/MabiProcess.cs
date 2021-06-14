@@ -136,7 +136,7 @@ namespace CPU_Preference_Changer.Core
                     {
                         // get root window
                         windowHandle = WinAPI.FindWindow(null, null);
-                        while(windowHandle != IntPtr.Zero)
+                        while (windowHandle != IntPtr.Zero)
                         {
                             if (WinAPI.GetParent(windowHandle) == IntPtr.Zero)
                             {
@@ -147,7 +147,7 @@ namespace CPU_Preference_Changer.Core
                             windowHandle = WinAPI.GetWindow(windowHandle, GetWindowCmd.GW_HWNDNEXT);
                         }
                     }
-                        
+
                     // default show window as show and no activate window
                     result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
                     if (!result)

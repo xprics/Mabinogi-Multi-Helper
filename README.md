@@ -35,12 +35,6 @@ Build : Visual Studio 2019
     - BackgroundTaskManager 버그 수정
 2021-06-11
     - add background task manager
-2021-06-10
-    - process hide
-    - process minimize
-2021-06-09
-    - shutdown computer class
-    - kill process class
 2021-06-08
     - add trayicon
     - set activity window

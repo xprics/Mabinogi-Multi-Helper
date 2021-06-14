@@ -17,7 +17,7 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         *  SW_RESTORE	 9	 원상태로 되돌립니다.
         *  SW_SHOWDEFAULT	 10	 -
         *  SW_FORCEMINIMIZE	 11	 최소화 합니다.
-    */
+        */
     public enum SwindOp : uint {
         SW_HIDE = 0
            , SW_SHOWNORMAL = 1
