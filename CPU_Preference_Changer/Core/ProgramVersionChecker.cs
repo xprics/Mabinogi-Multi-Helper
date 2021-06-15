@@ -112,7 +112,7 @@ namespace CPU_Preference_Changer.Core {
         /// </summary>
         static ProgramVersionChecker()
         {
-            currentVersion = "2021.06.09_REV_1.002";
+            currentVersion = "2021.06.15_REV_1.001";
         }
 
         /// <summary>
