@@ -33,18 +33,56 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
            , SW_FORCEMINIMIZE = 11
     };
 
+    /*
+    GW_HWNDFIRST 0   최상위 Window를 찾는다.
+    GW_HWNDLAST  1   최하위 Window를 찾는다.
+    GW_HWNDNEXT  2   하위 Window를 찾는다.
+    GW_HWNDPREV  3   상위 Window를 찾는다.
+    GW_OWNER     4   부모 Window를 찾는다.
+    GW_CHILD     5   자식 Window를 찾는다.
+    */
+    public enum GetWindowCmd : uint
+    {
+        GW_HWNDFIRST = 0,
+        GW_HWNDLAST = 1,
+        GW_HWNDNEXT = 2,
+        GW_HWNDPREV = 3,
+        GW_OWNER = 4,
+        GW_CHILD = 5,
+        GW_ENABLEDPOPUP = 6
+    }
+
     public class WinAPI {
 
         /// <summary>
         /// Win32 API Window process handler 가져오기.
         /// 첫 파라미터는 프로세스 이름(null으로 생략 가능), 두 번째 파라미터는 타이틀 이름(null으로 생략 가능).
-        /// 파라미터 2개 중 1개는 반드시 입력해주셔야 됩니다.
+        /// 두 파라미터 다 null을 입력할 경우 최상위 root window가 반환됩니다.
         /// </summary>
         /// <param name="strProcessName"></param>
         /// <param name="strWindowTitleName"></param>
         /// <returns></returns>
         [DllImport("User32", EntryPoint = "FindWindow")]
         public static extern IntPtr FindWindow(string strProcessName, string strWindowTitleName);
+
+        /// <summary>
+        /// 해당 window의 부모님 안부를 묻습니다.
+        /// 없으면(최상위 부모라면) IntPtr.Zero를 반환합니다.
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <returns></returns>
+        [DllImport("user32")]
+        public static extern IntPtr GetParent(IntPtr hWnd);
+
+        /// <summary>
+        /// 지정한 Window와의 관계 Window찾습니다.
+        /// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindow
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="wCmd"></param>
+        /// <returns></returns>
+        [DllImport("user32")]
+        public static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCmd wCmd);
 
         /// <summary>
         /// Win32 API SetForegroundWindow 선언,, 이걸로해보고 잘안되면 ShowWindow를 써보던가 한다...
@@ -55,14 +93,13 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         /// <summary>
-        /// Win32 API ShowWindow, 최소화된 프로그램을 강제로 깨우는 함수
+        /// Win32 API ShowWindow
         /// </summary>
         /// <param name="hwnd"></param>
         /// <param name="nCmdShow"></param>
         /// <returns></returns>
         [DllImport("user32")]
         public static extern bool ShowWindow(IntPtr hwnd, SwindOp nCmdShow);
-
 
         /// <summary>
         /// Win32 Api GetTickCount64  =-시간반환 (부팅 후 지금까지 밀리초단위로)

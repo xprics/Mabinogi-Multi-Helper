@@ -33,7 +33,6 @@ Build : Visual Studio 2019
     - 시스템 예약 종료 기능 추가
     - 소스코드 최적화
     - BackgroundTaskManager 버그 수정
-    
 2021-06-11
     - add background task manager
 2021-06-08

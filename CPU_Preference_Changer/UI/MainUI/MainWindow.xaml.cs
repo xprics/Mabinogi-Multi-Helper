@@ -32,19 +32,6 @@ namespace CPU_Preference_Changer.UI.MainUI
             // init trayicon
             initTrayIcon();
 
-            /*
-             * init timer (TimerMainWindow.cs)
-            initTimer();
-            2021.06.11 by LT인척하는엘프;
-                ==> 타이머를 이용하지 않고 백그라운드 Task 매니저를 이용하게 함
-            */
-
-            /*
-            ProcessKillRunner.Instance.Start(); //start process killer
-            2021.06.11 by LT인척하는엘프; 
-                ==>백그라운드 Task 매니저를 구현하여 Task매니저가 Task단위로 관리하게 함
-            */
-
             //백그라운드 Task Manager 시작
             BackgroundFreqTaskMgmt backMgmt = MMHGlobalInstance<MMHGlobal>.GetInstance().backgroundFreqTaskManager;
             backMgmt.startTaskManager();
@@ -89,7 +76,6 @@ namespace CPU_Preference_Changer.UI.MainUI
             /*리스트 뷰 이벤트 클릭 리스너 등록...*/
             lvMabiProcess.onProcessNameClick += MabiLv_OnProcessNameClicked;
             lvMabiProcess.onCoreStateClick += MabiLv_OnCoreClicked;
-            //lvMabiProcess.onProcessNameRightClick += MabiLv_OnProcessNameRightClicked;
             lvMabiProcess.onCbHideClicked += LvMabiProcess_onCbHideClicked;
             lvMabiProcess.onCbRkClicked += LvMabiProcess_onCbRkClicked;
 
@@ -222,13 +208,8 @@ namespace CPU_Preference_Changer.UI.MainUI
             }
             this.trayIcon = null;
 
-#if __OLD__CODE__
-    2021.06.11 by LT인척하는엘프; 백그라운드 Task 매니저를 구현하여 Task매니저거 관리하게 함
-            // dispose process killer
-            ProcessKillRunner.Instance.Stop();
-#else
             MMHGlobalInstance<MMHGlobal>.GetInstance().Release();
-#endif
+
             // real shutdown this process
             Application.Current.Shutdown();
         }
