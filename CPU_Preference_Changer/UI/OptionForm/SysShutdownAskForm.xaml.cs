@@ -39,6 +39,7 @@ namespace CPU_Preference_Changer.UI.OptionForm {
                 Thread.Sleep(1);
                 if (s.ElapsedMilliseconds >= (60 * 1000)) {
                     shutdownWindow();
+                    break;/*반복해서 종료명령 내리는것 방지*/
                 }
             }
         }
