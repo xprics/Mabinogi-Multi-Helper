@@ -15,20 +15,12 @@ namespace CPU_Preference_Changer.Core {
         public BackgroundFreqTaskMgmt backgroundFreqTaskManager = null;
 
         /// <summary>
-        /// 전역적으로 관리. 
-        /// 시스템 예약 종료 작업...
+        /// 예약 종료 ( 시스템 or 클라이언트 )  걸어둔 갯수..
         /// </summary>
-        public SystemShutdownTask shutdownTask { get; private set; }
-
-        /// <summary>
-        /// 시스템 예약종료 작업 핸들
-        /// </summary>
-        public HBFT sysShutdownTaskHandle { get; set; }
+        public int reservedTaskCount;
 
         public MMHGlobal()
         {
-            sysShutdownTaskHandle = null;
-            shutdownTask = new SystemShutdownTask(DateTime.Now);
             backgroundFreqTaskManager = new BackgroundFreqTaskMgmt();
         }
 

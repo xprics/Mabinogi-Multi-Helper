@@ -44,7 +44,7 @@ namespace CPU_Preference_Changer.UI.OptionForm {
             // 
             // dateTimePicker1
             // 
-            this.dateTimePicker1.CustomFormat = "yyyy-MM-dd HH시 mm분";
+            this.dateTimePicker1.CustomFormat = "yyyy년 MM월 dd일 HH시 mm분";
             this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateTimePicker1.Location = new System.Drawing.Point(26, 55);
             this.dateTimePicker1.MaxDate = new System.DateTime(2099, 1, 1, 0, 0, 0, 0);

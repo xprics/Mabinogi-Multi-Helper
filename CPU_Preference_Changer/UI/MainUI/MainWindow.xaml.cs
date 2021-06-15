@@ -163,7 +163,8 @@ namespace CPU_Preference_Changer.UI.MainUI
                     switch (askForm.getUsrSelect()) {
                         /*그냥 종료하기 누루면 바로 종료..*/
                         case CloseAskFormResult.eClose:
-                            CloseApplication();
+                            if (CloseApplication() == false)
+                                e.Cancel = true;
                             return;
                             break;/* return때문에 필요없지만 프로그래머를 위해 명시적으로 넣어 둠*/
 
@@ -200,8 +201,19 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// <summary>
         /// 찐탱 프로그램 종료하는 코드
         /// </summary>
-        private void CloseApplication()
+        private bool CloseApplication()
         {
+            var gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
+            if (gInstance.reservedTaskCount > 0) {
+                var ret = MessageBox.Show(string.Format("{0}\n{1}",
+                                                        "프로그램을 종료하면 예약 종료 작업이 실행되지 않습니다.\n",
+                                                        "그래도 종료하시겠습니까?")
+                                          ,"안내"
+                                          ,MessageBoxButton.YesNo
+                                          ,MessageBoxImage.Warning);
+                if (ret == MessageBoxResult.No) 
+                    return false;
+            }
             // dispose tray icon
             if (this.trayIcon != null)
             {
@@ -214,6 +226,7 @@ namespace CPU_Preference_Changer.UI.MainUI
 
             // real shutdown this process
             Application.Current.Shutdown();
+            return true;
         }
 
         private void UI_DispatchEvt(Delegate method, params object[] obj)
