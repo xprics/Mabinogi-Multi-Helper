@@ -1,7 +1,9 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Linq;
+using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace CPU_Preference_Changer.MabiProcessListView
 {
@@ -21,11 +23,13 @@ namespace CPU_Preference_Changer.MabiProcessListView
         public delegate void OnProcessNameRightCLick(LV_MabiProcessRowData rowData);
         public delegate void OnCbHideClicked(LV_MabiProcessRowData rowData);
         public delegate void OnCbRkClicked(LV_MabiProcessRowData rowData);
+        public delegate void OnLvClicked(object sender, RoutedEventArgs e);
 
         public event OnProcessNameClicked onProcessNameClick;
         public event OnPCoreStateClicked onCoreStateClick;
         public event OnCbRkClicked onCbRkClicked;
         public event OnCbHideClicked onCbHideClicked;
+        public event OnLvClicked onLvClicked;
 
         // process name right click
         public event OnProcessNameRightCLick onProcessNameRightClick;
@@ -35,6 +39,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
             InitializeComponent();
             this.onProcessNameClick = null;
             this.onCoreStateClick = null;
+            this.MabiProcessListView.Width = this.Width;
         }
 
         /// <summary>
@@ -155,6 +160,36 @@ namespace CPU_Preference_Changer.MabiProcessListView
             int rowIdx = lvItms.findItmIdxFromTagIndex(tagIdx);
             MabiProcessListView.SelectedItem = data;
             MabiProcessListView.SelectedIndex = rowIdx;
+        }
+
+        /// <summary>
+        /// 출력중인 내용을 프로세스 시작시간을 기준으로 정렬하기
+        /// </summary>
+        /// <param name="sortDirection"></param>
+        public void sortListData(ListSortDirection sortDirection)
+        {
+            if (lvItms == null) return;
+
+            List<LV_MabiProcessRowData> sortedList;
+
+            /* 메인캐릭터 찍어둔 정보가 맨위로 올라오게 1차 정렬한 후 
+               프로세스 시작 시간으로 2차 정렬 함.*/
+            switch (sortDirection) {
+                case ListSortDirection.Descending:
+                    sortedList = lvItms.OrderByDescending(x=>x.bMainCharacter).ThenByDescending(x => x.startTime ).ToList();
+                    break;
+                case ListSortDirection.Ascending:
+                    sortedList = lvItms.OrderByDescending(x => x.bMainCharacter).ThenBy(x => x.startTime).ToList();
+                    break;
+                default:
+                    return;
+            }
+
+            /* LIST로 나오기때문에 ObservableCollection으로 바로 덮어쓸 수 없다.
+              lvItms = sortedList 처럼..*/
+            foreach (var x in sortedList) {
+                lvItms.Move(lvItms.IndexOf(x), sortedList.IndexOf(x));
+            }
         }
 
         #region 프로세스명 클릭 이벤트 처리
@@ -300,6 +335,12 @@ namespace CPU_Preference_Changer.MabiProcessListView
         {
             if (onCbHideClicked != null)
                 onCbHideClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+        }
+
+        private void MabiProcessListView_Click(object sender, RoutedEventArgs e)
+        {
+            if (onLvClicked != null)
+                onLvClicked(sender, e);
         }
     }
 }

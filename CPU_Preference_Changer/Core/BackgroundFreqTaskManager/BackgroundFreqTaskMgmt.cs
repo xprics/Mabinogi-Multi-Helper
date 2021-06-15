@@ -118,7 +118,9 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         {
             if (hBFT == null) return;
             dickLock.WaitOne();
-            taskDict.Remove(hBFT.taskID);
+            try {
+                taskDict.Remove(hBFT.taskID);
+            } catch { }
             dickLock.ReleaseMutex();
         }
 
