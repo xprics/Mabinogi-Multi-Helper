@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading;
 
 namespace CPU_Preference_Changer.MabiProcessListView
 {
@@ -153,7 +154,34 @@ namespace CPU_Preference_Changer.MabiProcessListView
     /// </summary>
     public class LvMabiDataCollection : ObservableCollection<LV_MabiProcessRowData>
     {
+        /// <summary>
+        /// 리스트뷰 데이터를 여러 스레드에서 접근하여 읽어가기만 하면 괜찮은데
+        /// 어떤 경우 여러 스레드에서 Write를 시도할 수도 있어서 그럴 때 Lock을 걸기위함
+        /// </summary>
+        private Mutex dataMutex;
+
+        public LvMabiDataCollection()
+        {
+            dataMutex = new Mutex();
+        }
+
         int itmIdx = 0;
+
+        /// <summary>
+        /// 데이터 락 설정
+        /// </summary>
+        public void waitForSingleObject()
+        {
+            dataMutex.WaitOne();
+        }
+
+        /// <summary>
+        /// 데이터 락 해제
+        /// </summary>
+        public void ReleaseMutex()
+        {
+            dataMutex.ReleaseMutex();
+        }
 
         /// <summary>
         /// add함수 재정의,,, 자동으로 idx를 생성한 뒤 넣게한다!
@@ -165,6 +193,15 @@ namespace CPU_Preference_Changer.MabiProcessListView
             newData.tbCoreStateIdxTag = itmIdx + "";
             itmIdx++;
             base.Add(newData);
+        }
+
+        /// <summary>
+        /// 삭제함수 재정의...
+        /// </summary>
+        /// <param name="i"></param>
+        public new void RemoveAt(int i)
+        {
+            base.RemoveAt(i);
         }
 
         /// <summary>
@@ -187,14 +224,21 @@ namespace CPU_Preference_Changer.MabiProcessListView
             }
         }
 
-        public bool havePidData(int pid)
+        /// <summary>
+        /// 해당 PID값을 가지는 데이터가 있는지?
+        /// </summary>
+        /// <param name="pid"></param>
+        /// <returns></returns>
+        private bool havePidData(int pid)
         {
+            bool ret = false;
             foreach (var x in this.Items) {
                 if (  x.processID.Equals(pid + "") ) {
-                    return true;
+                    ret = true;
+                    break;
                 }
             }
-            return false;
+            return ret;
         }
 
         public delegate void beforeItmRemoved(LV_MabiProcessRowData removeData);
@@ -210,6 +254,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
                (아이템이 5개인데, 0번부터 돌다가 1번째를 삭제하고, idx2로 넘어가면??
                 최초 5개일 때 기준 4번째 데이터를 보게 될 것,...)*/
             int pid;
+
             for (int i = this.Items.Count-1; i >= 0; --i) {
                 if (int.TryParse(this.Items[i].processID, out pid)) {
                     if (newDataCollection.havePidData(pid) == false) {
@@ -241,12 +286,15 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// <returns></returns>
         public LV_MabiProcessRowData findItmFromTagIndex(int tagIdx)
         {
+            LV_MabiProcessRowData findData=null;
+
             foreach (var x in this.Items) {
                 if ( x.tbCoreStateIdxTag.Equals(tagIdx+"")) {
-                    return x;
+                    findData = x;
+                    break;
                 }
             }
-            return null;
+            return findData;
         }
 
         /// <summary>
@@ -256,12 +304,26 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// <returns></returns>
         public int findItmIdxFromTagIndex(int tagIdx)
         {
+            int retVal=-1;
+
             for ( int i = 0; i<this.Items.Count; ++i) {
                 if (this.Items[i].tbCoreStateIdxTag.Equals(tagIdx + "")) {
-                    return i;
+                    retVal= i;
+                    break;
                 }
             }
-            return -1;
+            return retVal;
+        }
+
+        /// <summary>
+        /// 모든 데이터를 순회한다
+        /// </summary>
+        /// <param name="enumCallBack"></param>
+        public void enumAllData(Action<LV_MabiProcessRowData> enumCallBack)
+        {
+            foreach(var x in this.Items) {
+                enumCallBack(x);
+            }
         }
     }
 }

@@ -16,7 +16,9 @@
         HorizontalContentAlignment="Stretch"
         BorderBrush="Gray"
         BorderThickness="1" 
-        SelectionMode="Single">
+        SelectionMode="Single"
+        GridViewColumnHeader.Click="MabiProcessListView_Click"
+        >
 
         <ListView.ItemContainerStyle>
             <Style TargetType="ListViewItem">

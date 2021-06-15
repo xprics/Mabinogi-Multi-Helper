@@ -6,7 +6,9 @@ using CPU_Preference_Changer.MabiProcessListView;
 using CPU_Preference_Changer.UI.InfoForm;
 using CPU_Preference_Changer.UI.OptionForm;
 using System;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 
 /// <summary>
 /// by LT인척하는엘프 2021.06.11 ; 
@@ -29,8 +31,9 @@ namespace CPU_Preference_Changer.UI.MainUI {
             /*본캐 체크된 것만... 최대한 코어 사용하게 하고 나머지는 하나로 몰아 넣는다!*/
             var lst = lvMabiProcess.getLvItems();
             IntPtr val = MabiProcess.GetMaxAffinityVal();
-            foreach (var x in lst) {
-                if (x.bMainCharacter) {
+            lst.enumAllData(curData =>
+            {
+                if (curData.bMainCharacter) {
                     ulong max, min;
                     max = (ulong)MabiProcess.GetMaxAffinityVal();
                     min = (ulong)MabiProcess.GetMinAffinityVal();
@@ -39,9 +42,9 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 } else {
                     val = MabiProcess.GetMinAffinityVal();
                 }
-                MabiProcess.setTargetCoreState(((LvRowParam)x.userParam).PID, val);
-                x.coreState = val + "";
-            }
+                MabiProcess.setTargetCoreState(((LvRowParam)curData.userParam).PID, val);
+                curData.coreState = val + "";
+            });
             showMessage("설정 완료");
         }
 
@@ -55,10 +58,11 @@ namespace CPU_Preference_Changer.UI.MainUI {
             /*모든 프로세스에 대하여 초기화 수행!*/
             var lst = lvMabiProcess.getLvItems();
             IntPtr resetVal = MabiProcess.GetMaxAffinityVal();
-            foreach (var x in lst) {
-                MabiProcess.setTargetCoreState(((LvRowParam)x.userParam).PID, resetVal);
-                x.coreState = resetVal + "";
-            }
+            lst.enumAllData(curData =>
+            {
+                MabiProcess.setTargetCoreState(((LvRowParam)curData.userParam).PID, resetVal);
+                curData.coreState = resetVal + "";
+            });
             showMessage("설정 완료");
         }
 
@@ -178,7 +182,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
 
                 /*윈도우 Notify 이용하여 알려줌..
                    => 윈도우7은 안되니까 메세지 박스로 간단하게 한다.*/
-                MessageBox.Show(string.Format("컴퓨터가 [{0}]에 자동 종료 될 예정입니다.",tsf.selTime.ToString("yyyy-MM-dd HH시 mm분")),"안내");
+                showMessage(string.Format("컴퓨터가 [{0}]에 자동 종료 될 예정입니다.", tsf.selTime.ToString("yyyy-MM-dd HH시 mm분")));
             }
         }
 
@@ -198,8 +202,19 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 /*예약 종료 취소해야함*/
                 gInstance.backgroundFreqTaskManager.removeFreqTask(((LvRowParam)(rowData.userParam)).hReservedKillTask);
                 rowParam.hReservedKillTask = null;
+                rowData.reservedKillTime = "None";
                 return;
             }
+
+            /* 클라이언트를 강제 종료시키는 것이기 때문에 
+               혹시라도 해당 클라이언트로 게임을 플레이 하던중이라면 
+               게임 내용이 저장되지 않아서 문제가 생길 수 있음을 화면에 출력하여 알려준다.*/
+
+            string warnMsg;
+            warnMsg = string.Format("{0}\n{1}",
+                                "이 기능은 클라이언트를 강제로 종료시킵니다.",
+                                "강제 종료로 인해 혹시라도 데이터가 서버에 저장되지 않을 수 있는 점 주의하시길 바랍니다.");
+            showMessage(warnMsg);
 
             tsf.ShowDialog();
             if (tsf.DialogResult == System.Windows.Forms.DialogResult.OK) {
@@ -229,6 +244,32 @@ namespace CPU_Preference_Changer.UI.MainUI {
             } else {
                 /*숨겨진 것을 보이게 만드는 케이스*/
                 MabiProcess.UnSetHideWindow(((LvRowParam)rowData.userParam).PID);
+            }
+        }
+
+
+        ListSortDirection sortDirection = ListSortDirection.Ascending;
+        /// <summary>
+        /// 리스트 뷰 클릭되었을 때...
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LvMabiProcess_onLvClicked(object sender, RoutedEventArgs e)
+        {
+            var headerClicked = e.OriginalSource as GridViewColumnHeader;
+
+            if (headerClicked != null) {
+                if (headerClicked.Role != GridViewColumnHeaderRole.Padding) {
+                    /*적절히 정렬수행함...*/
+                    lvMabiProcess.sortListData(sortDirection);
+
+                    /*다음 클릭 시 반대방향 정렬을 위해 미리 토글해둠*/
+                    if (sortDirection == ListSortDirection.Ascending) {
+                        sortDirection = ListSortDirection.Descending;
+                    } else {
+                        sortDirection = ListSortDirection.Ascending;
+                    }
+                }
             }
         }
 

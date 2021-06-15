@@ -89,14 +89,15 @@ namespace CPU_Preference_Changer.UI.MainUI
             /*리스트 뷰 이벤트 클릭 리스너 등록...*/
             lvMabiProcess.onProcessNameClick += MabiLv_OnProcessNameClicked;
             lvMabiProcess.onCoreStateClick += MabiLv_OnCoreClicked;
-            //lvMabiProcess.onProcessNameRightClick += MabiLv_OnProcessNameRightClicked;
             lvMabiProcess.onCbHideClicked += LvMabiProcess_onCbHideClicked;
             lvMabiProcess.onCbRkClicked += LvMabiProcess_onCbRkClicked;
+            lvMabiProcess.onLvClicked += LvMabiProcess_onLvClicked;
 
             this.tb_CpuName.Text = SystemInfo.GetCpuName();
             this.tb_CpuCoreCnt.Text = SystemInfo.GetCpuCoreCntStr();
         }
 
+        
         /// <summary>
         /// 메세지 박스 Show.
         /// </summary>
@@ -266,12 +267,12 @@ namespace CPU_Preference_Changer.UI.MainUI
             LvRowParam lp = (LvRowParam)rmData.userParam;
             
             if ( lp.hReservedKillTask != null) {
+                /*예약 종료를 걸어놨는데 사람이 수동으로 예약된 시간보다 먼저 종료한 경우 발생.*/
                 MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
                 BackgroundFreqTaskMgmt backTmgr = gInstance.backgroundFreqTaskManager;
                 backTmgr.removeFreqTask(lp.hReservedKillTask);
             }
         }
-
 
         /// <summary>
         /// 프로세스 목록 다시 가져오기
@@ -283,9 +284,9 @@ namespace CPU_Preference_Changer.UI.MainUI
                 // work thread invoke UI thread
                 UI_DispatchEvt(new Action(delegate {
                     /*계속 할당받지말고,... 기존에 쓰던것을 활용하게 하다!*/
-                    LvMabiDataCollection lvItm = new LvMabiDataCollection();
+                    LvMabiDataCollection newList = new LvMabiDataCollection();
 
-                    object param = lvItm; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
+                    object param = newList; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
                     MabiProcess.getAllTargets(CB_FindMabiProcess, ref param);
 
                     /*by LT인척하는엘프 2021.06.13
@@ -293,9 +294,9 @@ namespace CPU_Preference_Changer.UI.MainUI
                      목록을 적절히 갱신시키게 함!*/
                     var curList = lvMabiProcess.getLvItems();
                     if (curList == null) {
-                        lvMabiProcess.setDataSoure(lvItm);
+                        lvMabiProcess.setDataSoure(newList);
                     } else {
-                        curList.updateDataCollection(lvItm, removeReservedInfo);
+                        curList.updateDataCollection(newList, removeReservedInfo);
                     }
                 }));
             }
