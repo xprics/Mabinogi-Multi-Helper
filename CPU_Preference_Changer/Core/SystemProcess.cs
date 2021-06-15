@@ -36,9 +36,12 @@ namespace CPU_Preference_Changer.Core
             System.Diagnostics.Process.Start("shutdown.exe", "-s -f -t " + seconds);
         }
 
+        /// <summary>
+        /// 즉시 종료
+        /// </summary>
         public static void ShutdownNow()
         {
-            System.Diagnostics.Process.Start("shutdown.exe", "-s -f");
+            Shutdown(1);
         }
     }
 }
