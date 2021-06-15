@@ -6,9 +6,28 @@ using System.Text;
 
 namespace CPU_Preference_Changer.Core
 {
-    class MabiProcess
-    {
+    class MabiProcess {
         public delegate void FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, bool isHide, ref object usrParam);
+
+        private readonly static string mabiClientName ;
+        private readonly static string mabiRunFilePath;
+        static MabiProcess(){
+            mabiClientName = "client";
+            mabiRunFilePath = string.Format(@"{0}\{1}.exe", getMabinogiInstallPathFromReg(), mabiClientName);
+         }
+
+        /// <summary>
+        /// 마비노기 프로세스가 맞는지 아닌지 판단한다.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static bool isMabiProcess(Process p)
+        {
+            if (string.Compare(p.MainModule.FileName.ToUpper(), mabiRunFilePath.ToUpper()) == 0) {
+                return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// 마비노기로 추정되는 프로세스 목록 얻기
@@ -17,9 +36,7 @@ namespace CPU_Preference_Changer.Core
         public static void getAllTargets(FindMabiProcess fnFindMabiProcess, ref object usrParam)
         {
             // 실행 프로세스 중 Client(마비노기 클라이언트 프로세스 이름) 가져오기
-            const string mabiClientName = "Client";
             Process[] lst = Process.GetProcessesByName(mabiClientName);
-            string runFilePath = string.Format(@"{0}\{1}.exe",getMabinogiInstallPathFromReg(), mabiClientName);
             foreach (Process p in lst)
             {
                 using (p)
@@ -28,15 +45,15 @@ namespace CPU_Preference_Changer.Core
                     {
                         /*마비노기 폴더에서 실행 된 client.exe라면 마비노기다.
                           toupper를 이용 대문자로 바꿔서 비교한다...*/
-                        if( string.Compare(p.MainModule.FileName.ToUpper(), runFilePath.ToUpper()) == 0) {
+                        if(isMabiProcess(p)) {
                             /*콜백함수 실행*/
                             fnFindMabiProcess(p.ProcessName,
-                                      p.Id,
-                                      p.StartTime.ToString(),
-                                      p.ProcessorAffinity,
-                                      p.MainModule.FileName,
-                                      p.MainWindowHandle == IntPtr.Zero ? true : false,
-                                      ref usrParam);
+                                              p.Id,
+                                              p.StartTime.ToString(),
+                                              p.ProcessorAffinity,
+                                              p.MainModule.FileName,
+                                              p.MainWindowHandle == IntPtr.Zero ? true : false,
+                                              ref usrParam);
                         }
                     }
                     catch
@@ -134,7 +151,7 @@ namespace CPU_Preference_Changer.Core
                         windowHandle = p.MainWindowHandle;
                     else
                     {
-                        // get root window
+                        //get root window
                         windowHandle = WinAPI.FindWindow(null, null);
                         while (windowHandle != IntPtr.Zero)
                         {
