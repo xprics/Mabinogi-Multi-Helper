@@ -40,6 +40,14 @@ namespace CPU_Preference_Changer.BackgroundTask {
         }
 
         /// <summary>
+        /// task작업을 최대한 빨리 실행시키게 한다.
+        /// </summary>
+        public void taskRunAsPossibleAsFast()
+        {
+            runCount = 0;
+        }
+
+        /// <summary>
         /// 주기적으로 실행 되는 함수... 5번 실행 될 때 마다 목록을 갱신한다
         /// (주기 : 함수 실행 주기 1초, 5회 => 5초마다 갱신)
         /// </summary>

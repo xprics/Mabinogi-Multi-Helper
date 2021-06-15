@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Linq;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace CPU_Preference_Changer.MabiProcessListView
 {
@@ -34,12 +35,18 @@ namespace CPU_Preference_Changer.MabiProcessListView
         // process name right click
         public event OnProcessNameRightCLick onProcessNameRightClick;
 
+        /// <summary>
+        /// 리스트 뷰 출력중인 데이터의 스레드 동기화를 위해
+        /// </summary>
+        /// 
+        private Mutex lvDataMutex;
         public LV_MabiProcess()
         {
             InitializeComponent();
             this.onProcessNameClick = null;
             this.onCoreStateClick = null;
             this.MabiProcessListView.Width = this.Width;
+            lvDataMutex = new Mutex();
         }
 
         /// <summary>
@@ -172,6 +179,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
 
             List<LV_MabiProcessRowData> sortedList;
 
+            LvMabi_WaitSingleObject();
             /* 메인캐릭터 찍어둔 정보가 맨위로 올라오게 1차 정렬한 후 
                프로세스 시작 시간으로 2차 정렬 함.*/
             switch (sortDirection) {
@@ -190,6 +198,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
             foreach (var x in sortedList) {
                 lvItms.Move(lvItms.IndexOf(x), sortedList.IndexOf(x));
             }
+            LvMabi_ReleaseMutex();
         }
 
         #region 프로세스명 클릭 이벤트 처리
@@ -204,8 +213,11 @@ namespace CPU_Preference_Changer.MabiProcessListView
         {
             if (bProcessNameClick) {
                 /*이벤트 처리 콜백 함수 실행*/
-                if (onProcessNameClick != null)
+                if (onProcessNameClick != null) {
+                    LvMabi_WaitSingleObject();
                     onProcessNameClick(GetLvRowItmData(ctlTagStrToInt(sender)));
+                    LvMabi_ReleaseMutex();
+                }
                 bProcessNameClick = false;
             }
         }
@@ -232,8 +244,11 @@ namespace CPU_Preference_Changer.MabiProcessListView
         {
             if (bCoreStateMouseDown) {
                 /*이벤트 처리 콜백 함수 실행*/
-                if(onCoreStateClick!=null)
+                if (onCoreStateClick != null) {
+                    LvMabi_WaitSingleObject();
                     onCoreStateClick(GetLvRowItmData(ctlTagStrToInt(sender)));
+                    LvMabi_ReleaseMutex();
+                }
                 bCoreStateMouseDown = false;
             }
         }
@@ -258,89 +273,72 @@ namespace CPU_Preference_Changer.MabiProcessListView
             if (bProcessNameRightClick)
             {
                 /*이벤트 처리 콜백 함수 실행*/
-                if (this.onProcessNameRightClick != null)
-                    this.onProcessNameRightClick(GetLvRowItmData(ctlTagStrToInt(sender)));
+                if (onProcessNameRightClick != null) {
+                    LvMabi_WaitSingleObject();
+                    onProcessNameRightClick(GetLvRowItmData(ctlTagStrToInt(sender)));
+                    LvMabi_ReleaseMutex();
+                }
                 bProcessNameRightClick = false;
             }
         }
         #endregion
 
-        #region 숨김 클릭 이벤트 처리
-        private bool bCbHideClick = false;
-
-        private void cbHide_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            bCbHideClick = true;
-        }
-
-        private void cbHide_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (bCbHideClick) {
-                /*이벤트 처리 콜백 함수 실행*/
-                if (onCbHideClicked != null)
-                    onCbHideClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
-                bCbHideClick = false;
-            }
-        }
-
-        private void cbHide_MouseLeave(object sender, MouseEventArgs e)
-        {
-            if (bCbHideClick) bCbHideClick = false;
-        }
-        #endregion
-
-        #region 예약종료 체크박스 클릭 이벤트 처리
-        private bool bCbRkClick = false;
-
-        private void cbRK_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            bCbRkClick = true;
-        }
-
-        private void cbRK_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (bCbRkClick) {
-                /*이벤트 처리 콜백 함수 실행*/
-                if (onCbRkClicked != null)
-                    onCbRkClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
-                bCbRkClick = false;
-            }
-        }
-
-        private void cbRK_MouseLeave(object sender, MouseEventArgs e)
-        {
-            if (bCbRkClick) bCbRkClick = false;
-        }
-        #endregion
-
         private void cbRK_Checked(object sender, RoutedEventArgs e)
         {
+            LvMabi_WaitSingleObject();
             if (onCbRkClicked != null)
                 onCbRkClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+            LvMabi_ReleaseMutex();
         }
 
         private void cbRK_Unchecked(object sender, RoutedEventArgs e)
         {
+            LvMabi_WaitSingleObject();
             if (onCbRkClicked != null)
                 onCbRkClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+            LvMabi_ReleaseMutex();
         }
 
         private void cbHide_Checked(object sender, RoutedEventArgs e)
         {
+            LvMabi_WaitSingleObject();
             if (onCbHideClicked != null)
                 onCbHideClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+            LvMabi_ReleaseMutex();
         }
 
         private void cbHide_Unchecked(object sender, RoutedEventArgs e)
         {
+            LvMabi_WaitSingleObject();
             if (onCbHideClicked != null)
                 onCbHideClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+            LvMabi_ReleaseMutex();
         }
 
         private void MabiProcessListView_Click(object sender, RoutedEventArgs e)
         {
+            LvMabi_WaitSingleObject();
             if (onLvClicked != null)
                 onLvClicked(sender, e);
+            LvMabi_ReleaseMutex();
+        }
+
+        
+        
+        /// <summary>
+        /// 리스트뷰에 관리중인 데이터의 스레드 동기화를 위해 사용. (락 걸어두기)
+        /// </summary>
+        public void LvMabi_WaitSingleObject()
+        {
+            lvDataMutex.WaitOne();
+        }
+
+        /// <summary>
+        /// 리스트뷰에 관리중인 데이터의 스레드 동기화를 위해 사용. (락 해제)
+        /// </summary>
+        public void LvMabi_ReleaseMutex()
+        {
+            lvDataMutex.ReleaseMutex();
         }
     }
 }

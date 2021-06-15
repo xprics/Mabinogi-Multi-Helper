@@ -60,17 +60,11 @@
                                                 Tag="{Binding Path=tbCoreStateIdxTag}"/>
                                         <CheckBox Content="더미!" Visibility="Hidden" />
                                         <CheckBox Content="숨김"
-                                                  MouseLeftButtonDown="cbHide_MouseLeftButtonDown"
-                                                  MouseLeftButtonUp="cbHide_MouseLeftButtonUp"
-                                                  MouseLeave="cbHide_MouseLeave" 
                                                   Unchecked="cbHide_Unchecked"
                                                   Checked="cbHide_Checked"
                                                   IsChecked="{Binding Path=isHide}"
                                                   Tag="{Binding Path=tbCoreStateIdxTag}"/>
                                         <CheckBox Content="예약종료"
-                                                  MouseLeftButtonDown="cbRK_MouseLeftButtonDown"
-                                                  MouseLeftButtonUp="cbRK_MouseLeftButtonUp"
-                                                  MouseLeave="cbRK_MouseLeave" 
                                                   Checked="cbRK_Checked"
                                                   Unchecked="cbRK_Unchecked"
                                                   IsChecked="{Binding Path=isKillReserved}"

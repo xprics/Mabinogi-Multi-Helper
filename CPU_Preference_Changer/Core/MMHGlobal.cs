@@ -25,9 +25,6 @@ namespace CPU_Preference_Changer.Core {
         /// </summary>
         public HBFT sysShutdownTaskHandle { get; set; }
 
-
-
-
         public MMHGlobal()
         {
             sysShutdownTaskHandle = null;

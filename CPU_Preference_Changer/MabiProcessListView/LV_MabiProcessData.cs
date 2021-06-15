@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Threading;
 
 namespace CPU_Preference_Changer.MabiProcessListView
 {
@@ -154,34 +153,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
     /// </summary>
     public class LvMabiDataCollection : ObservableCollection<LV_MabiProcessRowData>
     {
-        /// <summary>
-        /// 리스트뷰 데이터를 여러 스레드에서 접근하여 읽어가기만 하면 괜찮은데
-        /// 어떤 경우 여러 스레드에서 Write를 시도할 수도 있어서 그럴 때 Lock을 걸기위함
-        /// </summary>
-        private Mutex dataMutex;
-
-        public LvMabiDataCollection()
-        {
-            dataMutex = new Mutex();
-        }
-
         int itmIdx = 0;
-
-        /// <summary>
-        /// 데이터 락 설정
-        /// </summary>
-        public void waitForSingleObject()
-        {
-            dataMutex.WaitOne();
-        }
-
-        /// <summary>
-        /// 데이터 락 해제
-        /// </summary>
-        public void ReleaseMutex()
-        {
-            dataMutex.ReleaseMutex();
-        }
 
         /// <summary>
         /// add함수 재정의,,, 자동으로 idx를 생성한 뒤 넣게한다!

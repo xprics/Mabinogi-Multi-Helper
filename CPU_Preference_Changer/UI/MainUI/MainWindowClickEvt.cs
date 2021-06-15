@@ -201,11 +201,17 @@ namespace CPU_Preference_Changer.UI.MainUI {
 
             tsf.ShowDialog();
             if (tsf.DialogResult == System.Windows.Forms.DialogResult.OK) {
-                /* PID<->예약시간 쌍으로 맞아야한다! 
-                   => 프로세스 목록 갱신 후 사라지거나 하면 예약종료도 자동 취소해야하니까...*/
+                
+                /* 새로운 Task를 생성하고.. */
                 killTask = new MabiClientKillTask(rowParam.PID,tsf.selTime);
+
+                /*Task와 연동 될 이벤트 연결*/
+                killTask.onClientProcessKilled += MabiClientKillTask_onClientProcessKilled;
+
+                /*Task매니저에 작업 등록*/
                 rowParam.hReservedKillTask = backTmgr.addFreqTask(killTask);
 
+                /*리스트뷰에 예약된 시간을 출력한다.*/
                 rowData.reservedKillTime = tsf.selTime.ToString();
                 /*윈도우 Notify 이용하여 알려줌..
                    => 윈도우7은 안되니까 메세지 박스로 간단하게 한다.*/
@@ -213,6 +219,15 @@ namespace CPU_Preference_Changer.UI.MainUI {
             }
             /*유저가 취소했으니 체크박스도 다시 해제한다.*/
             rowData.isKillReserved = false;
+        }
+
+        /// <summary>
+        /// 클라이언트가 강제종료되었을 때 일어나는 이벤트 처리 함수
+        /// </summary>
+        /// <param name="sender"></param>
+        private void MabiClientKillTask_onClientProcessKilled(object sender)
+        {
+            RefresMabiProcess();
         }
 
         /// <summary>
@@ -229,7 +244,6 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 MabiProcess.UnSetHideWindow(((LvRowParam)rowData.userParam).PID);
             }
         }
-
 
         ListSortDirection sortDirection = ListSortDirection.Ascending;
         /// <summary>

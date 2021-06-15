@@ -274,12 +274,19 @@ namespace CPU_Preference_Changer.UI.MainUI
                     /*by LT인척하는엘프 2021.06.13
                      귀찮아서 무조건 Set하던것을.. 기존 아이템과 비교하여
                      목록을 적절히 갱신시키게 함!*/
+                    /*독립된 스레드이므로 버튼 클릭과 겹치게 되면 곤란하다
+                      예: 버튼 클릭 이벤트에서 리스트를 참조중인데 
+                          하필 그 순간 프로세스 종료가 감지되어서 여기서 바로 삭제되면...?
+                          버튼 클릭이벤트에서 제대로 작동이 되지 않을 수 있다.
+                          확실하게 데이터에 Lock을 걸어두고 참조하게 한다.*/
+                    lvMabiProcess.LvMabi_WaitSingleObject();
                     var curList = lvMabiProcess.getLvItems();
                     if (curList == null) {
                         lvMabiProcess.setDataSoure(newList);
                     } else {
                         curList.updateDataCollection(newList, removeReservedInfo);
                     }
+                    lvMabiProcess.LvMabi_ReleaseMutex();
                 }));
             }
         }
