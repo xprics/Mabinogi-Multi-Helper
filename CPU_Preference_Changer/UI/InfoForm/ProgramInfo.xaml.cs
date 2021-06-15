@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using CPU_Preference_Changer.Core;
+using System.Diagnostics;
 using System.Windows;
 
 namespace CPU_Preference_Changer.UI.InfoForm {
@@ -11,6 +12,7 @@ namespace CPU_Preference_Changer.UI.InfoForm {
             this.Owner = parent;
             InitializeComponent();
             this.ResizeMode = ResizeMode.CanMinimize;
+            tb_version.Text = ProgramVersionChecker.currentVersion;
         }
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)

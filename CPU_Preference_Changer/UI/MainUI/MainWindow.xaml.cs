@@ -300,5 +300,11 @@ namespace CPU_Preference_Changer.UI.MainUI
             ControlTextUpdateInvoke(refreshTimeLabel, str);
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (ProgramVersionChecker.isNewVersionExist()) {
+                showMessage("새 버전이 있습니다!!\n[프로그램→정보]메뉴를 이용하여 새 버전을 받을 수 있습니다.");
+            }
+        }
     }
 }

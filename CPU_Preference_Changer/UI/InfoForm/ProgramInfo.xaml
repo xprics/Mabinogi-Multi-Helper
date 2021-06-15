@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CPU_Preference_Changer.UI.InfoForm"
         mc:Ignorable="d"
-        Title="프로그램 정보" Height="176.159" Width="367.43" WindowStartupLocation="CenterOwner">
+        Title="프로그램 정보" Height="176.159" Width="387.43" WindowStartupLocation="CenterOwner">
 
     <Grid  Margin="10">
         <Grid.RowDefinitions>
@@ -21,10 +21,12 @@
                             프로그램 정보
                 </TextBlock>
                 <StackPanel Margin="10 0 0 0">
-                    <!-- 버전을 빡세게 관리할 필요는 없으니까... 그냥 여기서 타이핑해서 올리세요. -->
-                    <TextBlock Style="{StaticResource INFO_STR_STYLE}">
-                                프로그램 버전 - 2021.06.09_REV_1.001
-                    </TextBlock>
+                    <!-- 버전은 ProgramVersionChecker.cs에 있음. . -->
+                    <WrapPanel>
+                        <TextBlock Style="{StaticResource INFO_STR_STYLE}" >프로그램 버전 - </TextBlock>
+                        <TextBlock Margin="5 0 0 0" x:Name="tb_version" Style="{StaticResource INFO_STR_STYLE}" Text="abcd"/>
+                    </WrapPanel>
+
 
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Style="{StaticResource INFO_STR_STYLE}">

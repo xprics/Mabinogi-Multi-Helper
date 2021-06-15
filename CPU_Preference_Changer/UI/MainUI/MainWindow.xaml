@@ -6,7 +6,8 @@
         xmlns:CLV="clr-namespace:CPU_Preference_Changer.MabiProcessListView"
         xmlns:local="clr-namespace:CPU_Preference_Changer"
         mc:Ignorable="d"
-        Title="Mabinogi Multi Helper" Height="430" Width="750" WindowStartupLocation="CenterScreen" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0">
+        Title="Mabinogi Multi Helper" Height="430" Width="750" WindowStartupLocation="CenterScreen" ScrollViewer.VerticalScrollBarVisibility="Disabled" BorderThickness="0"
+        Loaded="Window_Loaded">
    
     <Grid  Margin="10">
         <Grid.ColumnDefinitions>
