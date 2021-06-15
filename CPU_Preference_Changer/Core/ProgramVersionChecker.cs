@@ -132,9 +132,12 @@ namespace CPU_Preference_Changer.Core {
                     string webVersion = str.Substring(parsingStr.Length);
                     if (false == webVersion.ToUpper().Equals(currentVersion.ToUpper())) {
                         return true;
+                    } else {
+                        return false;
                     }
                 }
             } catch { }
+            /*뭔가 문제있어서 버전 확인에 실패한 경우.,... 새 버전 없다고친다.*/
             return false;
         }
     }

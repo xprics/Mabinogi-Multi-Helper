@@ -7,6 +7,7 @@ using CPU_Preference_Changer.UI.InfoForm;
 using CPU_Preference_Changer.UI.OptionForm;
 using System;
 using System.ComponentModel;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -135,10 +136,33 @@ namespace CPU_Preference_Changer.UI.MainUI {
             ProgramInfo pi = new ProgramInfo(this);
             pi.ShowDialog();
         }
+
+        /// <summary>
+        /// 시스템 종료 작업 핸들
+        /// </summary>
+        private HBFT hShutdownTask = null;
+
+        /// <summary>
+        /// 시스템 예약 종료 메뉴 클릭했을 때
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void menu_SystemPowerOff_Click(object sender, RoutedEventArgs e)
         {
             /*TODO : 1)시스템 예약 종료시간을 입력받고, 예약종료 걸어두기.
                      2)만약 이미 예약종료를 걸어두었다면?? 취소할 수 있게 취소 걸어두기 */
+            MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
+            var taskMgr = gInstance.backgroundFreqTaskManager;
+
+            /*이미 예약되어 있다면 취소한다. */
+            if (menu_SystemPowerOff.IsChecked) {
+                taskMgr.removeFreqTask(hShutdownTask);
+                Interlocked.Decrement(ref gInstance.reservedTaskCount);
+                hShutdownTask = null;
+                menu_SystemPowerOff.IsChecked = false;
+                return;
+            }
+
             TimeSelectForm tsf = new TimeSelectForm("시스템 종료 시간을 선택하세요?");
             tsf.ShowDialog();
             if (tsf.DialogResult == System.Windows.Forms.DialogResult.OK) {
@@ -153,19 +177,18 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 2) Shutdown의 -t옵션을 쓴 예약이 아닌, 프로그램에서 시간을 확인하다가
                    해당시간 5분전이 되면 5분 후 시스템이 종료된다는 창을 보여줘서
                    해당 창에서 5분동안 응답이 없다면 그때가서 실제로 종료하게 한다!*/
-                MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
-                var task = gInstance.shutdownTask;
-                task.modiSysShutdownTime(tsf.selTime);
+                SystemShutdownTask task = new SystemShutdownTask(tsf.selTime);
 
-                if (gInstance.sysShutdownTaskHandle==null) {
-                    /*최초로 종료 예약한 경우 Task매니저에 등록해둔다...*/
-                    var taskMgr = gInstance.backgroundFreqTaskManager;
-                    gInstance.sysShutdownTaskHandle = taskMgr.addFreqTask(task);
-                }
+                /*최초로 종료 예약한 경우 Task매니저에 등록해둔다...*/
+                hShutdownTask = taskMgr.addFreqTask(task);
 
                 /*윈도우 Notify 이용하여 알려줌..
                    => 윈도우7은 안되니까 메세지 박스로 간단하게 한다.*/
-                showMessage(string.Format("컴퓨터가 [{0}]에 자동 종료 될 예정입니다.", tsf.selTime.ToString("yyyy-MM-dd HH시 mm분")));
+                showMessage(string.Format("컴퓨터가 [{0}]에 자동 종료 될 예정입니다.", tsf.selTime.ToString("yyyy년 MM월 dd일 HH시 mm분")));
+
+                /* 메뉴 체크 해둔다. */
+                menu_SystemPowerOff.IsChecked = true;
+                Interlocked.Increment(ref gInstance.reservedTaskCount);
             }
         }
 
@@ -186,6 +209,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 gInstance.backgroundFreqTaskManager.removeFreqTask(((LvRowParam)(rowData.userParam)).hReservedKillTask);
                 rowParam.hReservedKillTask = null;
                 rowData.reservedKillTime = "None";
+                Interlocked.Decrement(ref gInstance.reservedTaskCount);
                 return;
             }
 
@@ -215,6 +239,9 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 rowData.reservedKillTime = tsf.selTime.ToString();
                 /*윈도우 Notify 이용하여 알려줌..
                    => 윈도우7은 안되니까 메세지 박스로 간단하게 한다.*/
+
+                /*예약된 작업 수량 증가.*/
+                Interlocked.Increment(ref gInstance.reservedTaskCount);
                 return;
             }
             /*유저가 취소했으니 체크박스도 다시 해제한다.*/
@@ -228,6 +255,8 @@ namespace CPU_Preference_Changer.UI.MainUI {
         private void MabiClientKillTask_onClientProcessKilled(object sender)
         {
             RefresMabiProcess();
+            MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
+            Interlocked.Decrement(ref gInstance.reservedTaskCount);
         }
 
         /// <summary>
