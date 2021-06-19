@@ -1,5 +1,4 @@
-﻿
-namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
+﻿namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
 
     /// <summary>
     /// by LT인척하는엘프 2021.06.10

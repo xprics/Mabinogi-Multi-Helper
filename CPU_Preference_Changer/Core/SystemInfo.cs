@@ -11,13 +11,11 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static string GetCpuName()
         {
-            try
-            {
+            try {
                 ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
-                foreach (ManagementObject x in searcher.Get())
-                {
+                foreach (ManagementObject x in searcher.Get()) {
                     //대다수는 CPU가 하나 부착되어있으므로 한번만에 찾아진것 반환
-                    return (x["Name"]).ToString();
+                    return x["Name"].ToString();
                 }
                 return "";
             } catch {
@@ -31,8 +29,7 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static int GetCpuCoreCnt()
         {
-            try
-            {
+            try {
                 return Environment.ProcessorCount;
             } catch {
                 return 0;
@@ -45,8 +42,7 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static string GetCpuCoreCntStr()
         {
-            try
-            {
+            try {
                 return Environment.ProcessorCount + "코어";
             } catch {
                 return "???";

@@ -152,7 +152,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
             /*TODO : 1)시스템 예약 종료시간을 입력받고, 예약종료 걸어두기.
                      2)만약 이미 예약종료를 걸어두었다면?? 취소할 수 있게 취소 걸어두기 */
             MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
-            var taskMgr = gInstance.backgroundFreqTaskManager;
+            BackgroundFreqTaskMgmt taskMgr = gInstance.backgroundFreqTaskManager;
 
             /*이미 예약되어 있다면 취소한다. */
             if (menu_SystemPowerOff.IsChecked) {

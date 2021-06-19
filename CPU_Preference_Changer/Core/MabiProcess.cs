@@ -11,7 +11,7 @@ namespace CPU_Preference_Changer.Core
 
         private readonly static string mabiClientName ;
         private readonly static string mabiRunFilePath;
-        static MabiProcess(){
+        static MabiProcess() {
             mabiClientName = "client";
             mabiRunFilePath = string.Format(@"{0}\{1}.exe", getMabinogiInstallPathFromReg(), mabiClientName);
          }
@@ -37,12 +37,9 @@ namespace CPU_Preference_Changer.Core
         {
             // 실행 프로세스 중 Client(마비노기 클라이언트 프로세스 이름) 가져오기
             Process[] lst = Process.GetProcessesByName(mabiClientName);
-            foreach (Process p in lst)
-            {
-                using (p)
-                {
-                    try
-                    {
+            foreach (Process p in lst) {
+                using (p) {
+                    try {
                         /*마비노기 폴더에서 실행 된 client.exe라면 마비노기다.
                           toupper를 이용 대문자로 바꿔서 비교한다...*/
                         if(isMabiProcess(p)) {
@@ -55,9 +52,7 @@ namespace CPU_Preference_Changer.Core
                                               p.MainWindowHandle == IntPtr.Zero ? true : false,
                                               ref usrParam);
                         }
-                    }
-                    catch
-                    {
+                    } catch {
                         // GetProcesses() 에서 System Process를 건들 경우 Exception 발생
                     }
                 }
@@ -71,9 +66,7 @@ namespace CPU_Preference_Changer.Core
         /// <param name="numOfCore">할당할 코어 수 (CPU수보다 많이한들 의미없음..</param>
         public static void setTargetCoreState(int pid, IntPtr Affinity)
         {
-            
-            using(Process p = Process.GetProcessById(pid))
-            {
+            using(Process p = Process.GetProcessById(pid)) {
                 if (p != null) p.ProcessorAffinity = Affinity;
             }
         }
@@ -140,44 +133,39 @@ namespace CPU_Preference_Changer.Core
         public static bool SetActivityWindow(int pid)
         {
             bool result = true;
-            using (Process p = Process.GetProcessById(pid))
-            {
-                try
-                {
+            using (Process p = Process.GetProcessById(pid)) {
+                try {
                     IntPtr windowHandle = IntPtr.Zero;
 
                     // MainWindowHandle == InPtr.Zero : this process is hide
-                    if (p.MainWindowHandle != IntPtr.Zero)
+                    if (p.MainWindowHandle != IntPtr.Zero) {
                         windowHandle = p.MainWindowHandle;
-                    else
-                    {
+                    } else {
                         //get root window
                         windowHandle = WinAPI.FindWindow(null, null);
-                        while (windowHandle != IntPtr.Zero)
-                        {
-                            if (WinAPI.GetParent(windowHandle) == IntPtr.Zero)
-                            {
+                        while (windowHandle != IntPtr.Zero) {
+                            // check I'm father
+                            if (WinAPI.GetParent(windowHandle) == IntPtr.Zero) {
+                                // get pid on I'm father window
                                 WinAPI.GetWindowThreadProcessId(windowHandle, out uint getPid);
-                                if (getPid == pid)
-                                    break;
+                                // is there?
+                                if (getPid == pid) break;
                             }
+                            // next window
                             windowHandle = WinAPI.GetWindow(windowHandle, GetWindowCmd.GW_HWNDNEXT);
                         }
                     }
 
                     // default show window as show and no activate window
                     result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
-                    if (!result)
-                        result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
-                    if (result)
-                        WinAPI.SetForegroundWindow(windowHandle);
-                }
-                catch
-                {
+                    // 가끔 이놈이 활성화는 했는데, false를 내뱉을때가 존재함
+                    if (!result) result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
+                    if (result) WinAPI.SetForegroundWindow(windowHandle);
+
+                } catch {
                     result = false;
                 }
             }
-
             return result;
         }
 
@@ -189,15 +177,11 @@ namespace CPU_Preference_Changer.Core
         public static bool SetMinimizeWindow(int pid)
         {
             bool result = true;
-            using (Process p = Process.GetProcessById(pid))
-            {
-                try
-                {
+            using (Process p = Process.GetProcessById(pid)) {
+                try {
                     WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_MINIMIZE);
                     result = true;
-                }
-                catch
-                {
+                } catch {
                     result = false;
                 }
             }
@@ -212,14 +196,10 @@ namespace CPU_Preference_Changer.Core
         public static bool SetHideWindow(int pid)
         {
             bool result = true;
-            using (Process p = Process.GetProcessById(pid))
-            {
-                try
-                {
+            using (Process p = Process.GetProcessById(pid)) {
+                try {
                     result = WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_HIDE);
-                }
-                catch
-                {
+                } catch {
                     result = false;
                 }
             }
@@ -232,8 +212,8 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static string getMabinogiInstallPathFromReg()
         {
-            using (var HKCU = Registry.CurrentUser) {
-                using (var mabiRegKey = HKCU.OpenSubKey(@"SOFTWARE\Nexon\Mabinogi")) {
+            using (RegistryKey HKCU = Registry.CurrentUser) {
+                using (RegistryKey mabiRegKey = HKCU.OpenSubKey(@"SOFTWARE\Nexon\Mabinogi")) {
                     return mabiRegKey.GetValue("ExecutablePath").ToString();
                 }
             }
@@ -267,7 +247,7 @@ namespace CPU_Preference_Changer.Core
                  * 마비노기 라면 SHOW처리하고 중단한다...
                  * 그런데 테스트 결과 보통은 Enum첫번째 들어오자마자 만나는 윈도우 한들이 마비노기 창이다.
                  * Debug.WriteLine("WINDOW TITLE = [" + sb.ToString() + "]");*/
-                if( sb.ToString().Equals("마비노기")) {
+                if(sb.ToString().Equals("마비노기")) {
                     WinAPI.ShowWindow(hwnd, SwindOp.SW_SHOW);
                     return false; /*ENUM중단.*/
                 }

@@ -1,7 +1,5 @@
-﻿using CPU_Preference_Changer.BackgroundTask;
-using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
+﻿using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
 using CPU_Preference_Changer.Core.SingleTonTemplate;
-using System;
 
 namespace CPU_Preference_Changer.Core {
     /// <summary>

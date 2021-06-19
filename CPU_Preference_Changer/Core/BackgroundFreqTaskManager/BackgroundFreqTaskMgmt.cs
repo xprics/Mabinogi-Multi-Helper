@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using CPU_Preference_Changer.Core.SingleTonTemplate;
 using CPU_Preference_Changer.WinAPI_Wrapper;
 
 namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
@@ -144,7 +143,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                 if (taskDict.Count == 0) continue;
 
                 dickLock.WaitOne();
-                foreach (var cur in taskDict) {
+                foreach (KeyValuePair<int, TaskInfo> cur in taskDict) {
                     var curInfo = cur.Value;
 
                     var curTask = curInfo.task;
@@ -158,9 +157,8 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                     if (curTime >= (curInfo.lastRunTime + curTask.getFreqTick())) {
                         curInfo.lastRunTime = curTime;
                         /*이 작업이 오래걸리면 다른 작업들도 지연되기때문에 Thread로 실행한다...*/
-                        var th = new Thread(() =>
-                        {
-                            if(false==curTask.runFreqWork(curInfo.taskHandle, curInfo.taskParam)) {
+                        Thread th = new Thread(() => {
+                            if (false == curTask.runFreqWork(curInfo.taskHandle, curInfo.taskParam)) {
                                 removeFreqTask(curInfo.taskHandle);
                             }
                             curInfo.runState = false;
@@ -204,7 +202,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         }
 
         /// <summary>
-        /// 
+        /// 백그라운드 관리자 닫기
         /// </summary>
         public void Release()
         {

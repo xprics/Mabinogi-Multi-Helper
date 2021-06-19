@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace CPU_Preference_Changer.Core {
 
@@ -54,7 +52,7 @@ namespace CPU_Preference_Changer.Core {
                 req =  (HttpWebRequest)WebRequest.Create(URL);
                 req.Proxy = null;
                 req.Credentials = CredentialCache.DefaultCredentials;
-                ServicePointManager.ServerCertificateValidationCallback += new System.Net.Security.RemoteCertificateValidationCallback(validateServerCertificate);
+                ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback(validateServerCertificate);
 
                 req.CookieContainer = new CookieContainer();
                 req.Method = "GET";
