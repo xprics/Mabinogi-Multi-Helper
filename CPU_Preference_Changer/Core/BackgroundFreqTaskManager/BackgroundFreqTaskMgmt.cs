@@ -113,6 +113,10 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
             return addFreqTask(task, null);
         }
 
+        /// <summary>
+        /// 주기적으로 실행하던 작업을 제거합니다.
+        /// </summary>
+        /// <param name="hBFT">작업 핸들 (addFreqTask에서 리턴받은 값)</param>
         public void removeFreqTask(HBFT hBFT)
         {
             if (hBFT == null) return;
@@ -123,6 +127,9 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
             dickLock.ReleaseMutex();
         }
 
+        /// <summary>
+        /// Task Manager시작하기
+        /// </summary>
         public void startTaskManager()
         {
             if (bRun) return;
@@ -131,15 +138,21 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
             bRun = true;
         }
 
+        /// <summary>
+        /// TaskManager종료하기
+        /// </summary>
         public void stopFreqTaskManager()
         {
             bRun = false;
         }
 
+        /// <summary>
+        /// 실행 중 문제삼아도 Try~Catch로 살리기위해 TaskManager의 작업 내용을 서브 Proc로 분리시킴
+        /// </summary>
         private void taskManagerWorkThreadSubProc()
         {
             while (bRun) {
-                Thread.Sleep(10);
+                Thread.Sleep(10); /*CPU사용량 과다사용 방지*/
                 if (taskDict.Count == 0) continue;
 
                 dickLock.WaitOne();
@@ -172,7 +185,10 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                 dickLock.ReleaseMutex();
             }
         }
-
+        
+        /// <summary>
+        /// TaskManager 워커 스레드
+        /// </summary>
         private void taskManagerWorkThread()
         {
             bManagerStop = true;
@@ -197,6 +213,8 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                     Debug.WriteLine(err.StackTrace.ToString());
                     Debug.WriteLine("######################################################");
                 }
+                /*Thread.Sleep(10);은 taskManagerWorkThreadSubProc 함수가 시작되면 Sleep(10)을 시작하고 하기때문에
+                 * 현재 버전에선 필요없다..*/
             }
             bManagerStop = false;
         }
