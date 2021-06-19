@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace CPU_Preference_Changer.Core
+﻿namespace CPU_Preference_Changer.Core
 {
     /// <summary>
     /// System Process class
@@ -13,35 +9,40 @@ namespace CPU_Preference_Changer.Core
         /// Shutdown computer
         /// </summary>
         /// <param name="seconds">int second</param>
-        public static void Shutdown(int seconds)
+        public static bool Shutdown(int seconds)
         {
-            Shutdown(seconds.ToString());
+            return Shutdown(seconds.ToString());
         }
 
         /// <summary>
         /// Shutdown computer
         /// </summary>
         /// <param name="seconds">uint second</param>
-        public static void Shutdown(uint seconds)
+        public static bool Shutdown(uint seconds)
         {
-            Shutdown(seconds.ToString());
+            return Shutdown(seconds.ToString());
         }
 
         /// <summary>
         /// Shutdown computer
         /// </summary>
         /// <param name="seconds">string second</param>
-        public static void Shutdown(string seconds)
+        public static bool Shutdown(string seconds)
         {
-            System.Diagnostics.Process.Start("shutdown.exe", "-s -f -t " + seconds);
+            try {
+                System.Diagnostics.Process.Start("shutdown.exe", "-s -f -t " + seconds);
+                return true;
+            } catch {
+                return false;
+            }
         }
 
         /// <summary>
         /// 즉시 종료
         /// </summary>
-        public static void ShutdownNow()
+        public static bool ShutdownNow()
         {
-            Shutdown(1);
+            return Shutdown(1);
         }
     }
 }

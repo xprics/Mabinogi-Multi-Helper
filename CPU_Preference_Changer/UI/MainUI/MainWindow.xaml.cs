@@ -166,7 +166,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                             if (CloseApplication() == false)
                                 e.Cancel = true;
                             return;
-                            break;/* return때문에 필요없지만 프로그래머를 위해 명시적으로 넣어 둠*/
+                            //break;/* return때문에 필요없지만 프로그래머를 위해 명시적으로 넣어 둠*/
 
                         /*트레이로 보내기 누루면 보냄*/
                         case CloseAskFormResult.eGoTray:
@@ -215,8 +215,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                     return false;
             }
             // dispose tray icon
-            if (this.trayIcon != null)
-            {
+            if (this.trayIcon != null) {
                 this.trayIcon.Visible = false;
                 this.trayIcon.Dispose();
             }

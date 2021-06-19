@@ -1,11 +1,7 @@
 ﻿using CPU_Preference_Changer.Core;
 using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
-using CPU_Preference_Changer.Core.SingleTonTemplate;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
 namespace CPU_Preference_Changer.BackgroundTask {
     /// <summary>

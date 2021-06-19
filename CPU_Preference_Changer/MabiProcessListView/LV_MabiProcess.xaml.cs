@@ -32,9 +32,6 @@ namespace CPU_Preference_Changer.MabiProcessListView
         public event OnCbHideClicked onCbHideClicked;
         public event OnLvClicked onLvClicked;
 
-        // process name right click
-        public event OnProcessNameRightCLick onProcessNameRightClick;
-
         /// <summary>
         /// 리스트 뷰 출력중인 데이터의 스레드 동기화를 위해
         /// </summary>
@@ -134,7 +131,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
             int ret; string tagStr;
             if (obj == null) return -1;
 
-            var type = obj.GetType();
+            System.Type type = obj.GetType();
             if (type == typeof(TextBlock)) {
                 tagStr = (obj as TextBlock).Tag.ToString();
             } else if (type == typeof(RadioButton)) {
@@ -151,6 +148,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
             return -1;
         }
 
+        #region 본캐(라디오 버튼) 이벤트 처리
         /// <summary>
         /// 라디오 그룹 버튼 눌렀을 때..,,
         /// </summary>
@@ -163,43 +161,12 @@ namespace CPU_Preference_Changer.MabiProcessListView
             if (data == null) return;
             ResetMainCharFlag();
             data.bMainCharacter = true;
-            
+
             int rowIdx = lvItms.findItmIdxFromTagIndex(tagIdx);
             MabiProcessListView.SelectedItem = data;
             MabiProcessListView.SelectedIndex = rowIdx;
         }
-
-        /// <summary>
-        /// 출력중인 내용을 프로세스 시작시간을 기준으로 정렬하기
-        /// </summary>
-        /// <param name="sortDirection"></param>
-        public void sortListData(ListSortDirection sortDirection)
-        {
-            if (lvItms == null) return;
-
-            List<LV_MabiProcessRowData> sortedList;
-
-            LvMabi_WaitSingleObject();
-            /* 메인캐릭터 찍어둔 정보가 맨위로 올라오게 1차 정렬한 후 
-               프로세스 시작 시간으로 2차 정렬 함.*/
-            switch (sortDirection) {
-                case ListSortDirection.Descending:
-                    sortedList = lvItms.OrderByDescending(x=>x.bMainCharacter).ThenByDescending(x => x.startTime ).ToList();
-                    break;
-                case ListSortDirection.Ascending:
-                    sortedList = lvItms.OrderByDescending(x => x.bMainCharacter).ThenBy(x => x.startTime).ToList();
-                    break;
-                default:
-                    return;
-            }
-
-            /* LIST로 나오기때문에 ObservableCollection으로 바로 덮어쓸 수 없다.
-              lvItms = sortedList 처럼..*/
-            foreach (var x in sortedList) {
-                lvItms.Move(lvItms.IndexOf(x), sortedList.IndexOf(x));
-            }
-            LvMabi_ReleaseMutex();
-        }
+        #endregion
 
         #region 프로세스명 클릭 이벤트 처리
         private bool bProcessNameClick = false;
@@ -225,7 +192,6 @@ namespace CPU_Preference_Changer.MabiProcessListView
         private void TextBlock_MouseLeave(object sender, MouseEventArgs e)
         {
             if (bProcessNameClick) bProcessNameClick = false;
-            if (bProcessNameRightClick) bProcessNameRightClick = false;
         }
         #endregion
 
@@ -260,29 +226,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
         }
         #endregion
 
-        #region 프로세스명 오른쪽 클릭 이벤트 처리
-        private bool bProcessNameRightClick = false;
-
-        private void TextBlock_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            bProcessNameRightClick = true;
-        }
-
-        private void TextBlock_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (bProcessNameRightClick)
-            {
-                /*이벤트 처리 콜백 함수 실행*/
-                if (onProcessNameRightClick != null) {
-                    LvMabi_WaitSingleObject();
-                    onProcessNameRightClick(GetLvRowItmData(ctlTagStrToInt(sender)));
-                    LvMabi_ReleaseMutex();
-                }
-                bProcessNameRightClick = false;
-            }
-        }
-        #endregion
-
+        #region 체크박스 예약종료 이벤트 처리
         private void cbRK_Checked(object sender, RoutedEventArgs e)
         {
             LvMabi_WaitSingleObject();
@@ -298,7 +242,9 @@ namespace CPU_Preference_Changer.MabiProcessListView
                 onCbRkClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
             LvMabi_ReleaseMutex();
         }
+        #endregion
 
+        #region 체크박스 숨김 이벤트 처리
         private void cbHide_Checked(object sender, RoutedEventArgs e)
         {
             LvMabi_WaitSingleObject();
@@ -314,7 +260,9 @@ namespace CPU_Preference_Changer.MabiProcessListView
                 onCbHideClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
             LvMabi_ReleaseMutex();
         }
+        #endregion
 
+        #region 프로세스 목록 정렬 이벤트 처리
         private void MabiProcessListView_Click(object sender, RoutedEventArgs e)
         {
             LvMabi_WaitSingleObject();
@@ -323,8 +271,42 @@ namespace CPU_Preference_Changer.MabiProcessListView
             LvMabi_ReleaseMutex();
         }
 
-        
-        
+        /// <summary>
+        /// 출력중인 내용을 프로세스 시작시간을 기준으로 정렬하기
+        /// </summary>
+        /// <param name="sortDirection"></param>
+        public void sortListData(ListSortDirection sortDirection)
+        {
+            if (lvItms == null) return;
+
+            List<LV_MabiProcessRowData> sortedList;
+
+            LvMabi_WaitSingleObject();
+            /* 메인캐릭터 찍어둔 정보가 맨위로 올라오게 1차 정렬한 후 
+               프로세스 시작 시간으로 2차 정렬 함.*/
+            switch (sortDirection)
+            {
+                case ListSortDirection.Descending:
+                    sortedList = lvItms.OrderByDescending(x => x.bMainCharacter).ThenByDescending(x => x.startTime).ToList();
+                    break;
+                case ListSortDirection.Ascending:
+                    sortedList = lvItms.OrderByDescending(x => x.bMainCharacter).ThenBy(x => x.startTime).ToList();
+                    break;
+                default:
+                    return;
+            }
+
+            /* LIST로 나오기때문에 ObservableCollection으로 바로 덮어쓸 수 없다.
+              lvItms = sortedList 처럼..*/
+            foreach (LV_MabiProcessRowData x in sortedList)
+            {
+                lvItms.Move(lvItms.IndexOf(x), sortedList.IndexOf(x));
+            }
+            LvMabi_ReleaseMutex();
+        }
+        #endregion
+
+        #region 쓰레드 동기화 Mutex
         /// <summary>
         /// 리스트뷰에 관리중인 데이터의 스레드 동기화를 위해 사용. (락 걸어두기)
         /// </summary>
@@ -340,5 +322,6 @@ namespace CPU_Preference_Changer.MabiProcessListView
         {
             lvDataMutex.ReleaseMutex();
         }
+        #endregion
     }
 }

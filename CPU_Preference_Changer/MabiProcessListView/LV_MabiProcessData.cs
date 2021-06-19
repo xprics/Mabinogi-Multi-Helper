@@ -184,13 +184,8 @@ namespace CPU_Preference_Changer.MabiProcessListView
         public void updateData(int pid,LV_MabiProcessRowData newData)
         {
             /*숨김상태 이외 업데이트 필요한 정보 있는지 모르겠음.*/
-            foreach (var x in this.Items) {
+            foreach (LV_MabiProcessRowData x in this.Items) {
                 if (x.processID.Equals(pid + "")) {
-                    /*
-                    if (x.isHide != newData.isHide)
-                        x.isHide = newData.isHide;
-                    */
-                    /*위 if문 없이 그냥 대입만해도 동일하고 연산이 1회적다..*/
                     x.isHide = newData.isHide;
                 }
             }
@@ -204,7 +199,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
         private bool havePidData(int pid)
         {
             bool ret = false;
-            foreach (var x in this.Items) {
+            foreach (LV_MabiProcessRowData x in this.Items) {
                 if (  x.processID.Equals(pid + "") ) {
                     ret = true;
                     break;
@@ -236,8 +231,8 @@ namespace CPU_Preference_Changer.MabiProcessListView
                 }
             }
             /*CASE 2. 프로세스가 새로 실행되어 새롭게 추가된 정보찾아서 Add.*/
-            foreach(var x in newDataCollection) {
-                if ( int.TryParse(x.processID,out pid)) {
+            foreach(LV_MabiProcessRowData x in newDataCollection) {
+                if ( int.TryParse(x.processID, out pid)) {
                     if (this.havePidData(pid) == false) {
                         this.Add(x);
                     } else {
@@ -260,8 +255,8 @@ namespace CPU_Preference_Changer.MabiProcessListView
         {
             LV_MabiProcessRowData findData=null;
 
-            foreach (var x in this.Items) {
-                if ( x.tbCoreStateIdxTag.Equals(tagIdx+"")) {
+            foreach (LV_MabiProcessRowData x in this.Items) {
+                if ( x.tbCoreStateIdxTag.Equals(tagIdx + "")) {
                     findData = x;
                     break;
                 }
@@ -276,9 +271,9 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// <returns></returns>
         public int findItmIdxFromTagIndex(int tagIdx)
         {
-            int retVal=-1;
+            int retVal = -1;
 
-            for ( int i = 0; i<this.Items.Count; ++i) {
+            for ( int i = 0; i < this.Items.Count; ++i) {
                 if (this.Items[i].tbCoreStateIdxTag.Equals(tagIdx + "")) {
                     retVal= i;
                     break;
@@ -293,7 +288,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
         /// <param name="enumCallBack"></param>
         public void enumAllData(Action<LV_MabiProcessRowData> enumCallBack)
         {
-            foreach(var x in this.Items) {
+            foreach(LV_MabiProcessRowData x in this.Items) {
                 enumCallBack(x);
             }
         }
