@@ -27,6 +27,9 @@ Build : Visual Studio 2019
 
 
 ```Text
+2021-06-19
+    - 프로세스 마우스 오른쪽 클릭 이벤트 삭제
+    - 프로세스 kill 3가지 옵션 추가(TaskKill, WMI Terminate, WMIC Delete)
 2021-06-15
     - 낮은 확률로 Thread UnSafe한 케이스 수정
     - 프로세스 예약 종료 시 목록 즉시 갱신되게 수정
