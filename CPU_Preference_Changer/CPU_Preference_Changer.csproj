@@ -115,6 +115,7 @@
     <Compile Include="BackgroundTask\MabiClientKillTask.cs" />
     <Compile Include="Core\BackgroundFreqTaskManager\BackgroundFreqTaskMgmt.cs" />
     <Compile Include="Core\BackgroundFreqTaskManager\IBackgroundFreqTask.cs" />
+    <Compile Include="Core\Logger\MMH_Logger.cs" />
     <Compile Include="Core\MMHGlobal.cs" />
     <Compile Include="Core\ProgramVersionChecker.cs" />
     <Compile Include="Core\SingleTonTemplate\MMHGlobalInstance.cs" />

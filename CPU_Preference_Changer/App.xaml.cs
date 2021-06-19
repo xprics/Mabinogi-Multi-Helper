@@ -1,4 +1,6 @@
-﻿using CPU_Preference_Changer.WinAPI_Wrapper;
+﻿using CPU_Preference_Changer.Core;
+using CPU_Preference_Changer.Core.SingleTonTemplate;
+using CPU_Preference_Changer.WinAPI_Wrapper;
 using System.Windows;
 
 namespace CPU_Preference_Changer
@@ -27,6 +29,16 @@ namespace CPU_Preference_Changer
                 WinAPI.ShowWindow(wHandle, SwindOp.SW_SHOWNORMAL);
                 WinAPI.SetForegroundWindow(wHandle);
                 Shutdown();
+            }
+
+            /*프로그램 실행인자가 있다면 적절히 파싱한다.*/
+            if( e.Args.Length != 0) {
+                foreach ( string x in e.Args ) {
+                    string upper = x.ToUpper();
+                    if (upper.Equals("DEBUG_RUN")) {
+                        MMHGlobalInstance<MMHGlobal>.GetInstance().bDebugModeRun = true;
+                    }
+                }
             }
         }
     }

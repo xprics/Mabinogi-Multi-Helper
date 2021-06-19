@@ -1,4 +1,5 @@
 ﻿using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
+using CPU_Preference_Changer.Core.Logger;
 using CPU_Preference_Changer.Core.SingleTonTemplate;
 
 namespace CPU_Preference_Changer.Core {
@@ -17,13 +18,30 @@ namespace CPU_Preference_Changer.Core {
         /// </summary>
         public int reservedTaskCount;
 
+        /// <summary>
+        /// 프로그램이 디버그모드로 실행되는가...
+        /// </summary>
+        public bool bDebugModeRun { get; set; }
+
+        /// <summary>
+        /// 디브그용 로거...
+        /// </summary>
+        public MMH_Logger dbgLogger = null;
+
         public MMHGlobal()
         {
             backgroundFreqTaskManager = new BackgroundFreqTaskMgmt();
+            bDebugModeRun = false;
         }
 
+        /// <summary>
+        /// 글로벌 인스턴스 해제 ...
+        /// </summary>
         public void Release()
         {
+            if ( dbgLogger!=null) {
+                dbgLogger.closeLogFile();
+            }
             backgroundFreqTaskManager.Release();
         }
 

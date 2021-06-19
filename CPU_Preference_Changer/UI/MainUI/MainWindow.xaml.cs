@@ -9,6 +9,7 @@ using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
 using CPU_Preference_Changer.Core.SingleTonTemplate;
 using CPU_Preference_Changer.BackgroundTask;
 using System.Threading;
+using CPU_Preference_Changer.Core.Logger;
 
 namespace CPU_Preference_Changer.UI.MainUI
 {
@@ -22,10 +23,16 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// </summary>
         public System.Windows.Forms.NotifyIcon trayIcon = null;
         private object lockObj = new object();
+        private bool bDebugRun = false;
+        private MMH_Logger logger;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            //디버그 모드인지 값 받아온다..
+            MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
+            bDebugRun = gInstance.bDebugModeRun;
 
             //윈도우 글자, 이벤트 초기화
             initWindow();
@@ -34,14 +41,19 @@ namespace CPU_Preference_Changer.UI.MainUI
             initTrayIcon();
 
             //백그라운드 Task Manager 시작
-            BackgroundFreqTaskMgmt backMgmt = MMHGlobalInstance<MMHGlobal>.GetInstance().backgroundFreqTaskManager;
+            BackgroundFreqTaskMgmt backMgmt = gInstance.backgroundFreqTaskManager;
             backMgmt.startTaskManager();
             backMgmt.addFreqTask(new ProcessListRefreshTask(this));
 
+            if (bDebugRun) {
 #if __WIN__64__DBG__
-            /*디버그 모드에서만 보이도록 한다!*/
-            dbgPanel.Visibility = Visibility.Visible;
+                /*개발자 디버그 모드에서만 보이도록 한다!*/
+                dbgPanel.Visibility = Visibility.Visible;
 #endif
+
+                /*디버그 모드라면 디버그 로거 생성해둠*/
+                logger = gInstance.dbgLogger = new MMH_Logger("./MMH_Log.txt");
+            }
         }
 
         /// <summary>
@@ -274,13 +286,16 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// </summary>
         public void RefresMabiProcess()
         {
+            dbgLogWriteStr("RefreshMabiProcess","Wait Lock");
             // lock
             lock (this.lockObj) {
+                dbgLogWriteStr("RefreshMabiProcess", "UI_DispatchEvt Start");
                 // work thread invoke UI thread
                 UI_DispatchEvt(new Action(delegate {
                     /*계속 할당받지말고,... 기존에 쓰던것을 활용하게 하다!*/
                     LvMabiDataCollection newList = new LvMabiDataCollection();
 
+                    dbgLogWriteStr("RefreshMabiProcess", "Find Mabinogi Process");
                     object param = newList; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
                     MabiProcess.getAllTargets(CB_FindMabiProcess, ref param);
 
@@ -292,15 +307,20 @@ namespace CPU_Preference_Changer.UI.MainUI
                           하필 그 순간 프로세스 종료가 감지되어서 여기서 바로 삭제되면...?
                           버튼 클릭이벤트에서 제대로 작동이 되지 않을 수 있다.
                           확실하게 데이터에 Lock을 걸어두고 참조하게 한다.*/
+                    dbgLogWriteStr("RefreshMabiProcess", "Wait for Lv Object");
                     lvMabiProcess.LvMabi_WaitSingleObject();
                     var curList = lvMabiProcess.getLvItems();
                     if (curList == null) {
+                        dbgLogWriteStr("RefreshMabiProcess", "Lv Data set.");
                         lvMabiProcess.setDataSoure(newList);
                     } else {
+                        dbgLogWriteStr("RefreshMabiProcess", "Lv Data Update.");
                         curList.updateDataCollection(newList, removeReservedInfo);
                     }
                     lvMabiProcess.LvMabi_ReleaseMutex();
+                    dbgLogWriteStr("RefreshMabiProcess", "Release Lv Object");
                 }));
+                dbgLogWriteStr("RefreshMabiProcess", "UI_DispatchEvt End");
             }
         }
 
@@ -313,11 +333,27 @@ namespace CPU_Preference_Changer.UI.MainUI
             ControlTextUpdateInvoke(refreshTimeLabel, str);
         }
 
+        /// <summary>
+        /// 윈도우 창이 로딩되었을 때...
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
             if (ProgramVersionChecker.isNewVersionExist()) {
                 showMessage("새 버전이 있습니다!!\n[프로그램→정보]메뉴를 이용하여 새 버전을 받을 수 있습니다.");
+            }
+        }
+
+        /// <summary>
+        /// 디버그 모드일 경우 Log파일로 메세지 출력
+        /// </summary>
+        /// <param name="funcName"></param>
+        /// <param name="str"></param>
+        private void dbgLogWriteStr(string funcName, string str)
+        {
+            if (bDebugRun) {
+                logger.writeLog(string.Format("[{0}] {1}", funcName,str));
             }
         }
     }
