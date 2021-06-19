@@ -1,7 +1,6 @@
 ﻿using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
 using CPU_Preference_Changer.UI.OptionForm;
 using System;
-using System.Diagnostics;
 
 namespace CPU_Preference_Changer.BackgroundTask {
 

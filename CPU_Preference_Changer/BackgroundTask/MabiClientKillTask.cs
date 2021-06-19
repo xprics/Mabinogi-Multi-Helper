@@ -1,11 +1,7 @@
 ﻿using CPU_Preference_Changer.Core;
 using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
-using CPU_Preference_Changer.Core.SingleTonTemplate;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
 namespace CPU_Preference_Changer.BackgroundTask {
     /// <summary>
@@ -62,8 +58,13 @@ namespace CPU_Preference_Changer.BackgroundTask {
         /// 종료시키지 못 했을 때 또다른 방법으로 강종시켜봄
         /// </summary>
         private void killCLientProcess2()
-        { 
+        {
             /*나중에 잘 안되는 일 생기면 그때 구현.*/
+
+            // 엌ㅋㅋㅋㅋㅋㅋㅋㅋ
+            if (!SystemProcess.TaskKill(PID))
+                if (!SystemProcess.WMICProcessKill(PID))
+                    if (!SystemProcess.WMIProcessTerminate(PID)) { }
         }
 
         /// <summary>

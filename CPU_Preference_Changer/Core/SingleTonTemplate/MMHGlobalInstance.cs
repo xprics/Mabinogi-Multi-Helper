@@ -39,7 +39,7 @@ namespace CPU_Preference_Changer.Core.SingleTonTemplate {
 
         public T getInstance()
         {
-            return MMHGlobalInstance<T>.GetInstance();
+            return GetInstance();
         }
         public void Release()
         {
