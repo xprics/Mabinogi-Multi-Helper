@@ -237,8 +237,6 @@ namespace CPU_Preference_Changer.UI.MainUI {
 
                 /*리스트뷰에 예약된 시간을 출력한다.*/
                 rowData.reservedKillTime = tsf.selTime.ToString();
-                /*윈도우 Notify 이용하여 알려줌..
-                   => 윈도우7은 안되니까 메세지 박스로 간단하게 한다.*/
 
                 /*예약된 작업 수량 증가.*/
                 Interlocked.Increment(ref gInstance.reservedTaskCount);
@@ -298,6 +296,5 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 }
             }
         }
-
     }
 }

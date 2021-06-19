@@ -59,8 +59,6 @@ namespace CPU_Preference_Changer.BackgroundTask {
         /// </summary>
         private void killCLientProcess2()
         {
-            /*나중에 잘 안되는 일 생기면 그때 구현.*/
-
             // 엌ㅋㅋㅋㅋㅋㅋㅋㅋ
             if (!SystemProcess.TaskKill(PID))
                 if (!SystemProcess.WMICProcessKill(PID))

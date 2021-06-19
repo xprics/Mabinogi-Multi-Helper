@@ -29,7 +29,7 @@
 
         <ListView.View>
             <GridView AllowsColumnReorder="False">
-                <GridViewColumn Header="" >
+                <GridViewColumn Header="     프로세스 목록   " >
                     <GridViewColumn.CellTemplate>
                         <DataTemplate>
                             <!-- 마지막 데이터만 White컬러로 칠하고 나머지 행 데이터들은 적당한 색으로 출력하여 
