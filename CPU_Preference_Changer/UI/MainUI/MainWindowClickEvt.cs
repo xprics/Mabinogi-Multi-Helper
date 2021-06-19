@@ -24,13 +24,23 @@ namespace CPU_Preference_Changer.UI.MainUI {
         /// <param name="e"></param>
         private void btAutoSet_Click(object sender, RoutedEventArgs e)
         {
+            dbgLogWriteStr("btAutoSet_Click", "btAutoSet Clicked.");
             if (lvMabiProcess.isMainCharSel() == false) {
-                showMessage("어떤 클라이언트가 본캐인지 선택하세요!\n프로세스 명을 클릭하면 마비노기 화면으로 전환됩니다!");
+                showMessage("어떤 클라이언트가 본캐인지 선택하세요!\n"
+                           +"프로세스 명을 클릭하면 마비노기 화면으로 전환됩니다!");
                 return;
             }
 
+            lvMabiProcess.LvMabi_WaitSingleObject();
+            /*------------------------------------------------------------------*/
             /*본캐 체크된 것만... 최대한 코어 사용하게 하고 나머지는 하나로 몰아 넣는다!*/
             var lst = lvMabiProcess.getLvItems();
+            /*------------------------------------------------------------------*/
+            if (lst == null) return;
+            /*------------------------------------------------------------------*/
+            dbgLogWriteStr("btAutoSet_Click", string.Format("{0} ; Target Count->{1}",
+                                                            "Enum Start... ",
+                                                            lst.Count));
             IntPtr val = MabiProcess.GetMaxAffinityVal();
             lst.enumAllData(curData =>
             {
@@ -46,6 +56,8 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 MabiProcess.setTargetCoreState(((LvRowParam)curData.userParam).PID, val);
                 curData.coreState = val + "";
             });
+            lvMabiProcess.LvMabi_ReleaseMutex();
+            /*------------------------------------------------------------------*/
             showMessage("설정 완료");
         }
 
@@ -56,14 +68,26 @@ namespace CPU_Preference_Changer.UI.MainUI {
         /// <param name="e"></param>
         private void btReset_Click(object sender, RoutedEventArgs e)
         {
+            dbgLogWriteStr("btReset_Click", "btReset Clicked.");
+            /*------------------------------------------------------------------*/
+            lvMabiProcess.LvMabi_WaitSingleObject();
+            /*------------------------------------------------------------------*/
             /*모든 프로세스에 대하여 초기화 수행!*/
             var lst = lvMabiProcess.getLvItems();
+            /*------------------------------------------------------------------*/
+            if (lst == null) return;
+            /*------------------------------------------------------------------*/
+            dbgLogWriteStr("btReset_Click", string.Format("{0} ; Target Count->{1}"
+                                                          ,"Enum Start... "
+                                                          ,lst.Count));
             IntPtr resetVal = MabiProcess.GetMaxAffinityVal();
             lst.enumAllData(curData =>
             {
                 MabiProcess.setTargetCoreState(((LvRowParam)curData.userParam).PID, resetVal);
                 curData.coreState = resetVal + "";
             });
+            lvMabiProcess.LvMabi_ReleaseMutex();
+            /*------------------------------------------------------------------*/
             showMessage("설정 완료");
         }
 
