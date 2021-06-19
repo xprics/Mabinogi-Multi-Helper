@@ -144,16 +144,21 @@ namespace CPU_Preference_Changer.Core
                         //get root window
                         windowHandle = WinAPI.FindWindow(null, null);
                         while (windowHandle != IntPtr.Zero) {
+                            // check I'm father
                             if (WinAPI.GetParent(windowHandle) == IntPtr.Zero) {
+                                // get pid on I'm father window
                                 WinAPI.GetWindowThreadProcessId(windowHandle, out uint getPid);
+                                // is there?
                                 if (getPid == pid) break;
                             }
+                            // next window
                             windowHandle = WinAPI.GetWindow(windowHandle, GetWindowCmd.GW_HWNDNEXT);
                         }
                     }
 
                     // default show window as show and no activate window
                     result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
+                    // 가끔 이놈이 활성화는 했는데, false를 내뱉을때가 존재함
                     if (!result) result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
                     if (result) WinAPI.SetForegroundWindow(windowHandle);
 
@@ -207,8 +212,8 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static string getMabinogiInstallPathFromReg()
         {
-            using (var HKCU = Registry.CurrentUser) {
-                using (var mabiRegKey = HKCU.OpenSubKey(@"SOFTWARE\Nexon\Mabinogi")) {
+            using (RegistryKey HKCU = Registry.CurrentUser) {
+                using (RegistryKey mabiRegKey = HKCU.OpenSubKey(@"SOFTWARE\Nexon\Mabinogi")) {
                     return mabiRegKey.GetValue("ExecutablePath").ToString();
                 }
             }
@@ -242,7 +247,7 @@ namespace CPU_Preference_Changer.Core
                  * 마비노기 라면 SHOW처리하고 중단한다...
                  * 그런데 테스트 결과 보통은 Enum첫번째 들어오자마자 만나는 윈도우 한들이 마비노기 창이다.
                  * Debug.WriteLine("WINDOW TITLE = [" + sb.ToString() + "]");*/
-                if( sb.ToString().Equals("마비노기")) {
+                if(sb.ToString().Equals("마비노기")) {
                     WinAPI.ShowWindow(hwnd, SwindOp.SW_SHOW);
                     return false; /*ENUM중단.*/
                 }
