@@ -298,6 +298,5 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 }
             }
         }
-
     }
 }

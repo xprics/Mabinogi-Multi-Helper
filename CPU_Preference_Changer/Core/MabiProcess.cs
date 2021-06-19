@@ -232,10 +232,14 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static string getMabinogiInstallPathFromReg()
         {
-            using (var HKCU = Registry.CurrentUser) {
-                using (var mabiRegKey = HKCU.OpenSubKey(@"SOFTWARE\Nexon\Mabinogi")) {
-                    return mabiRegKey.GetValue("ExecutablePath").ToString();
+            try {
+                using (var HKCU = Registry.CurrentUser) {
+                    using (var mabiRegKey = HKCU.OpenSubKey(@"SOFTWARE\Nexon\Mabinogi")) {
+                        return mabiRegKey.GetValue("ExecutablePath").ToString();
+                    }
                 }
+            }catch {
+                return "";
             }
         }
 
