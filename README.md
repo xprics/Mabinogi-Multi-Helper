@@ -26,6 +26,8 @@ Build : Visual Studio 2019
 
 
 ```Text
+2021-06-20
+    - 릴리즈 모드 실행중에도 로그를 찍기 위해 로거 클래스 및 로거 기능 적용 (프로그램 실행 인자에 -DEBUG_RUN으로 사용)
 2021-06-19
     - 프로세스 마우스 오른쪽 클릭 이벤트 삭제
     - 프로세스 kill 3가지 옵션 추가(TaskKill, WMI Terminate, WMIC Delete)
