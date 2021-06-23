@@ -19,8 +19,6 @@ Build : Visual Studio 2019
 
 .Net Framework : 4.5
 ```
-## TODO
- - 일부 환경에서 작동되지 않는 버그 발생, 프로그램 옵션에 디버그 모드를 추가하여 디버그 모드로 프로그램이 실행되면 Log파일을 출력하게 하기 by xprics 진행중
 
 ## Change Log
 
