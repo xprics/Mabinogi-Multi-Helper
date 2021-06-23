@@ -8,8 +8,8 @@ using CPU_Preference_Changer.UI.OptionForm;
 using CPU_Preference_Changer.Core.BackgroundFreqTaskManager;
 using CPU_Preference_Changer.Core.SingleTonTemplate;
 using CPU_Preference_Changer.BackgroundTask;
-using System.Threading;
 using CPU_Preference_Changer.Core.Logger;
+using System.Diagnostics;
 
 namespace CPU_Preference_Changer.UI.MainUI
 {
@@ -23,6 +23,10 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// </summary>
         public System.Windows.Forms.NotifyIcon trayIcon = null;
         private object lockObj = new object();
+
+        /// <summary>
+        /// 추적용 로그를 남길것인가...
+        /// </summary>
         private bool bDebugRun = false;
         private MMH_Logger logger;
 
@@ -45,40 +49,23 @@ namespace CPU_Preference_Changer.UI.MainUI
             backMgmt.startTaskManager();
             backMgmt.addFreqTask(new ProcessListRefreshTask(this));
 
+
+            /*크래시 로그를 남기기 위해...*/
+            logger = gInstance.dbgLogger = new MMH_Logger("./MMH_Log.txt");
+            if(logger == null) {
+                showMessage("로거 생성에 실패하였습니다..");
+            }
             if (bDebugRun) {
+                if (logger != null) {
+                    logger.writeLog(  "ClientFullPath=["
+                                    + MabiProcess.mabiRunFilePath
+                                    + "]");
+                }
 #if __WIN__64__DBG__
                 /*개발자 디버그 모드에서만 보이도록 한다!*/
                 dbgPanel.Visibility = Visibility.Visible;
 #endif
-
-                /*디버그 모드라면 디버그 로거 생성해둠*/
-                logger = gInstance.dbgLogger = new MMH_Logger("./MMH_Log.txt");
             }
-        }
-
-        /// <summary>
-        /// 콜백함수, 마비노기로 추정되는 프로세스를 찾았을 때 실행
-        /// </summary>
-        /// <param name="pName"></param>
-        /// <param name="PID"></param>
-        /// <param name="startTime"></param>
-        /// <param name="coreState"></param>
-        /// <param name="runPath"></param>
-        /// <param name="usrParam"></param>
-        private void CB_FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, bool isHide, ref object usrParam)
-        {
-            LvMabiDataCollection lvItm = (LvMabiDataCollection)usrParam;
-
-             var newData = new LV_MabiProcessRowData(pName,
-                                                PID + "",
-                                                startTime,
-                                                coreState + "",
-                                                runPath);
-            LvRowParam param = new LvRowParam();
-            param.PID = PID; param.hReservedKillTask = null;
-            newData.userParam = param; //찾았던 프로세스 정보 보관해서 나중에 써먹기위함
-            newData.isHide = isHide;
-            lvItm.Add(newData);
         }
 
         /// <summary>
@@ -116,8 +103,7 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// </summary>
         private void initTrayIcon()
         {
-            try
-            {
+            try {
                 // allocation trayicon
                 this.trayIcon = new System.Windows.Forms.NotifyIcon();
                 this.trayIcon.Icon = Properties.Resources.TrayIcon;
@@ -152,9 +138,10 @@ namespace CPU_Preference_Changer.UI.MainUI
                     this.Visibility = Visibility.Visible;
                     this.trayIcon.Visible = false;
                 };
-            }
-            catch (Exception err)
-            {
+            } catch (Exception err) {
+                if(logger != null) {
+                    logger.writeLog(err);
+                }
                 showMessage("트레이 아이콘 생성 실패 : " + err.Message);
             }
         }
@@ -165,10 +152,8 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// <param name="e">OnClosing 이벤트 파라미터</param>
         protected override void OnClosing(CancelEventArgs e)
         {
-            try
-            {
-                if (this.trayIcon != null)
-                {
+            try {
+                if (this.trayIcon != null) {
                     /*바로 종료할건지 트레이로 보낼건지 물어보게 유저에게 물어본다.*/
                     CloseAskForm askForm = new CloseAskForm();
                     askForm.ShowDialog();
@@ -198,13 +183,13 @@ namespace CPU_Preference_Changer.UI.MainUI
                             break;
                     }
                 }
-            }
-            catch
-            {
+            } catch (Exception err) {
+                if(logger != null) {
+                    logger.writeLog(err);
+                }
                 e.Cancel = false;
             }
-            finally
-            {
+            finally {
                 // call base event
                 base.OnClosing(e);
             }
@@ -271,13 +256,68 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// <param name="rmData"></param>
         public void removeReservedInfo(LV_MabiProcessRowData rmData)
         {
-            LvRowParam lp = (LvRowParam)rmData.userParam;
-            
-            if ( lp.hReservedKillTask != null) {
-                /*예약 종료를 걸어놨는데 사람이 수동으로 예약된 시간보다 먼저 종료한 경우 발생.*/
-                MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
-                BackgroundFreqTaskMgmt backTmgr = gInstance.backgroundFreqTaskManager;
-                backTmgr.removeFreqTask(lp.hReservedKillTask);
+            LvRowParam lp;
+            try {
+                lp = (LvRowParam)rmData.userParam;
+
+                if (lp.hReservedKillTask != null) {
+                    /*예약 종료를 걸어놨는데 사람이 수동으로 예약된 시간보다 먼저 종료한 경우 발생.*/
+                    MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
+                    BackgroundFreqTaskMgmt backTmgr = gInstance.backgroundFreqTaskManager;
+                    backTmgr.removeFreqTask(lp.hReservedKillTask);
+                }
+            } catch (Exception err) {
+                if (logger != null) {
+                    logger.writeLog(err);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 콜백함수, 마비노기로 추정되는 프로세스를 찾았을 때 실행
+        /// </summary>
+        /// <param name="pName"></param>
+        /// <param name="PID"></param>
+        /// <param name="startTime"></param>
+        /// <param name="coreState"></param>
+        /// <param name="runPath"></param>
+        /// <param name="usrParam"></param>
+        private void CB_FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, bool isHide, ref object usrParam)
+        {
+            LvMabiDataCollection lvItm = (LvMabiDataCollection)usrParam;
+
+            var newData = new LV_MabiProcessRowData(pName,
+                                               PID + "",
+                                               startTime,
+                                               coreState + "",
+                                               runPath);
+            LvRowParam param = new LvRowParam();
+            param.PID = PID; param.hReservedKillTask = null;
+            newData.userParam = param; //찾았던 프로세스 정보 보관해서 나중에 써먹기위함
+            newData.isHide = isHide;
+            lvItm = null;
+            lvItm.Add(newData);
+        }
+
+        /// <summary>
+        /// 마비노기 프로세스 찾기 작업 하기 전 호출되는 콜백함수
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <param name="usrParam"></param>
+        private void CB_PreFindMabiProcess(Process[] lst, ref object usrParam)
+        {
+            if (bDebugRun) {
+                /*디버그 모드라면 현재 발견된 목록 수와 프로세스들의 FullPath를 로그에 찍어준다.*/
+                dbgLogWriteStr("CB_PreFindMabiProcess",
+                               "Target Count=["
+                               + (lst == null ? 0 : lst.Length)
+                               + "]");
+                int i=0;
+                foreach (Process p in lst) {
+                    dbgLogWriteStr("CB_PreFindMabiProcess",
+                                   string.Format("[{0}] FullPath={1}",
+                                                  i+1,MabiProcess.getProcessFullPath(p)));
+                }
             }
         }
 
@@ -286,41 +326,47 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// </summary>
         public void RefresMabiProcess()
         {
-            dbgLogWriteStr("RefreshMabiProcess","Wait Lock");
-            // lock
-            lock (this.lockObj) {
-                dbgLogWriteStr("RefreshMabiProcess", "UI_DispatchEvt Start");
-                // work thread invoke UI thread
-                UI_DispatchEvt(new Action(delegate {
-                    /*계속 할당받지말고,... 기존에 쓰던것을 활용하게 하다!*/
-                    LvMabiDataCollection newList = new LvMabiDataCollection();
+            try {
+                dbgLogWriteStr("RefreshMabiProcess", "Wait Lock");
+                // lock
+                lock (this.lockObj) {
+                    dbgLogWriteStr("RefreshMabiProcess", "UI_DispatchEvt Start");
+                    // work thread invoke UI thread
+                    UI_DispatchEvt(new Action(delegate {
+                        /*계속 할당받지말고,... 기존에 쓰던것을 활용하게 하다!*/
+                        LvMabiDataCollection newList = new LvMabiDataCollection();
 
-                    dbgLogWriteStr("RefreshMabiProcess", "Find Mabinogi Process");
-                    object param = newList; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
-                    MabiProcess.getAllTargets(CB_FindMabiProcess, ref param);
+                        dbgLogWriteStr("RefreshMabiProcess", "Find Mabinogi Process");
+                        object param = newList; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
+                        MabiProcess.getAllTargets(CB_FindMabiProcess, ref param, CB_PreFindMabiProcess);
 
-                    /*by LT인척하는엘프 2021.06.13
-                     귀찮아서 무조건 Set하던것을.. 기존 아이템과 비교하여
-                     목록을 적절히 갱신시키게 함!*/
-                    /*독립된 스레드이므로 버튼 클릭과 겹치게 되면 곤란하다
-                      예: 버튼 클릭 이벤트에서 리스트를 참조중인데 
-                          하필 그 순간 프로세스 종료가 감지되어서 여기서 바로 삭제되면...?
-                          버튼 클릭이벤트에서 제대로 작동이 되지 않을 수 있다.
-                          확실하게 데이터에 Lock을 걸어두고 참조하게 한다.*/
-                    dbgLogWriteStr("RefreshMabiProcess", "Wait for Lv Object");
-                    lvMabiProcess.LvMabi_WaitSingleObject();
-                    var curList = lvMabiProcess.getLvItems();
-                    if (curList == null) {
-                        dbgLogWriteStr("RefreshMabiProcess", "Lv Data set.");
-                        lvMabiProcess.setDataSoure(newList);
-                    } else {
-                        dbgLogWriteStr("RefreshMabiProcess", "Lv Data Update.");
-                        curList.updateDataCollection(newList, removeReservedInfo);
-                    }
-                    lvMabiProcess.LvMabi_ReleaseMutex();
-                    dbgLogWriteStr("RefreshMabiProcess", "Release Lv Object");
-                }));
-                dbgLogWriteStr("RefreshMabiProcess", "UI_DispatchEvt End");
+                        /*by LT인척하는엘프 2021.06.13
+                         귀찮아서 무조건 Set하던것을.. 기존 아이템과 비교하여
+                         목록을 적절히 갱신시키게 함!*/
+                        /*독립된 스레드이므로 버튼 클릭과 겹치게 되면 곤란하다
+                          예: 버튼 클릭 이벤트에서 리스트를 참조중인데 
+                              하필 그 순간 프로세스 종료가 감지되어서 여기서 바로 삭제되면...?
+                              버튼 클릭이벤트에서 제대로 작동이 되지 않을 수 있다.
+                              확실하게 데이터에 Lock을 걸어두고 참조하게 한다.*/
+                        dbgLogWriteStr("RefreshMabiProcess", "Wait for Lv Object");
+                        lvMabiProcess.LvMabi_WaitSingleObject();
+                        var curList = lvMabiProcess.getLvItems();
+                        if (curList == null) {
+                            dbgLogWriteStr("RefreshMabiProcess", "Lv Data set.");
+                            lvMabiProcess.setDataSoure(newList);
+                        } else {
+                            dbgLogWriteStr("RefreshMabiProcess", "Lv Data Update.");
+                            curList.updateDataCollection(newList, removeReservedInfo);
+                        }
+                        lvMabiProcess.LvMabi_ReleaseMutex();
+                        dbgLogWriteStr("RefreshMabiProcess", "Release Lv Object");
+                    }));
+                    dbgLogWriteStr("RefreshMabiProcess", "UI_DispatchEvt End");
+                }
+            } catch (Exception err) {
+                if (logger != null) {
+                    logger.writeLog(err);
+                }
             }
         }
 
@@ -340,8 +386,14 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// <param name="e"></param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (ProgramVersionChecker.isNewVersionExist()) {
-                showMessage("새 버전이 있습니다!!\n[프로그램→정보]메뉴를 이용하여 새 버전을 받을 수 있습니다.");
+            try {
+                if (ProgramVersionChecker.isNewVersionExist()) {
+                    showMessage("새 버전이 있습니다!!\n[프로그램→정보]메뉴를 이용하여 새 버전을 받을 수 있습니다.");
+                }
+            }catch(Exception err) {
+                if (logger != null) {
+                    logger.writeLog(err);
+                }
             }
         }
 
@@ -352,7 +404,7 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// <param name="str"></param>
         private void dbgLogWriteStr(string funcName, string str)
         {
-            if (bDebugRun) {
+            if (bDebugRun && (logger!=null)) {
                 logger.writeLog(string.Format("[{0}] {1}", funcName,str));
             }
         }

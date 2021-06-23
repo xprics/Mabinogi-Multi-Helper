@@ -24,71 +24,83 @@ namespace CPU_Preference_Changer.UI.MainUI {
         /// <param name="e"></param>
         private void btAutoSet_Click(object sender, RoutedEventArgs e)
         {
-            dbgLogWriteStr("btAutoSet_Click", "btAutoSet Clicked.");
-            if (lvMabiProcess.isMainCharSel() == false) {
-                showMessage("어떤 클라이언트가 본캐인지 선택하세요!\n"
-                           +"프로세스 명을 클릭하면 마비노기 화면으로 전환됩니다!");
-                return;
-            }
-
-            lvMabiProcess.LvMabi_WaitSingleObject();
-            /*------------------------------------------------------------------*/
-            /*본캐 체크된 것만... 최대한 코어 사용하게 하고 나머지는 하나로 몰아 넣는다!*/
-            var lst = lvMabiProcess.getLvItems();
-            /*------------------------------------------------------------------*/
-            if (lst == null) return;
-            /*------------------------------------------------------------------*/
-            dbgLogWriteStr("btAutoSet_Click", string.Format("{0} ; Target Count->{1}",
-                                                            "Enum Start... ",
-                                                            lst.Count));
-            IntPtr val = MabiProcess.GetMaxAffinityVal();
-            lst.enumAllData(curData =>
-            {
-                if (curData.bMainCharacter) {
-                    ulong max, min;
-                    max = (ulong)MabiProcess.GetMaxAffinityVal();
-                    min = (ulong)MabiProcess.GetMinAffinityVal();
-                    /* 부캐가 점유하고있는 CPU를 제외하고 활성화 함*/
-                    val = MabiProcess.ConvToSystemBit(max & (~min));
-                } else {
-                    val = MabiProcess.GetMinAffinityVal();
+            try {
+                dbgLogWriteStr("btAutoSet_Click", "btAutoSet Clicked.");
+                if (lvMabiProcess.isMainCharSel() == false) {
+                    showMessage("어떤 클라이언트가 본캐인지 선택하세요!\n"
+                               + "프로세스 명을 클릭하면 마비노기 화면으로 전환됩니다!");
+                    return;
                 }
-                MabiProcess.setTargetCoreState(((LvRowParam)curData.userParam).PID, val);
-                curData.coreState = val + "";
-            });
-            lvMabiProcess.LvMabi_ReleaseMutex();
-            /*------------------------------------------------------------------*/
-            showMessage("설정 완료");
+
+                lvMabiProcess.LvMabi_WaitSingleObject();
+                /*------------------------------------------------------------------*/
+                /*본캐 체크된 것만... 최대한 코어 사용하게 하고 나머지는 하나로 몰아 넣는다!*/
+                var lst = lvMabiProcess.getLvItems();
+                /*------------------------------------------------------------------*/
+                if (lst == null) return;
+                /*------------------------------------------------------------------*/
+                dbgLogWriteStr("btAutoSet_Click", string.Format("{0} ; Target Count->{1}",
+                                                                "Enum Start... ",
+                                                                lst.Count));
+                IntPtr val = MabiProcess.GetMaxAffinityVal();
+                lst.enumAllData(curData =>
+                {
+                    if (curData.bMainCharacter) {
+                        ulong max, min;
+                        max = (ulong)MabiProcess.GetMaxAffinityVal();
+                        min = (ulong)MabiProcess.GetMinAffinityVal();
+                    /* 부캐가 점유하고있는 CPU를 제외하고 활성화 함*/
+                        val = MabiProcess.ConvToSystemBit(max & (~min));
+                    } else {
+                        val = MabiProcess.GetMinAffinityVal();
+                    }
+                    MabiProcess.setTargetCoreState(((LvRowParam)curData.userParam).PID, val);
+                    curData.coreState = val + "";
+                });
+                lvMabiProcess.LvMabi_ReleaseMutex();
+                /*------------------------------------------------------------------*/
+                showMessage("설정 완료");
+            }catch(Exception err) {
+                if (logger != null) {
+                    logger.writeLog(err);
+                }
+            }
         }
 
         /// <summary>
-        /// 새로고침 버튼을 클릭했을 때
+        /// 초기화 버튼을 클릭했을 때
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btReset_Click(object sender, RoutedEventArgs e)
         {
-            dbgLogWriteStr("btReset_Click", "btReset Clicked.");
-            /*------------------------------------------------------------------*/
-            lvMabiProcess.LvMabi_WaitSingleObject();
-            /*------------------------------------------------------------------*/
-            /*모든 프로세스에 대하여 초기화 수행!*/
-            var lst = lvMabiProcess.getLvItems();
-            /*------------------------------------------------------------------*/
-            if (lst == null) return;
-            /*------------------------------------------------------------------*/
-            dbgLogWriteStr("btReset_Click", string.Format("{0} ; Target Count->{1}"
-                                                          ,"Enum Start... "
-                                                          ,lst.Count));
-            IntPtr resetVal = MabiProcess.GetMaxAffinityVal();
-            lst.enumAllData(curData =>
-            {
-                MabiProcess.setTargetCoreState(((LvRowParam)curData.userParam).PID, resetVal);
-                curData.coreState = resetVal + "";
-            });
-            lvMabiProcess.LvMabi_ReleaseMutex();
-            /*------------------------------------------------------------------*/
-            showMessage("설정 완료");
+            try {
+                dbgLogWriteStr("btReset_Click", "btReset Clicked.");
+                /*------------------------------------------------------------------*/
+                lvMabiProcess.LvMabi_WaitSingleObject();
+                /*------------------------------------------------------------------*/
+                /*모든 프로세스에 대하여 초기화 수행!*/
+                var lst = lvMabiProcess.getLvItems();
+                /*------------------------------------------------------------------*/
+                if (lst == null) return;
+                /*------------------------------------------------------------------*/
+                dbgLogWriteStr("btReset_Click", string.Format("{0} ; Target Count->{1}"
+                                                              , "Enum Start... "
+                                                              , lst.Count));
+                IntPtr resetVal = MabiProcess.GetMaxAffinityVal();
+                lst.enumAllData(curData =>
+                {
+                    MabiProcess.setTargetCoreState(((LvRowParam)curData.userParam).PID, resetVal);
+                    curData.coreState = resetVal + "";
+                });
+                lvMabiProcess.LvMabi_ReleaseMutex();
+                /*------------------------------------------------------------------*/
+                showMessage("설정 완료");
+            }catch(Exception err) {
+                if (logger != null) {
+                    logger.writeLog(err);
+                }
+            }
         }
 
         /// <summary>
@@ -132,24 +144,10 @@ namespace CPU_Preference_Changer.UI.MainUI {
         }
 
         /// <summary>
-        /// 새로고침 눌렀음..
+        /// 메뉴 - 종료 클릭
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btRefresh_Click(object sender, RoutedEventArgs e)
-        {
-            initWindow();
-            showMessage("새로고침 완료");
-        }
-        /// <summary>
-        /// 프로그램 종료 버튼 이벤트
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btExit_Click(object sender, RoutedEventArgs e)
-        {
-            CloseApplication();
-        }
         private void menu_Close_Click(object sender, RoutedEventArgs e)
         {
             CloseApplication();
@@ -287,12 +285,18 @@ namespace CPU_Preference_Changer.UI.MainUI {
         /// <param name="rowData"></param>
         private void LvMabiProcess_onCbHideClicked(LV_MabiProcessRowData rowData)
         {
-            if (rowData.isHide) {
-                /*보여진 것을 숨겨야하는 케이스*/
-                MabiProcess.SetHideWindow(((LvRowParam)rowData.userParam).PID);
-            } else {
-                /*숨겨진 것을 보이게 만드는 케이스*/
-                MabiProcess.UnSetHideWindow(((LvRowParam)rowData.userParam).PID);
+            try {
+                if (rowData.isHide) {
+                    /*보여진 것을 숨겨야하는 케이스*/
+                    MabiProcess.SetHideWindow(((LvRowParam)rowData.userParam).PID);
+                } else {
+                    /*숨겨진 것을 보이게 만드는 케이스*/
+                    MabiProcess.UnSetHideWindow(((LvRowParam)rowData.userParam).PID);
+                }
+            }catch (Exception err) {
+                if (logger != null) {
+                    logger.writeLog(err);
+                }
             }
         }
 
@@ -308,14 +312,20 @@ namespace CPU_Preference_Changer.UI.MainUI {
 
             if (headerClicked != null) {
                 if (headerClicked.Role != GridViewColumnHeaderRole.Padding) {
-                    /*적절히 정렬수행함...*/
-                    lvMabiProcess.sortListData(sortDirection);
+                    try {
+                        /*적절히 정렬수행함...*/
+                        lvMabiProcess.sortListData(sortDirection);
 
-                    /*다음 클릭 시 반대방향 정렬을 위해 미리 토글해둠*/
-                    if (sortDirection == ListSortDirection.Ascending) {
-                        sortDirection = ListSortDirection.Descending;
-                    } else {
-                        sortDirection = ListSortDirection.Ascending;
+                        /*다음 클릭 시 반대방향 정렬을 위해 미리 토글해둠*/
+                        if (sortDirection == ListSortDirection.Ascending) {
+                            sortDirection = ListSortDirection.Descending;
+                        } else {
+                            sortDirection = ListSortDirection.Ascending;
+                        }
+                    }catch (Exception err) {
+                        if (logger != null) {
+                            logger.writeLog(err);
+                        }
                     }
                 }
             }

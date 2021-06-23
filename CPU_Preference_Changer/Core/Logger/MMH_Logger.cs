@@ -36,6 +36,16 @@ namespace CPU_Preference_Changer.Core.Logger {
         }
 
         /// <summary>
+        /// 주어진 String에 타임스탬프를 덧붙인다.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private string mkTimeStampStr(string str)
+        {
+            return string.Format("[{0}] {1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss:ffff"), str);
+        }
+
+        /// <summary>
         /// 로그 기록 ( 기록시간과 개행문자는 알아서 넣어줌 )
         /// </summary>
         /// <param name="str"></param>
@@ -45,8 +55,21 @@ namespace CPU_Preference_Changer.Core.Logger {
                 /*멀티스레드 환경에서 이미 닫긴경우 아무것도 안하게 처리..*/
                 if (sw == null) return;
                 /*Date 기록*/
-                sw.WriteLine(string.Format("[{0}] {1}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss:ffff"), str));
+                sw.WriteLine(mkTimeStampStr(str));
                 sw.Flush(); /*로그가 바로바로 기록되도록 Flush한다.*/
+            }
+        }
+
+        /// <summary>
+        /// Exception정보 로그로 쓰기..
+        /// </summary>
+        /// <param name="err"></param>
+        public void writeLog(Exception err)
+        {
+            lock (obj) {
+                sw.WriteLine(mkTimeStampStr(err.Message));
+                sw.WriteLine(mkTimeStampStr(err.StackTrace));
+                sw.Flush();
             }
         }
 
