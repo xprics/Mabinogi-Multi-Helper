@@ -8,13 +8,34 @@ namespace CPU_Preference_Changer.Core
 {
     class MabiProcess {
         public delegate void FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, bool isHide, ref object usrParam);
+        public delegate void PreFindMabiProcess(Process[] lst,ref object userParam);
 
-        private readonly static string mabiClientName ;
-        private readonly static string mabiRunFilePath;
+        /// <summary>
+        /// 마비노기 클라이언트 명칭
+        /// </summary>
+        public readonly static string mabiClientName ;
+        
+        /// <summary>
+        /// 마비노기가 설치되었을것으로 판단되는 경로 + 클라이언트.exe (클라이언트 프로그램 fullPath)
+        /// </summary>
+        public readonly static string mabiRunFilePath;
         static MabiProcess() {
             mabiClientName = "client";
             mabiRunFilePath = string.Format(@"{0}\{1}.exe", getMabinogiInstallPathFromReg(), mabiClientName);
          }
+
+        /// <summary>
+        /// 프로세스 실행경로 (FullPath) 얻기
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static string getProcessFullPath(Process p)
+        {
+            if (p != null) {
+                return p.MainModule.FileName;
+            }
+            return "";
+        }
 
         /// <summary>
         /// 마비노기 프로세스가 맞는지 아닌지 판단한다.
@@ -23,7 +44,7 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static bool isMabiProcess(Process p)
         {
-            if (string.Compare(p.MainModule.FileName.ToUpper(), mabiRunFilePath.ToUpper()) == 0) {
+            if (string.Compare(getProcessFullPath(p).ToUpper(), mabiRunFilePath.ToUpper()) == 0) {
                 return true;
             }
             return false;
@@ -32,11 +53,21 @@ namespace CPU_Preference_Changer.Core
         /// <summary>
         /// 마비노기로 추정되는 프로세스 목록 얻기
         /// </summary>
-        /// <returns></returns>
-        public static void getAllTargets(FindMabiProcess fnFindMabiProcess, ref object usrParam)
+        /// <param name="fnFindMabiProcess">마비노기 프로세스를 찾았을 때 실행할 콜백</param>
+        /// <param name="usrParam">유저 Param</param>
+        /// <param name="preFindMabiProcess">마비노기 프로세스를 찾기 전, 실행되는 함수(타겟정보)</param>
+        public static void getAllTargets(FindMabiProcess fnFindMabiProcess, ref object usrParam,
+                                         PreFindMabiProcess preFindMabiProcess)
         {
             // 실행 프로세스 중 Client(마비노기 클라이언트 프로세스 이름) 가져오기
             Process[] lst = Process.GetProcessesByName(mabiClientName);
+            /*----------------------------------------------------------------------------------*/
+            if (preFindMabiProcess != null) {
+                preFindMabiProcess(lst, ref usrParam);
+            }
+            /*----------------------------------------------------------------------------------*/
+            if (lst == null) return;
+            /*----------------------------------------------------------------------------------*/
             foreach (Process p in lst) {
                 using (p) {
                     try {
@@ -57,6 +88,7 @@ namespace CPU_Preference_Changer.Core
                     }
                 }
             }
+            /*----------------------------------------------------------------------------------*/
         }
 
         /// <summary>
