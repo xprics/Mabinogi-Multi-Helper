@@ -295,7 +295,6 @@ namespace CPU_Preference_Changer.UI.MainUI
             param.PID = PID; param.hReservedKillTask = null;
             newData.userParam = param; //찾았던 프로세스 정보 보관해서 나중에 써먹기위함
             newData.isHide = isHide;
-            lvItm = null;
             lvItm.Add(newData);
         }
 
