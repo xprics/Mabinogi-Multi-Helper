@@ -61,9 +61,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 /*------------------------------------------------------------------*/
                 showMessage("설정 완료");
             }catch(Exception err) {
-                if (logger != null) {
-                    logger.writeLog(err);
-                }
+                programErrLogWrite(err);
             }
         }
 
@@ -97,9 +95,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 /*------------------------------------------------------------------*/
                 showMessage("설정 완료");
             }catch(Exception err) {
-                if (logger != null) {
-                    logger.writeLog(err);
-                }
+                programErrLogWrite(err);
             }
         }
 
@@ -294,9 +290,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
                     MabiProcess.UnSetHideWindow(((LvRowParam)rowData.userParam).PID);
                 }
             }catch (Exception err) {
-                if (logger != null) {
-                    logger.writeLog(err);
-                }
+                programErrLogWrite(err);
             }
         }
 
@@ -323,9 +317,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
                             sortDirection = ListSortDirection.Ascending;
                         }
                     }catch (Exception err) {
-                        if (logger != null) {
-                            logger.writeLog(err);
-                        }
+                        programErrLogWrite(err);
                     }
                 }
             }

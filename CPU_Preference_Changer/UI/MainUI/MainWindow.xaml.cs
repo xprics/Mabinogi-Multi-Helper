@@ -139,9 +139,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                     this.trayIcon.Visible = false;
                 };
             } catch (Exception err) {
-                if(logger != null) {
-                    logger.writeLog(err);
-                }
+                programErrLogWrite(err);
                 showMessage("트레이 아이콘 생성 실패 : " + err.Message);
             }
         }
@@ -184,9 +182,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                     }
                 }
             } catch (Exception err) {
-                if(logger != null) {
-                    logger.writeLog(err);
-                }
+                programErrLogWrite(err);
                 e.Cancel = false;
             }
             finally {
@@ -267,9 +263,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                     backTmgr.removeFreqTask(lp.hReservedKillTask);
                 }
             } catch (Exception err) {
-                if (logger != null) {
-                    logger.writeLog(err);
-                }
+                programErrLogWrite(err);
             }
         }
 
@@ -298,9 +292,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                 newData.isHide = isHide;
                 lvItm.Add(newData);
             }catch(Exception err) {
-                if (logger != null) {
-                    logger.writeLog(err);
-                }
+                programErrLogWrite(err);
             }
         }
 
@@ -369,9 +361,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                     dbgLogWriteStr("RefreshMabiProcess", "UI_DispatchEvt End");
                 }
             } catch (Exception err) {
-                if (logger != null) {
-                    logger.writeLog(err);
-                }
+                programErrLogWrite(err);
             }
         }
 
@@ -396,9 +386,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                     showMessage("새 버전이 있습니다!!\n[프로그램→정보]메뉴를 이용하여 새 버전을 받을 수 있습니다.");
                 }
             }catch(Exception err) {
-                if (logger != null) {
-                    logger.writeLog(err);
-                }
+                programErrLogWrite(err);
             }
         }
 
@@ -411,6 +399,18 @@ namespace CPU_Preference_Changer.UI.MainUI
         {
             if (bDebugRun && (logger!=null)) {
                 logger.writeLog(string.Format("[{0}] {1}", funcName,str));
+            }
+        }
+
+        /// <summary>
+        /// 예외 상황 발생 시 로그 남기기..
+        /// </summary>
+        /// <param name="err"></param>
+        private void programErrLogWrite(Exception err)
+        {
+            if (logger != null) {
+                logger.writeLog(err);
+                showMessage(string.Format("[프로그램 실행 중 오류 발생]\n{0}\n{1}",err.Message,err.StackTrace));
             }
         }
     }
