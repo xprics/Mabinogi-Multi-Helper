@@ -115,6 +115,8 @@ namespace CPU_Preference_Changer.Core {
     /// 프로그램 버전 체크를 위한 클래스
     /// </summary>
     class ProgramVersionChecker {
+        private readonly static string version_date;
+        private readonly static string version_revValue;
         public readonly static string currentVersion;
         private readonly static string parsingStr = "^^#$";
 
@@ -124,7 +126,85 @@ namespace CPU_Preference_Changer.Core {
         /// </summary>
         static ProgramVersionChecker()
         {
-            currentVersion = "2021.06.15_REV_1.001";
+            version_date = "2021.07.16";
+            version_revValue = "1.000"; /* 소수점 3자리 비어있더라도 3자리까지 꽉채울 것!*/
+            currentVersion = string.Format("{0}_REV_{1}",version_date,version_revValue);
+
+            if (isValidVer(currentVersion) == false) {
+                /*심각한에러.*/
+                throw new Exception("Version값 에러");
+            }
+        }
+
+        /// <summary>
+        /// 버전 정보 중 YMD얻기
+        /// </summary>
+        /// <param name="verStr"></param>
+        /// <returns></returns>
+        private static string getCurVerDate(string verStr)
+        {
+            /*YYYY.mm.dd를 포함한다면 최소 10글자..*/
+            if (verStr == null || isValidVer(verStr) == false)
+                return "";
+            /* yyyy.mm.dd로 시작되기때문에 앞부분 10글자 짤라냄.*/
+            return verStr.Substring(0,10);
+        }
+
+        /// <summary>
+        /// 버전 글자가 맞는지 검사..
+        /// 이게 틀릴 이유는 없다고보는데... 일단 대충 만들어둠.
+        /// </summary>
+        /// <param name="verStr"></param>
+        /// <returns></returns>
+        private static bool isValidVer(string verStr)
+        {
+            /*1. 20글자가 아니면 버전정보 아님*/
+            if (verStr.Length != 20) return false;
+            /*2. YYYY.MM.DD이후, _REV_가 발견되어야 함*/
+            if (verStr.Contains("_REV_") == false) return false;
+            /*3. _REV_가 11번째 (idx로는10)에서 발견되어야 함.*/
+            if (verStr.IndexOf("_REV_") != 10) return false;
+            /*---------------------------------------------------------------*/
+            /*날짜형식 및 REV버전 형식(소수점3자리) 확인해야하지만.. 
+             *   귀찮으니 패스하자....*/
+            return true;
+        }
+
+        /// <summary>
+        /// rev버전 값 얻기
+        /// </summary>
+        /// <param name="verStr"></param>
+        /// <returns></returns>
+        private static string getRevVer(string verStr)
+        {
+            if (verStr == null || isValidVer(verStr) == false)
+                return "";
+            /*버전값에 의하면 REV버전 값은 16번째부터 나온다!*/
+            return verStr.Substring(15, verStr.Length - 15);
+        }
+
+        /// <summary>
+        /// 프로그램 버전 검사 함수
+        /// </summary>
+        /// <param name="curVerseion"></param>
+        /// <returns>-1 : 인자로 주어진 버전이 더 옛날 버전
+        ///           0 : 동일한 버전
+        ///           1 : 인자로 주어진 버전이 더 미래의 버전 ( 프로그램 배포 전에 발생 or Git의 버전 정보를 갱신하지 않아서 발생 )</returns>
+        private static int versionCompare(string curVer)
+        {
+            /*두 버전이 단순히 동일한지..*/
+            if (curVer.ToUpper().Equals(currentVersion.ToUpper()))
+                return 0;
+            /*날짜 파트 검사.*/
+            string curVer_Date, curVer_rev;
+
+            curVer_Date = getCurVerDate(curVer);
+            curVer_rev = getRevVer(curVer);
+
+            int i = string.Compare(version_date, curVer_Date);
+            if (i != 0) return i;
+            /* 날짜까지 같다면 rev버전 비교*/
+            return string.Compare(version_revValue, curVer_rev);
         }
 
         /// <summary>
@@ -142,7 +222,11 @@ namespace CPU_Preference_Changer.Core {
                 var str = getter.getFirstHiddenStr();
                 if (str != null) {
                     string webVersion = str.Substring(parsingStr.Length);
-                    if (false == webVersion.ToUpper().Equals(currentVersion.ToUpper())) {
+                    /*버전 정보는 YYYY.MM.DD_REV_1.001처럼 되어있다.
+                       따라서,,
+                    날짜를 파싱하고, 뒤에 REV버전을 파싱하여
+                    나보다 높은지 낮은지 판단할 수 있음!*/
+                    if (versionCompare(webVersion.ToUpper())<0) {
                         return true;
                     } else {
                         return false;
