@@ -10,6 +10,7 @@ using CPU_Preference_Changer.Core.SingleTonTemplate;
 using CPU_Preference_Changer.BackgroundTask;
 using CPU_Preference_Changer.Core.Logger;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace CPU_Preference_Changer.UI.MainUI
 {
@@ -381,13 +382,23 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// <param name="e"></param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            try {
-                if (ProgramVersionChecker.isNewVersionExist()) {
-                    showMessage("새 버전이 있습니다!!\n[프로그램→정보]메뉴를 이용하여 새 버전을 받을 수 있습니다.");
+            ProgramVersionCheck();
+        }
+
+        /// <summary>
+        /// 프로그램 버전 확인..
+        /// </summary>
+        private void ProgramVersionCheck()
+        {
+            var task1 = Task.Run( () => {
+                try {
+                    if (ProgramVersionChecker.isNewVersionExist()) {
+                        showMessage("새 버전이 있습니다!!\n[프로그램→정보]메뉴를 이용하여 새 버전을 받을 수 있습니다.");
+                    }
+                } catch (Exception err) {
+                    programErrLogWrite(err);
                 }
-            }catch(Exception err) {
-                programErrLogWrite(err);
-            }
+            });
         }
 
         /// <summary>
