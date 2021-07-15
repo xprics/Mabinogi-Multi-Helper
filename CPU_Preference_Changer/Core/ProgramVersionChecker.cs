@@ -67,8 +67,22 @@ namespace CPU_Preference_Changer.Core {
                 if ( response.StatusCode == HttpStatusCode.OK) {
                     using (var x = response.GetResponseStream()) {
                         StreamReader sr = new StreamReader(x);
-                        while (!sr.EndOfStream) {
-                            var curLine = sr.ReadLine();
+                        /* by LT인척하는엘프 2021.07.16 
+                         * 아래와 같이 sr.EndOfStream과 sr.ReadLine()을 이용하여
+                           구현했던 버전에서 무슨 이유인지 모르지만 Release모드에서
+                            아주 낮은 확률로 EndOfStream이 영원히 false인 현상이 발견되어서
+                            String을 모두 받아내고 개행문자단위로 구분하여 찾게함!
+                        =======================================================
+                        while(!sr.EndOfStream){
+                            string curLine = sr.readLine();
+                            if ( curLine.Contains(targetStr) )
+                                targetLst.Add(curLine);
+                        }
+                        =======================================================
+                         */
+                        string readStr = sr.ReadToEnd();
+                        string[] sepLine = readStr.Split(new char[] {'\r','\n' });
+                        foreach(string curLine in sepLine) {
                             if ( curLine.Contains(targetStr) )
                                 targetLst.Add(curLine);
                         }

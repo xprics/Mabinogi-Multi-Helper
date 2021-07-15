@@ -31,7 +31,7 @@ namespace CPU_Preference_Changer.Core.Logger {
         /// </summary>
         private void openLogFile()
         {
-            fs = File.Open(logPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            fs = File.Open(logPath, FileMode.OpenOrCreate, FileAccess.ReadWrite,FileShare.Read);
             sw = new StreamWriter(fs);
         }
 
