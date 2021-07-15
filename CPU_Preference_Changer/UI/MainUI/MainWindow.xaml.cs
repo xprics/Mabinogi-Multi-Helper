@@ -284,18 +284,24 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// <param name="usrParam"></param>
         private void CB_FindMabiProcess(string pName, int PID, string startTime, IntPtr coreState, string runPath, bool isHide, ref object usrParam)
         {
-            LvMabiDataCollection lvItm = (LvMabiDataCollection)usrParam;
+            try {
+                LvMabiDataCollection lvItm = (LvMabiDataCollection)usrParam;
 
-            var newData = new LV_MabiProcessRowData(pName,
-                                               PID + "",
-                                               startTime,
-                                               coreState + "",
-                                               runPath);
-            LvRowParam param = new LvRowParam();
-            param.PID = PID; param.hReservedKillTask = null;
-            newData.userParam = param; //찾았던 프로세스 정보 보관해서 나중에 써먹기위함
-            newData.isHide = isHide;
-            lvItm.Add(newData);
+                var newData = new LV_MabiProcessRowData(pName,
+                                                   PID + "",
+                                                   startTime,
+                                                   coreState + "",
+                                                   runPath);
+                LvRowParam param = new LvRowParam();
+                param.PID = PID; param.hReservedKillTask = null;
+                newData.userParam = param; //찾았던 프로세스 정보 보관해서 나중에 써먹기위함
+                newData.isHide = isHide;
+                lvItm.Add(newData);
+            }catch(Exception err) {
+                if (logger != null) {
+                    logger.writeLog(err);
+                }
+            }
         }
 
         /// <summary>
