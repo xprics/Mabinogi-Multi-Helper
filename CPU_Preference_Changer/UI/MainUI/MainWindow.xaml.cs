@@ -388,17 +388,29 @@ namespace CPU_Preference_Changer.UI.MainUI
         /// <summary>
         /// 프로그램 버전 확인..
         /// </summary>
-        private void ProgramVersionCheck()
+        private async void ProgramVersionCheck()
         {
-            var task1 = Task.Run( () => {
-                try {
-                    if (ProgramVersionChecker.isNewVersionExist()) {
-                        showMessage("새 버전이 있습니다!!\n[프로그램→정보]메뉴를 이용하여 새 버전을 받을 수 있습니다.");
-                    }
-                } catch (Exception err) {
-                    programErrLogWrite(err);
+            var task= Task.Run(() => ProgramVersionCheckSubProc());
+
+            int ret = await task;
+            if (ret == -1) {
+                showMessage("새 버전이 있습니다!!\n[프로그램→정보]메뉴를 이용하여 새 버전을 받을 수 있습니다.");
+            } else if (ret == 1) {
+                showMessage("버전 확인 중 오류가 발생했습니다...");
+            }
+        }
+
+        private int ProgramVersionCheckSubProc()
+        {
+            try {
+                if (ProgramVersionChecker.isNewVersionExist()) {
+                    return -1;
                 }
-            });
+            } catch (Exception err) {
+                programErrLogWrite(err);
+                return 1;
+            }
+            return 0;
         }
 
         /// <summary>
