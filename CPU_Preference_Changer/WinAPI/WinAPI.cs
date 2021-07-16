@@ -115,7 +115,7 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         /// <param name="hwnd">윈도우 핸들</param>
         /// <param name="lParam">사용자 Param</param>
         /// <returns></returns>
-        public delegate bool EnumWindowsProc(IntPtr hwnd, int lParam);
+        public delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr lParam);
 
         /// <summary>
         /// 모든 윈도우를 순회하는 윈도우 API함수.
@@ -125,7 +125,7 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         /// <returns></returns>
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, int lParam);
+        public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
 
         /// <summary>
         /// 윈도우 핸들을 통해 PID값을 얻어오는 WIN32 API 함수
@@ -145,5 +145,13 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         /// <returns></returns>
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        /// <summary>
+        /// Get Winddow Text Length
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern int GetWindowTextLength(IntPtr hWnd);
     }
 }
