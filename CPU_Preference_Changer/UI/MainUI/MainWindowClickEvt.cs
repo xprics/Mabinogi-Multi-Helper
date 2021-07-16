@@ -167,8 +167,8 @@ namespace CPU_Preference_Changer.UI.MainUI {
         /// <param name="e"></param>
         private void menu_SystemPowerOff_Click(object sender, RoutedEventArgs e)
         {
-            /*TODO : 1)시스템 예약 종료시간을 입력받고, 예약종료 걸어두기.
-                     2)만약 이미 예약종료를 걸어두었다면?? 취소할 수 있게 취소 걸어두기 */
+            dbgLogWriteStr("menu_SystemPowerOff_Click", "System Shutdown Click Start");
+
             MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
             BackgroundFreqTaskMgmt taskMgr = gInstance.backgroundFreqTaskManager;
 
@@ -208,6 +208,8 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 menu_SystemPowerOff.IsChecked = true;
                 Interlocked.Increment(ref gInstance.reservedTaskCount);
             }
+
+            dbgLogWriteStr("menu_SystemPowerOff_Click", "System Shutdown Click End");
         }
 
         /// <summary>
@@ -216,6 +218,8 @@ namespace CPU_Preference_Changer.UI.MainUI {
         /// <param name="rowData"></param>
         private void LvMabiProcess_onCbRkClicked(LV_MabiProcessRowData rowData)
         {
+            dbgLogWriteStr("LvMabiProcess_onCbRkClicked", "Process Reserv Kill Click Start");
+
             TimeSelectForm tsf = new TimeSelectForm("종료할 시간을 선택하세요??");
             MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
             BackgroundFreqTaskMgmt backTmgr = gInstance.backgroundFreqTaskManager;
@@ -228,6 +232,7 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 rowParam.hReservedKillTask = null;
                 rowData.reservedKillTime = "None";
                 Interlocked.Decrement(ref gInstance.reservedTaskCount);
+                dbgLogWriteStr("LvMabiProcess_onCbRkClicked", "Process Reserv Kill Click End");
                 return;
             }
 
@@ -258,10 +263,12 @@ namespace CPU_Preference_Changer.UI.MainUI {
 
                 /*예약된 작업 수량 증가.*/
                 Interlocked.Increment(ref gInstance.reservedTaskCount);
+                dbgLogWriteStr("LvMabiProcess_onCbRkClicked", "Process Reserv Kill Click End");
                 return;
             }
             /*유저가 취소했으니 체크박스도 다시 해제한다.*/
             rowData.isKillReserved = false;
+            dbgLogWriteStr("LvMabiProcess_onCbRkClicked", "Process Reserv Kill Click End");
         }
 
         /// <summary>
@@ -282,16 +289,22 @@ namespace CPU_Preference_Changer.UI.MainUI {
         private void LvMabiProcess_onCbHideClicked(LV_MabiProcessRowData rowData)
         {
             try {
+                dbgLogWriteStr("LvMabiProcess_onCbHideClicked", "Hide Click Start");
                 if (rowData.isHide) {
                     /*보여진 것을 숨겨야하는 케이스*/
                     MabiProcess.SetHideWindow(((LvRowParam)rowData.userParam).PID);
                 } else {
                     /*숨겨진 것을 보이게 만드는 케이스*/
-                    MabiProcess.UnSetHideWindow(((LvRowParam)rowData.userParam).PID);
+                    MabiProcess.UnSetHideWindow((uint)((LvRowParam)rowData.userParam).PID,
+                        (Exception err) =>
+                        {
+                            programErrLogWrite(err);
+                        });
                 }
             }catch (Exception err) {
                 programErrLogWrite(err);
             }
+            dbgLogWriteStr("LvMabiProcess_onCbHideClicked", "Hide Click end");
         }
 
         ListSortDirection sortDirection = ListSortDirection.Ascending;

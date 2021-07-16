@@ -400,6 +400,12 @@ namespace CPU_Preference_Changer.UI.MainUI
             }
         }
 
+        /// <summary>
+        /// 프로그램 버전 검사 (비동기 처리를 위해 함수 분리)
+        /// </summary>
+        /// <returns>-1 새 버전 있음
+        ///           0 최신버전임
+        ///           1 알아보던 중 오류 발생..</returns>
         private int ProgramVersionCheckSubProc()
         {
             try {

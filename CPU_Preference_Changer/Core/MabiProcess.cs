@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace CPU_Preference_Changer.Core
@@ -256,21 +257,54 @@ namespace CPU_Preference_Changer.Core
         }
 
         /// <summary>
+        /// Enumwindow수행 중 에러 발생 시 실행 할 콜백 함수
+        /// </summary>
+        /// <param name="err"></param>
+        public delegate void EnumWindowErrCallBack(Exception err);
+
+        /// <summary>
+        /// EnumWIndow에 전달 될 Parameter..
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        private struct EnumWindowParam {
+            /// <summary>
+            /// pid값
+            /// </summary>
+            public uint pid; 
+
+            /// <summary>
+            /// 에러발생 시 실행 할 콜백함수
+            /// </summary>
+            public EnumWindowErrCallBack errProc;
+        }
+
+        /// <summary>
         /// EnumWindows에 들어 갈 콜백함수
         /// </summary>
         /// <param name="hwnd">현재 ENUM중인 핸들 값</param>
         /// <param name="lParam">유저 Param</param>
         /// <returns></returns>
-        private static bool CB_FindTargetHwndFromPID(IntPtr hwnd, int lParam)
+        private static bool CB_FindTargetHwndFromPID(IntPtr hwnd, IntPtr lParam)
         {
             uint curPID;
+            EnumWindowParam ep ;
 
+            ep = (EnumWindowParam)Marshal.PtrToStructure(lParam, typeof(EnumWindowParam));
             /* HWND를 통해 이 HWND가 어느 PID에 소속되어있는지 PID값을 얻어낸다. */
             WinAPI.GetWindowThreadProcessId(hwnd, out curPID);
-            if (curPID == (uint)lParam) {
+            if (curPID == ep.pid) {
                 /*PID가 동일한 대상을 찾았다.*/
-                StringBuilder sb=new StringBuilder();
-                WinAPI.GetWindowText(hwnd, sb, 256);
+                int captionLeng = WinAPI.GetWindowTextLength(hwnd);
+
+                /*널문자 고려하여 +1해야 함!*/
+                StringBuilder sb =new StringBuilder(captionLeng+1);
+                try {
+                    WinAPI.GetWindowText(hwnd, sb, sb.Capacity);
+                } catch(Exception err) {
+                    /*에러 발생..*/
+                    ep.errProc(err);
+                }
+
                 /*
                  * return false를 제거하고 ( 항상 return true;처리 )
                  * pParam이 지정한 모든 윈도우 핸들을 SW_SHOW 시켜보면
@@ -283,7 +317,7 @@ namespace CPU_Preference_Changer.Core
                  * 마비노기 라면 SHOW처리하고 중단한다...
                  * 그런데 테스트 결과 보통은 Enum첫번째 들어오자마자 만나는 윈도우 한들이 마비노기 창이다.
                  * Debug.WriteLine("WINDOW TITLE = [" + sb.ToString() + "]");*/
-                if(sb.ToString().Equals("마비노기")) {
+                if (sb.ToString().Equals("마비노기")) {
                     WinAPI.ShowWindow(hwnd, SwindOp.SW_SHOW);
                     return false; /*ENUM중단.*/
                 }
@@ -295,9 +329,19 @@ namespace CPU_Preference_Changer.Core
         /// 주어진 PID를 통해 숨겨졌던 창을 다시 활성화 시킨다..
         /// </summary>
         /// <param name="pid"></param>
-        public static void UnSetHideWindow(int pid)
+        public static void UnSetHideWindow(uint pid, EnumWindowErrCallBack errProc)
         {
-            WinAPI.EnumWindows(CB_FindTargetHwndFromPID, pid);
+            EnumWindowParam ep;
+            ep.pid = pid; ep.errProc = errProc;
+
+            /* 콜백함수 인자로 구조체를 전달하기 위해 Unmanaged Memory할당 후 복사..*/
+            IntPtr allocPtr = Marshal.AllocHGlobal(Marshal.SizeOf(ep));
+            Marshal.StructureToPtr(ep, allocPtr, false);
+            /*Enum Window시작*/
+            WinAPI.EnumWindows(CB_FindTargetHwndFromPID, allocPtr);
+
+            /*관리되지 않는 메모리에서 해당 포인터 삭제*/
+            Marshal.FreeHGlobal(allocPtr);
         }
     }
 }
