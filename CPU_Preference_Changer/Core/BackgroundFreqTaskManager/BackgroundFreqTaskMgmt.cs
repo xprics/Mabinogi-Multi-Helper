@@ -63,11 +63,27 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
             }
         }
 
+        /// <summary>
+        /// BackgroundFreqTaskMgmtLog 기록을 위한 delegate선언
+        /// </summary>
+        /// <param name="state"></param>
+        public delegate void BackBroundFreqTsakMgmtLogDelegate(string state);
+
+        /// <summary>
+        /// 로그 출력 이벤트 핸들러...
+        /// </summary>
+        public event BackBroundFreqTsakMgmtLogDelegate onLogInfoWrite=null;
+
         private int taskID;
         private Dictionary<int, TaskInfo> taskDict;
         private Mutex dickLock;
         private bool bRun = false;
         private bool bManagerStop;
+
+        /// <summary>
+        /// taskManager의 감시주기.. (밀리초)
+        /// </summary>
+        private const int taskManagerTerm = 10; 
 
         public BackgroundFreqTaskMgmt()
         {
@@ -100,6 +116,10 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
             /*-------------------------------------*/
             taskID++;
             dickLock.ReleaseMutex();
+
+            if (onLogInfoWrite!=null) {
+                onLogInfoWrite("addFreqTaskEnd!" + task.ToString()) ;
+            }
             return taskInfo.taskHandle;
         }
 
@@ -133,6 +153,10 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         public void startTaskManager()
         {
             if (bRun) return;
+
+            if (onLogInfoWrite != null){
+                onLogInfoWrite("Create taskManagerWorkThread...");
+            }
             Thread th = new Thread(taskManagerWorkThread);
             th.Start();
             bRun = true;
@@ -151,8 +175,24 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         /// </summary>
         private void taskManagerWorkThreadSubProc()
         {
+            int oneSecLoopCount; //몇번 루프해야 대=충 1초 지나는지>?
+
+            if (taskManagerTerm < 1000)
+                oneSecLoopCount = 1000 / taskManagerTerm;
+            else
+                oneSecLoopCount = 1;
+
+            int i = 0;
             while (bRun) {
-                Thread.Sleep(10); /*CPU사용량 과다사용 방지*/
+                Thread.Sleep(taskManagerTerm); /*CPU사용량 과다사용 방지*/
+
+                if (onLogInfoWrite != null){
+                    if( i % oneSecLoopCount == 0)  /*대충 1초에 1회,...*/
+                    {
+                        onLogInfoWrite("taskManagerWorkThread SubProc start...");
+                    }
+                }
+
                 if (taskDict.Count == 0) continue;
 
                 dickLock.WaitOne();
@@ -167,6 +207,15 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                     /*-------------------------------------------------------*/
                     /*현재 시간과 비교하여 실행 주기를 초과하였다면 실행시킨다.*/
                     ulong curTime = WinAPI.GetTickCount64();
+
+                    if (onLogInfoWrite != null)
+                    {
+                        if (i % oneSecLoopCount == 0)  /*대충 1초에 1회,...*/
+                        {
+                            onLogInfoWrite(string.Format("Task CurTime={0}, lastRunTime={1}, getFreqTick={2}",
+                                                         curTime,curInfo.lastRunTime,curTask.getFreqTick())) ;
+                        }
+                    }
                     if (curTime >= (curInfo.lastRunTime + curTask.getFreqTick())) {
                         curInfo.lastRunTime = curTime;
                         /*이 작업이 오래걸리면 다른 작업들도 지연되기때문에 Thread로 실행한다...*/
@@ -183,6 +232,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                     }
                 }
                 dickLock.ReleaseMutex();
+                ++i;
             }
         }
         
@@ -191,6 +241,12 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         /// </summary>
         private void taskManagerWorkThread()
         {
+            if (onLogInfoWrite != null) {
+                onLogInfoWrite(string.Format("Start taskManagerWorkThread...! -bRun={0}, bManagerStop={1}",
+                                             bRun,
+                                             bManagerStop )
+                              );
+            }
             bManagerStop = true;
             /*실행 해야하는 상태라면 계-속*/
             while (bRun) { 
@@ -212,6 +268,10 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                     Debug.WriteLine(err.Message);
                     Debug.WriteLine(err.StackTrace.ToString());
                     Debug.WriteLine("######################################################");
+                    if (onLogInfoWrite != null){
+                        onLogInfoWrite(err.Message);
+                        onLogInfoWrite(err.StackTrace);
+                    }
                 }
                 /*Thread.Sleep(10);은 taskManagerWorkThreadSubProc 함수가 시작되면 Sleep(10)을 시작하고 하기때문에
                  * 현재 버전에선 필요없다..*/
