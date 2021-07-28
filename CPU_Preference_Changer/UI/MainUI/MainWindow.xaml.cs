@@ -45,20 +45,17 @@ namespace CPU_Preference_Changer.UI.MainUI
             // init trayicon
             initTrayIcon();
 
-            //백그라운드 Task Manager 시작
-            BackgroundFreqTaskMgmt backMgmt = gInstance.backgroundFreqTaskManager;
-            backMgmt.startTaskManager();
-            backMgmt.addFreqTask(new ProcessListRefreshTask(this));
-
-
             /*크래시 로그를 남기기 위해...*/
             logger = gInstance.dbgLogger = new MMH_Logger("./MMH_Log.txt");
-            if(logger == null) {
+            if (logger == null)
+            {
                 showMessage("로거 생성에 실패하였습니다..");
             }
-            if (bDebugRun) {
-                if (logger != null) {
-                    logger.writeLog(  "ClientFullPath=["
+            if (bDebugRun)
+            {
+                if (logger != null)
+                {
+                    logger.writeLog("ClientFullPath=["
                                     + MabiProcess.mabiRunFilePath
                                     + "]");
                 }
@@ -67,6 +64,29 @@ namespace CPU_Preference_Changer.UI.MainUI
                 dbgPanel.Visibility = Visibility.Visible;
 #endif
             }
+
+            //백그라운드 Task Manager 시작
+            BackgroundFreqTaskMgmt backMgmt = gInstance.backgroundFreqTaskManager;
+            if (bDebugRun) {
+                backMgmt.onLogInfoWrite += BackMgmt_onLogInfoWrite;
+            }
+            backMgmt.startTaskManager();
+            if (null == backMgmt.addFreqTask(new ProcessListRefreshTask(this)))
+            {
+                if (logger != null)
+                {
+                    logger.writeLog("ProcessListRefreshTask Add Fail..");
+                }
+            }
+        }
+
+        /// <summary>
+        /// BackgroundWorker로그를 기록해야할 때.,,,
+        /// </summary>
+        /// <param name="state"></param>
+        private void BackMgmt_onLogInfoWrite(string state)
+        {
+            dbgLogWriteStr("BackMgmt_onLogInfoWrite", state);
         }
 
         /// <summary>
