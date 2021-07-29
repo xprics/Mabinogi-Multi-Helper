@@ -115,6 +115,7 @@
     <Compile Include="BackgroundTask\MabiClientKillTask.cs" />
     <Compile Include="Core\BackgroundFreqTaskManager\BackgroundFreqTaskMgmt.cs" />
     <Compile Include="Core\BackgroundFreqTaskManager\IBackgroundFreqTask.cs" />
+    <Compile Include="Core\FileManager.cs" />
     <Compile Include="Core\Logger\MMH_Logger.cs" />
     <Compile Include="Core\MMHGlobal.cs" />
     <Compile Include="Core\ProgramVersionChecker.cs" />
@@ -150,6 +151,9 @@
     <Compile Include="UI\OptionForm\TimeSelectForm.Designer.cs">
       <DependentUpon>TimeSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Tool\MabiDocRePath\MabiDocRePath.xaml.cs">
+      <DependentUpon>MabiDocRePath.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WinAPI\WinAPI.cs" />
     <Page Include="MabiProcessListView\LV_MabiProcess.xaml">
       <SubType>Designer</SubType>
@@ -176,6 +180,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UI\OptionForm\SysShutdownAskForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Tool\MabiDocRePath\MabiDocRePath.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -234,5 +242,6 @@
   <ItemGroup>
     <Resource Include="ReleaseNote.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
