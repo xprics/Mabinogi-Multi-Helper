@@ -126,8 +126,8 @@ namespace CPU_Preference_Changer.Core {
         /// </summary>
         static ProgramVersionChecker()
         {
-            version_date = "2021.07.16";
-            version_revValue = "1.002"; /* 소수점 3자리 비어있더라도 3자리까지 꽉채울 것!*/
+            version_date = "2021.07.29";
+            version_revValue = "1.001"; /* 소수점 3자리 비어있더라도 3자리까지 꽉채울 것!*/
             currentVersion = string.Format("{0}_REV_{1}",version_date,version_revValue);
 
             if (isValidVer(currentVersion) == false) {
