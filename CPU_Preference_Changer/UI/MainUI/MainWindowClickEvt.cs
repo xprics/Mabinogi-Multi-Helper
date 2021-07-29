@@ -5,6 +5,7 @@ using CPU_Preference_Changer.Core.SingleTonTemplate;
 using CPU_Preference_Changer.MabiProcessListView;
 using CPU_Preference_Changer.UI.InfoForm;
 using CPU_Preference_Changer.UI.OptionForm;
+using CPU_Preference_Changer.UI.Tool.MabiDocRePath;
 using System;
 using System.ComponentModel;
 using System.Threading;
@@ -334,6 +335,17 @@ namespace CPU_Preference_Changer.UI.MainUI {
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 마비노기 내문서 경로를 다른곳으로 옮기는 것을 도와주는 화면 출력..
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menu_mabiDocRePath_Click(object sender, RoutedEventArgs e)
+        {
+            MabiDocRePath mdr = new MabiDocRePath(this);
+            mdr.ShowDialog();
         }
     }
 }

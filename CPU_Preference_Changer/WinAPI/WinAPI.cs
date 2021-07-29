@@ -153,5 +153,25 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         /// <returns></returns>
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern int GetWindowTextLength(IntPtr hWnd);
+
+
+        [Flags]
+        public enum SYMBOLIC_LINK_FLAG
+        {
+            File = 0,
+            Directory = 1,
+            AllowUnprivilegedCreate = 2
+        }
+
+        /// <summary>
+        /// 심볼릭 링크 생성 api
+        /// </summary>
+        /// <param name="lpSymlinkFileName"></param>
+        /// <param name="lpTargetFileName"></param>
+        /// <param name="dwFlags"></param>
+        /// <returns></returns>
+        [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.I1)]
+        public static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, SYMBOLIC_LINK_FLAG dwFlags);
     }
 }

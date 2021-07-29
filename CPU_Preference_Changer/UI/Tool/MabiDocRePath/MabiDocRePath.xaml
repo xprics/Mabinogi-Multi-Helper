@@ -1,0 +1,39 @@
+﻿<Window x:Class="CPU_Preference_Changer.UI.Tool.MabiDocRePath.MabiDocRePath"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CPU_Preference_Changer.UI.Tool.MabiDocRePath"
+        mc:Ignorable="d"
+        Title="마비 내문서 경로 옮기기" Height="130" Width="510" WindowStartupLocation="CenterOwner"
+        >
+    <Grid VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="50"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+           
+        <Label Content="현재 경로" Grid.Row="0" Grid.Column="0"/>
+        <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" x:Name="tb_SourcePath" />
+            
+        <Label Content="새 경로" Grid.Row="2" Grid.Column="0"/>
+        <TextBox Grid.Row="2" Grid.Column="1"  IsReadOnly="True" x:Name="tb_DestPath"/>
+
+        <Button Grid.Row="0" Grid.Column="2" Content="..." x:Name="bt_SelSource" Click="bt_SelSource_Click"/>
+        <Button Grid.Row="2" Grid.Column="2" Content="..." x:Name="bt_SelDest" Click="bt_SelDest_Click"/>
+
+        <Button Margin="5 0 5 0" Grid.Row="0" Grid.Column="3" Grid.RowSpan="3" Content="옮김!" x:Name="bt_Start" Click="bt_Start_Click"/>
+
+        <Label x:Name="label_Message" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" Content="새 경로를 지정해주세요."/>
+    </Grid>
+</Window>
