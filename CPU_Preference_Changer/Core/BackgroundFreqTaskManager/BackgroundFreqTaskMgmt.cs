@@ -175,12 +175,10 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         /// </summary>
         private void taskManagerWorkThreadSubProc()
         {
-            int oneSecLoopCount; //몇번 루프해야 대=충 1초 지나는지>?
+            int oneSecLoopCount = 1; //몇번 루프해야 대=충 1초 지나는지>?
 
             if (taskManagerTerm < 1000)
                 oneSecLoopCount = 1000 / taskManagerTerm;
-            else
-                oneSecLoopCount = 1;
 
             int i = 0;
             while (bRun) {

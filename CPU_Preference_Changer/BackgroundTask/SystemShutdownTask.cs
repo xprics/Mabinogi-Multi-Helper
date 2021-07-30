@@ -40,7 +40,7 @@ namespace CPU_Preference_Changer.BackgroundTask {
         public bool runFreqWork(HBFT hTask, object param)
         {
             DateTime curTime = DateTime.Now;
-            curTime.CompareTo(targetTime);
+
             if (curTime.CompareTo(targetTime) > 0) {
                 /* 종료 시간이 되었다.
                  * 유저의 변심을 고려하여 최후의 1분 선택지를 유저에게 보여준다.*/
