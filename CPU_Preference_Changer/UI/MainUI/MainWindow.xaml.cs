@@ -462,5 +462,15 @@ namespace CPU_Preference_Changer.UI.MainUI
                 showMessage(string.Format("[프로그램 실행 중 오류 발생]\n{0}\n{1}",err.Message,err.StackTrace));
             }
         }
+
+        /// <summary>
+        /// 새로고침 클릭...
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            RefresMabiProcess();
+        }
     }
 }
