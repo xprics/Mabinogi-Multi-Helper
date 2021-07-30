@@ -23,7 +23,9 @@ namespace CPU_Preference_Changer.Core
         static MabiProcess() {
             mabiClientName = "client";
             mabiRunFilePath = string.Format(@"{0}\{1}.exe", getMabinogiInstallPathFromReg(), mabiClientName);
-         }
+
+            SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog("mariRunFilePath : " + mabiRunFilePath);
+        }
 
         /// <summary>
         /// 프로세스 실행경로 (FullPath) 얻기
@@ -32,10 +34,19 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static string getProcessFullPath(Process p)
         {
-            if (p != null) {
-                return p.MainModule.FileName;
+            string fullPath = "";
+            try
+            {
+                if (p != null)
+                    fullPath = p.MainModule.FileName;
             }
-            return "";
+            catch (Exception err)
+            {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+                fullPath = "";
+            }
+            SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog("getProcessFullPath : " + fullPath);
+            return fullPath;
         }
 
         /// <summary>
@@ -43,13 +54,7 @@ namespace CPU_Preference_Changer.Core
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        public static bool isMabiProcess(Process p)
-        {
-            if (string.Compare(getProcessFullPath(p).ToUpper(), mabiRunFilePath.ToUpper()) == 0) {
-                return true;
-            }
-            return false;
-        }
+        public static bool isMabiProcess(Process p) => string.Equals(getProcessFullPath(p).ToUpper(), mabiRunFilePath.ToUpper()) ? true : false;
 
         /// <summary>
         /// 마비노기로 추정되는 프로세스 목록 얻기
@@ -60,8 +65,24 @@ namespace CPU_Preference_Changer.Core
         public static void getAllTargets(FindMabiProcess fnFindMabiProcess, ref object usrParam,
                                          PreFindMabiProcess preFindMabiProcess)
         {
-            // 실행 프로세스 중 Client(마비노기 클라이언트 프로세스 이름) 가져오기
-            Process[] lst = Process.GetProcessesByName(mabiClientName);
+            Process[] lst = null;
+            try
+            {
+                // 실행 프로세스 중 Client(마비노기 클라이언트 프로세스 이름) 가져오기
+                lst = Process.GetProcessesByName(mabiClientName);
+            }
+            catch (Exception err)
+            {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+            }
+            finally
+            {
+                if (lst != null)
+                    SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(mabiClientName + " list : " + lst.Length);
+                else
+                    SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(mabiClientName + " list : null");
+            }
+
             /*----------------------------------------------------------------------------------*/
             if (preFindMabiProcess != null) {
                 preFindMabiProcess(lst, ref usrParam);
@@ -84,8 +105,8 @@ namespace CPU_Preference_Changer.Core
                                               p.MainWindowHandle == IntPtr.Zero ? true : false,
                                               ref usrParam);
                         }
-                    } catch {
-                        // GetProcesses() 에서 System Process를 건들 경우 Exception 발생
+                    } catch (Exception err) {
+                        SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                     }
                 }
             }
@@ -99,8 +120,16 @@ namespace CPU_Preference_Changer.Core
         /// <param name="numOfCore">할당할 코어 수 (CPU수보다 많이한들 의미없음..</param>
         public static void setTargetCoreState(int pid, IntPtr Affinity)
         {
-            using(Process p = Process.GetProcessById(pid)) {
-                if (p != null) p.ProcessorAffinity = Affinity;
+            try
+            {
+                using (Process p = Process.GetProcessById(pid))
+                {
+                    if (p != null) p.ProcessorAffinity = Affinity;
+                }
+            }
+            catch (Exception err)
+            {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
             }
         }
 
@@ -195,7 +224,8 @@ namespace CPU_Preference_Changer.Core
                     if (!result) result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
                     if (result) WinAPI.SetForegroundWindow(windowHandle);
 
-                } catch {
+                } catch (Exception err) {
+                    SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                     result = false;
                 }
             }
@@ -210,13 +240,18 @@ namespace CPU_Preference_Changer.Core
         public static bool SetMinimizeWindow(int pid)
         {
             bool result = true;
-            using (Process p = Process.GetProcessById(pid)) {
-                try {
+            try
+            {
+                using (Process p = Process.GetProcessById(pid))
+                {
                     WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_MINIMIZE);
                     result = true;
-                } catch {
-                    result = false;
                 }
+            }
+            catch (Exception err)
+            {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+                result = false;
             }
             return result;
         }
@@ -229,12 +264,17 @@ namespace CPU_Preference_Changer.Core
         public static bool SetHideWindow(int pid)
         {
             bool result = true;
-            using (Process p = Process.GetProcessById(pid)) {
-                try {
+            try
+            {
+                using (Process p = Process.GetProcessById(pid))
+                {
                     result = WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_HIDE);
-                } catch {
-                    result = false;
                 }
+            }
+            catch (Exception err)
+            {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+                result = false;
             }
             return result;
         }
@@ -251,7 +291,8 @@ namespace CPU_Preference_Changer.Core
                         return mabiRegKey.GetValue("ExecutablePath").ToString();
                     }
                 }
-            } catch {
+            } catch (Exception err) {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 return "";
             }
         }

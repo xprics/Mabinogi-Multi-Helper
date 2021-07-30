@@ -91,6 +91,7 @@ namespace CPU_Preference_Changer.Core {
                 response.Close();
                 return targetLst;
             } catch (Exception err){
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 Debug.WriteLine(err.Message);
             }
             return null;
@@ -232,7 +233,9 @@ namespace CPU_Preference_Changer.Core {
                         return false;
                     }
                 }
-            } catch { }
+            } catch (Exception err) {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+            }
             /*뭔가 문제있어서 버전 확인에 실패한 경우.,... 새 버전 없다고친다.*/
             return false;
         }
