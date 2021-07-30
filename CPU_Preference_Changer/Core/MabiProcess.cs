@@ -285,16 +285,22 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static string getMabinogiInstallPathFromReg()
         {
+            string mabiPath = "";
             try {
                 using (RegistryKey HKCU = Registry.CurrentUser) {
                     using (RegistryKey mabiRegKey = HKCU.OpenSubKey(@"SOFTWARE\Nexon\Mabinogi")) {
-                        return mabiRegKey.GetValue("ExecutablePath").ToString();
+                        if (mabiRegKey != null)
+                            mabiPath = mabiRegKey.GetValue("ExecutablePath").ToString();
+                        else
+                            mabiPath = "";
                     }
                 }
             } catch (Exception err) {
                 SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
-                return "";
+                mabiPath = "";
             }
+
+            return mabiPath;
         }
 
         /// <summary>
