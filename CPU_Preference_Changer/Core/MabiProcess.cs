@@ -300,6 +300,7 @@ namespace CPU_Preference_Changer.Core
                 mabiPath = "";
             }
 
+            SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog("mabinogi reg value : " + mabiPath);
             return mabiPath;
         }
 
@@ -365,7 +366,8 @@ namespace CPU_Preference_Changer.Core
                  * 그런데 테스트 결과 보통은 Enum첫번째 들어오자마자 만나는 윈도우 한들이 마비노기 창이다.
                  * Debug.WriteLine("WINDOW TITLE = [" + sb.ToString() + "]");*/
                 if (sb.ToString().Equals("마비노기")) {
-                    WinAPI.ShowWindow(hwnd, SwindOp.SW_SHOW);
+                    if (!WinAPI.ShowWindow(hwnd, SwindOp.SW_SHOW))
+                        WinAPI.ShowWindow(hwnd, SwindOp.SW_SHOW);
                     return false; /*ENUM중단.*/
                 }
             }

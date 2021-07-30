@@ -90,6 +90,10 @@ namespace CPU_Preference_Changer.MabiProcessListView
             }
             set {
                 _isHide = value;
+                if (value)
+                    Core.SingleTonTemplate.MMHGlobalInstance<Core.MMHGlobal>.GetInstance().dbgLogger.writeLog("PID " + this.processID + " is Hide");
+                else
+                    Core.SingleTonTemplate.MMHGlobalInstance<Core.MMHGlobal>.GetInstance().dbgLogger.writeLog("PID " + this.processID + " is Show");
                 NotifyPropertyChanged("isHide");
             }
         }
