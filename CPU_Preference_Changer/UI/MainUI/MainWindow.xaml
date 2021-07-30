@@ -59,14 +59,15 @@
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="0.5*"/>
+                    <ColumnDefinition Width="0.7*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Style="{StaticResource TITLE_STYLE}" Grid.Column="0">
                     마비노기 프로세스 목록
                 </TextBlock>
                 <DockPanel Grid.Column="2" LastChildFill="False">
                     <Button DockPanel.Dock="Right" Margin="8 0 0 0" Width="80" Name="btReset" Click="btReset_Click" Style="{StaticResource ROUND_BORDER_BTN_STYLE}">초기화</Button>
-                    <Button DockPanel.Dock="Right" Width="80" Name="btAutoSet" Click="btAutoSet_Click" Style="{StaticResource ROUND_BORDER_BTN_STYLE}">자동 할당</Button>
+                    <Button DockPanel.Dock="Right" Margin="8 0 0 0" Width="80" Name="btAutoSet" Click="btAutoSet_Click" Style="{StaticResource ROUND_BORDER_BTN_STYLE}">자동 할당</Button>
+                    <Button DockPanel.Dock="Right" Width="80" Name="btRefresh" Click="btRefresh_Click" Style="{StaticResource ROUND_BORDER_BTN_STYLE}">목록 갱신</Button>
                 </DockPanel>
             </Grid>
             <!-- 마비노기 실행 정보 출력 용 커스텀 리스트 뷰 -->
