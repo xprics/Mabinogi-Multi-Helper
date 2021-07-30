@@ -18,7 +18,9 @@ namespace CPU_Preference_Changer.Core
                     return x["Name"].ToString();
                 }
                 return "";
-            } catch {
+            } catch (Exception err)
+            {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 return "";
             }
         }
@@ -31,7 +33,8 @@ namespace CPU_Preference_Changer.Core
         {
             try {
                 return Environment.ProcessorCount;
-            } catch {
+            } catch (Exception err) {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 return 0;
             }
         }
@@ -44,7 +47,8 @@ namespace CPU_Preference_Changer.Core
         {
             try {
                 return Environment.ProcessorCount + "코어";
-            } catch {
+            } catch (Exception err) { 
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 return "???";
             }
         }

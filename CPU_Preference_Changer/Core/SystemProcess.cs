@@ -1,4 +1,6 @@
-﻿namespace CPU_Preference_Changer.Core
+﻿using System;
+
+namespace CPU_Preference_Changer.Core
 {
     /// <summary>
     /// System Process class
@@ -33,7 +35,8 @@
             try {
                 System.Diagnostics.Process.Start("shutdown", "-s -f -t " + seconds).Dispose();
                 return true;
-            } catch {
+            } catch (Exception err) {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 return false;
             }
         }
@@ -80,7 +83,8 @@
             try {
                 System.Diagnostics.Process.Start("taskkill", "/T /F /PID " + pid).Dispose();
                 return true;
-            } catch {
+            } catch (Exception err) {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 return false;
             }
         }
@@ -119,8 +123,9 @@
                 System.Diagnostics.Process.Start("WMIC", "PROCESS WHERE ProcessID=" + pid + " DELETE").Dispose();
                 return true;
             }
-            catch
+            catch (Exception err)
             {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 return false;
             }
         }
@@ -159,14 +164,17 @@
             try {
                 searcher = new System.Management.ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Process WHERE ProcessID=" + pid);
                 System.Management.ManagementObjectCollection collect = searcher.Get();
-                if (collect.Count <= 0) return false;
-                
 
-                foreach (System.Management.ManagementObject obj in collect) {
+                if (collect.Count <= 0)
+                    return false;
+
+                foreach (System.Management.ManagementObject obj in collect)
+                {
                     _ = obj.InvokeMethod("Terminate", null);
                 }
                 return true;
-            } catch {
+            } catch (Exception err) {
+                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 return false;
             }
             finally {

@@ -85,7 +85,8 @@ namespace CPU_Preference_Changer.BackgroundTask {
                         killCLientProcess2();
                     }
                 }
-            } catch {
+            } catch (Exception err) {
+                Core.SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 //PID에 해당하는 프로세스 하필 이 순간에 사라져서 없을 경우 예외 발생
             }
         }
@@ -99,7 +100,6 @@ namespace CPU_Preference_Changer.BackgroundTask {
         public bool runFreqWork(HBFT taskHandle, object param)
         {
             DateTime curTime = DateTime.Now;
-            curTime.CompareTo(killTime);
 
             if (curTime.CompareTo(killTime) > 0) {
                 /*예약 시간을 넘었다! 해당 PID값 확인해보고 

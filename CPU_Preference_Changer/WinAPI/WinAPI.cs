@@ -171,7 +171,7 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         /// <param name="dwFlags"></param>
         /// <returns></returns>
         [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.I1)]
+        [return: MarshalAs(UnmanagedType.I1)]
         public static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, SYMBOLIC_LINK_FLAG dwFlags);
     }
 }

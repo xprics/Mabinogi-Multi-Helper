@@ -76,7 +76,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
 
         private int taskID;
         private Dictionary<int, TaskInfo> taskDict;
-        private Mutex dickLock;
+        private Mutex dictLock;
         private bool bRun = false;
         private bool bManagerStop;
 
@@ -89,7 +89,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         {
             taskDict = new Dictionary<int, TaskInfo>();
             taskID = 0; // TASK별로 붙일 아이디 값... 그냥 귀찮으니 0~순차적으로 증가하는 value를 키값으로 쓴다.
-            dickLock = new Mutex();
+            dictLock = new Mutex();
         }
 
         /// <summary>
@@ -101,12 +101,12 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         public HBFT addFreqTask(IBackgroundFreqTask task, object param)
         {
             if (task == null) return null;
-            dickLock.WaitOne();
+            dictLock.WaitOne();
 
             // oldTask가 이미 존재하는 이런 일은 일어날 수 없지만
             // 나중에 taskID쪽 코드를 수정하게 되면 발생 가능하니 일단 예외처리는 해둔다.
             if(taskDict.ContainsKey(taskID)) {
-                dickLock.ReleaseMutex();
+                dictLock.ReleaseMutex();
                 return null;
             }
             /*-------------------------------------*/
@@ -115,7 +115,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
             taskDict.Add(taskID, taskInfo);
             /*-------------------------------------*/
             taskID++;
-            dickLock.ReleaseMutex();
+            dictLock.ReleaseMutex();
 
             if (onLogInfoWrite!=null) {
                 onLogInfoWrite("addFreqTaskEnd!" + task.ToString()) ;
@@ -140,11 +140,11 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         public void removeFreqTask(HBFT hBFT)
         {
             if (hBFT == null) return;
-            dickLock.WaitOne();
+            dictLock.WaitOne();
             try {
                 taskDict.Remove(hBFT.taskID);
             } catch { }
-            dickLock.ReleaseMutex();
+            dictLock.ReleaseMutex();
         }
 
         /// <summary>
@@ -175,12 +175,10 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
         /// </summary>
         private void taskManagerWorkThreadSubProc()
         {
-            int oneSecLoopCount; //몇번 루프해야 대=충 1초 지나는지>?
+            int oneSecLoopCount = 1; //몇번 루프해야 대=충 1초 지나는지>?
 
             if (taskManagerTerm < 1000)
                 oneSecLoopCount = 1000 / taskManagerTerm;
-            else
-                oneSecLoopCount = 1;
 
             int i = 0;
             while (bRun) {
@@ -195,7 +193,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
 
                 if (taskDict.Count == 0) continue;
 
-                dickLock.WaitOne();
+                dictLock.WaitOne();
                 foreach (KeyValuePair<int, TaskInfo> cur in taskDict) {
                     var curInfo = cur.Value;
 
@@ -231,7 +229,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
                         curInfo.runState = false;
                     }
                 }
-                dickLock.ReleaseMutex();
+                dictLock.ReleaseMutex();
                 ++i;
             }
         }
@@ -287,7 +285,7 @@ namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
             stopFreqTaskManager();
             while (bManagerStop) Thread.Sleep(100);
             taskDict.Clear();
-            dickLock.Close();
+            dictLock.Close();
         }
     }
 }
