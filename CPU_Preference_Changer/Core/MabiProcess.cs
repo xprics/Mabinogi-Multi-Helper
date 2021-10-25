@@ -45,7 +45,7 @@ namespace CPU_Preference_Changer.Core
                 SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 fullPath = "";
             }
-            SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog("getProcessFullPath : " + fullPath);
+            SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog("[getProcessFullPath] " + fullPath);
             return fullPath;
         }
 
@@ -78,9 +78,9 @@ namespace CPU_Preference_Changer.Core
             finally
             {
                 if (lst != null)
-                    SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(mabiClientName + " list : " + lst.Length);
+                    SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog("[getAllTargets] " + mabiClientName + " list : " + lst.Length);
                 else
-                    SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(mabiClientName + " list : null");
+                    SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog("[getAllTargets] " + mabiClientName + " list : null");
             }
 
             /*----------------------------------------------------------------------------------*/
