@@ -1,4 +1,12 @@
-﻿namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
+﻿using System;
+
+namespace CPU_Preference_Changer.Core.BackgroundFreqTaskManager {
+
+    /// <summary>
+    /// 에러 이벤트 함수 타입 정의
+    /// </summary>
+    /// <param name="err"></param>
+    public delegate void ErrWriteEvent(Exception err);
 
     /// <summary>
     /// by LT인척하는엘프 2021.06.10
@@ -23,5 +31,9 @@
         /// </returns>
         bool runFreqWork(HBFT taskHandle, object param);
 
+        /// <summary>
+        /// 에러 이벤트 핸들러..
+        /// </summary>
+        event ErrWriteEvent errWriteEventHandler;
     }
 }

@@ -22,6 +22,11 @@ namespace CPU_Preference_Changer.BackgroundTask {
         public event OnClientKilled onClientProcessKilled;
 
         /// <summary>
+        /// 작동 중 에러 발생했을 때 이벤트 핸들러...
+        /// </summary>
+        public event ErrWriteEvent errWriteEventHandler = null;
+
+        /// <summary>
         /// 예약 종료 지정된 프로세스 PID값 보관
         /// </summary>
         private int PID;
@@ -86,8 +91,9 @@ namespace CPU_Preference_Changer.BackgroundTask {
                     }
                 }
             } catch (Exception err) {
-                Core.SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
                 //PID에 해당하는 프로세스 하필 이 순간에 사라져서 없을 경우 예외 발생
+                if (errWriteEventHandler!=null)
+                    errWriteEventHandler(err);
             }
         }
 

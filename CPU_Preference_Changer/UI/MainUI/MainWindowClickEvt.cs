@@ -106,9 +106,13 @@ namespace CPU_Preference_Changer.UI.MainUI {
         /// <param name="rowData">클릭된 리스트뷰 Row 정보</param>
         private void MabiLv_OnProcessNameClicked(LV_MabiProcessRowData rowData)
         {
-            /*이 프로세스를 가장 앞으로 옮긴다!*/
-            if (MabiProcess.SetActivityWindow(((LvRowParam)rowData.userParam).PID))
-                rowData.isHide = false;
+            try {
+                /*이 프로세스를 가장 앞으로 옮긴다!*/
+                if (MabiProcess.SetActivityWindow(((LvRowParam)rowData.userParam).PID))
+                    rowData.isHide = false;
+            }catch(Exception err) {
+                programErrLogWrite(err);
+            }
 
             /*딜레이 없이하면 자기자신(이 프로그램)만 활성화 됨
              * 문제는 PC마다 딜레이 시간이 다를 수 있고,, 알트탭으로 하면 더빨리
@@ -134,7 +138,11 @@ namespace CPU_Preference_Changer.UI.MainUI {
             //확인을 누른 경우 해당 Process에 대하여 유저가 설정한 값으로 설정한다!
             if (System.Windows.Forms.DialogResult.OK == selForm.ShowDialog()) {
                 IntPtr newVal = selForm.GetDlgResultValue();
-                MabiProcess.setTargetCoreState(((LvRowParam)rowData.userParam).PID, newVal);
+                try {
+                    MabiProcess.setTargetCoreState(((LvRowParam)rowData.userParam).PID, newVal);
+                }catch(Exception err) {
+                    programErrLogWrite(err);
+                }
                 rowData.coreState = newVal + "";
                 showMessage("설정 완료");
             }
@@ -297,10 +305,10 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 } else {
                     /*숨겨진 것을 보이게 만드는 케이스*/
                     MabiProcess.UnSetHideWindow((uint)((LvRowParam)rowData.userParam).PID,
-                        (Exception err) =>
-                        {
-                            programErrLogWrite(err);
-                        });
+                                                (Exception err) =>
+                                                {
+                                                    programErrLogWrite(err);
+                                                });
                 }
             }catch (Exception err) {
                 programErrLogWrite(err);

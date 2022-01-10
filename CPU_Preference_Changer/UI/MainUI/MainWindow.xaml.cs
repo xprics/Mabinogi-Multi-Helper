@@ -38,7 +38,7 @@ namespace CPU_Preference_Changer.UI.MainUI
             //디버그 모드인지 값 받아온다..
             MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
             bDebugRun = gInstance.bDebugModeRun;
-
+            bDebugRun = false;
             //윈도우 글자, 이벤트 초기화
             initWindow();
 
@@ -64,6 +64,9 @@ namespace CPU_Preference_Changer.UI.MainUI
                 dbgPanel.Visibility = Visibility.Visible;
 #endif
             }
+
+            /*마비노기 경로 관련 로그 남김*/
+            logger.writeLog("mariRunFilePath : " + MabiProcess.mabiRunFilePath);
 
             //백그라운드 Task Manager 시작
             BackgroundFreqTaskMgmt backMgmt = gInstance.backgroundFreqTaskManager;
@@ -327,14 +330,15 @@ namespace CPU_Preference_Changer.UI.MainUI
             if (bDebugRun) {
                 /*디버그 모드라면 현재 발견된 목록 수와 프로세스들의 FullPath를 로그에 찍어준다.*/
                 dbgLogWriteStr("CB_PreFindMabiProcess",
-                               "Target Count=["
-                               + (lst == null ? 0 : lst.Length)
-                               + "]");
+                               $"Target Count=[{(lst == null ? 0 : lst.Length)}]");
                 int i=0;
-                foreach (Process p in lst) {
-                    dbgLogWriteStr("CB_PreFindMabiProcess",
-                                   string.Format("[{0}] FullPath={1}",
-                                                  i+1,MabiProcess.getProcessFullPath(p)));
+                try {
+                    foreach (Process p in lst) {
+                        dbgLogWriteStr("CB_PreFindMabiProcess",
+                                       $"[{(i++) + 1}] FullPath={MabiProcess.getProcessFullPath(p)}");
+                    }
+                }catch(Exception err) {
+                    dbgLogWriteStr("CB_PreFindMabiProcess", $"예외 발생 : {err.Message}, {err.StackTrace.ToString()}");
                 }
             }
         }
@@ -358,6 +362,16 @@ namespace CPU_Preference_Changer.UI.MainUI
                         object param = newList; /*함수인자에서 바로 object로 캐스팅하면 에러 발생한다.*/
                         MabiProcess.getAllTargets(CB_FindMabiProcess, ref param, CB_PreFindMabiProcess);
 
+
+                        dbgLogWriteStr("RefreshMabiProcess", "NewListLeng = "+newList.Count);
+                        for ( int i=0; i<newList.Count; ++i)
+                        {
+                            dbgLogWriteStr("RefreshMabiProcess", "PID="+newList[i].processID);
+                            dbgLogWriteStr("RefreshMabiProcess", "P Name="+newList[i].processName);
+                            dbgLogWriteStr("RefreshMabiProcess", "Start Time="+newList[i].startTime);
+                        }
+                        
+
                         /*by LT인척하는엘프 2021.06.13
                          귀찮아서 무조건 Set하던것을.. 기존 아이템과 비교하여
                          목록을 적절히 갱신시키게 함!*/
@@ -375,6 +389,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                         } else {
                             dbgLogWriteStr("RefreshMabiProcess", "Lv Data Update.");
                             curList.updateDataCollection(newList, removeReservedInfo);
+                            lvMabiProcess.setDataSoure(newList);
                         }
                         lvMabiProcess.LvMabi_ReleaseMutex();
                         dbgLogWriteStr("RefreshMabiProcess", "Release Lv Object");

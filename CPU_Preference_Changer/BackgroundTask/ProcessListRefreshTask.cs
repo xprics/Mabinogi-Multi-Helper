@@ -25,6 +25,11 @@ namespace CPU_Preference_Changer.BackgroundTask {
         /// </summary>
         private MainWindow mainWindow;
 
+        /// <summary>
+        /// 작동 중 에러 발생했을 때 이벤트 핸들러...
+        /// </summary>
+        public event ErrWriteEvent errWriteEventHandler = null;
+
         public ProcessListRefreshTask(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
