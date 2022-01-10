@@ -22,9 +22,11 @@ namespace CPU_Preference_Changer.Core
         public readonly static string mabiRunFilePath;
         static MabiProcess() {
             mabiClientName = "client";
-            mabiRunFilePath = string.Format(@"{0}\{1}.exe", getMabinogiInstallPathFromReg(), mabiClientName);
-
-            SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog("mariRunFilePath : " + mabiRunFilePath);
+            try {
+                mabiRunFilePath = string.Format(@"{0}\{1}.exe", getMabinogiInstallPathFromReg(), mabiClientName);
+            }catch(Exception err) {
+                System.Windows.Forms.MessageBox.Show($"{err.Message}\n\n{err.StackTrace.ToString()}");
+            }
         }
 
         /// <summary>
@@ -42,10 +44,8 @@ namespace CPU_Preference_Changer.Core
             }
             catch (Exception err)
             {
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
-                fullPath = "";
+                throw err;
             }
-            SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog("getProcessFullPath : " + fullPath);
             return fullPath;
         }
 
@@ -54,7 +54,13 @@ namespace CPU_Preference_Changer.Core
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        public static bool isMabiProcess(Process p) => string.Equals(getProcessFullPath(p).ToUpper(), mabiRunFilePath.ToUpper()) ? true : false;
+        public static bool isMabiProcess(Process p) {
+            try {
+                return string.Equals(getProcessFullPath(p).ToUpper(), mabiRunFilePath.ToUpper()) ? true : false;
+            }catch (Exception err) {
+                throw err;
+            }
+        }
 
         /// <summary>
         /// 마비노기로 추정되는 프로세스 목록 얻기
@@ -73,14 +79,17 @@ namespace CPU_Preference_Changer.Core
             }
             catch (Exception err)
             {
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+                throw err;
             }
             finally
             {
+#if DEBUG
+                /*디버그 빌드에서만 로그 임시로 남겨봄.*/
                 if (lst != null)
                     SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(mabiClientName + " list : " + lst.Length);
                 else
                     SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(mabiClientName + " list : null");
+#endif
             }
 
             /*----------------------------------------------------------------------------------*/
@@ -106,7 +115,7 @@ namespace CPU_Preference_Changer.Core
                                               ref usrParam);
                         }
                     } catch (Exception err) {
-                        SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+                        /* 실패하면 아무것도 안하고 다음 process찾아봐도 된다,, */
                     }
                 }
             }
@@ -129,7 +138,7 @@ namespace CPU_Preference_Changer.Core
             }
             catch (Exception err)
             {
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+                throw err;
             }
         }
 
@@ -194,7 +203,7 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static bool SetActivityWindow(int pid)
         {
-            bool result = true;
+            bool result = false;
             using (Process p = Process.GetProcessById(pid)) {
                 try {
                     IntPtr windowHandle = IntPtr.Zero;
@@ -223,10 +232,8 @@ namespace CPU_Preference_Changer.Core
                     // 가끔 이놈이 활성화는 했는데, false를 내뱉을때가 존재함
                     if (!result) result = WinAPI.ShowWindow(windowHandle, SwindOp.SW_SHOW);
                     if (result) WinAPI.SetForegroundWindow(windowHandle);
-
                 } catch (Exception err) {
-                    SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
-                    result = false;
+                    throw err;
                 }
             }
             return result;
@@ -239,7 +246,7 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static bool SetMinimizeWindow(int pid)
         {
-            bool result = true;
+            bool result = false;
             try
             {
                 using (Process p = Process.GetProcessById(pid))
@@ -250,8 +257,7 @@ namespace CPU_Preference_Changer.Core
             }
             catch (Exception err)
             {
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
-                result = false;
+                throw err;
             }
             return result;
         }
@@ -263,7 +269,7 @@ namespace CPU_Preference_Changer.Core
         /// <returns></returns>
         public static bool SetHideWindow(int pid)
         {
-            bool result = true;
+            bool result = false;
             try
             {
                 using (Process p = Process.GetProcessById(pid))
@@ -273,8 +279,7 @@ namespace CPU_Preference_Changer.Core
             }
             catch (Exception err)
             {
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
-                result = false;
+                throw err;
             }
             return result;
         }
@@ -296,11 +301,11 @@ namespace CPU_Preference_Changer.Core
                     }
                 }
             } catch (Exception err) {
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
-                mabiPath = "";
+                throw err;
             }
-
+#if DEBUG
             SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog("mabinogi reg value : " + mabiPath);
+#endif
             return mabiPath;
         }
 
@@ -378,7 +383,7 @@ namespace CPU_Preference_Changer.Core
         /// 주어진 PID를 통해 숨겨졌던 창을 다시 활성화 시킨다..
         /// </summary>
         /// <param name="pid"></param>
-        public static void UnSetHideWindow(uint pid, EnumWindowErrCallBack errProc)
+        public static void UnSetHideWindow(uint pid, EnumWindowErrCallBack errProc=null)
         {
             EnumWindowParam ep;
             ep.pid = pid; ep.errProc = errProc;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CPU_Preference_Changer.Core.Logger;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -43,7 +44,7 @@ namespace CPU_Preference_Changer.Core {
         /// 웹 URL에 접속하고 targetStr을 포함하는 목록을 얻는다.
         /// </summary>
         /// <returns></returns>
-        private List<string> getHiddenStrFromHtmlDocument()
+        private List<string> getHiddenStrFromHtmlDocument(ILogWriter iLogger = null)
         {
             HttpWebRequest req;
             HttpWebResponse response;
@@ -91,8 +92,9 @@ namespace CPU_Preference_Changer.Core {
                 response.Close();
                 return targetLst;
             } catch (Exception err){
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
-                Debug.WriteLine(err.Message);
+                if (iLogger != null) {
+                    iLogger.writeLog(err);
+                }
             }
             return null;
         }
@@ -102,7 +104,7 @@ namespace CPU_Preference_Changer.Core {
         /// 없다면 null반환
         /// </summary>
         /// <returns></returns>
-        public string getFirstHiddenStr()
+        public string getFirstHiddenStr(ILogWriter iLogger = null)
         {
             var doc = getHiddenStrFromHtmlDocument();
             if (doc != null)
@@ -212,7 +214,7 @@ namespace CPU_Preference_Changer.Core {
         /// 프로그램의 새 버전이 존재하는지 검사한다.
         /// </summary>
         /// <returns></returns>
-        public static bool isNewVersionExist()
+        public static bool isNewVersionExist(ILogWriter iLogger=null)
         {
             /*버전 확인용 서버를 올릴수는 없으니까... (돈이 필요해진다...)
              * 이 프로그램 소스코드가 올려진 GIT페이지에 써진 버전 정보와 
@@ -234,7 +236,9 @@ namespace CPU_Preference_Changer.Core {
                     }
                 }
             } catch (Exception err) {
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+                if (iLogger!=null) {
+                    iLogger.writeLog(err);
+                }
             }
             /*뭔가 문제있어서 버전 확인에 실패한 경우.,... 새 버전 없다고친다.*/
             return false;

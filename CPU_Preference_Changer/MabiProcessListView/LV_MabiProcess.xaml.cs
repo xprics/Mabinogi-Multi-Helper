@@ -43,6 +43,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
             this.onProcessNameClick = null;
             this.onCoreStateClick = null;
             this.MabiProcessListView.Width = this.Width;
+            MabiProcessListView.ItemsSource = new LvMabiDataCollection();
             lvDataMutex = new Mutex();
         }
 
@@ -107,7 +108,9 @@ namespace CPU_Preference_Changer.MabiProcessListView
         private void DisposeAllResourece()
         {
             //참조 제거
-            MabiProcessListView.ItemsSource = null;
+            /*MabiProcessListView.ItemsSource = null;*/
+            LvMabiDataCollection items = (LvMabiDataCollection)MabiProcessListView.ItemsSource;
+            items.Clear();
             MabiProcessListView.Items.Clear();
             lvItms = null;
         }

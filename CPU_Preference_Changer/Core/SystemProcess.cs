@@ -36,7 +36,9 @@ namespace CPU_Preference_Changer.Core
                 System.Diagnostics.Process.Start("shutdown", "-s -f -t " + seconds).Dispose();
                 return true;
             } catch (Exception err) {
+#if DEBUG
                 SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+#endif
                 return false;
             }
         }
@@ -84,7 +86,9 @@ namespace CPU_Preference_Changer.Core
                 System.Diagnostics.Process.Start("taskkill", "/T /F /PID " + pid).Dispose();
                 return true;
             } catch (Exception err) {
+#if DEBUG
                 SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+#endif
                 return false;
             }
         }
@@ -125,7 +129,9 @@ namespace CPU_Preference_Changer.Core
             }
             catch (Exception err)
             {
+#if DEBUG
                 SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+#endif
                 return false;
             }
         }
@@ -174,7 +180,9 @@ namespace CPU_Preference_Changer.Core
                 }
                 return true;
             } catch (Exception err) {
+#if DEBUG
                 SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+#endif
                 return false;
             }
             finally {
