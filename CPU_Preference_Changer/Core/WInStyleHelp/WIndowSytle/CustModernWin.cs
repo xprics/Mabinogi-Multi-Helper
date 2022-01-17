@@ -11,6 +11,11 @@ namespace CPU_Preference_Changer.Core.WInStyleHelp.WIndowSytle
 {
     partial class CustModernWin : ResourceDictionary
     {
+        /// <summary>
+        /// 닫기 버튼 눌렀을 때.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void winCLoseBtn_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
@@ -20,6 +25,11 @@ namespace CPU_Preference_Changer.Core.WInStyleHelp.WIndowSytle
             }
         }
 
+        /// <summary>
+        /// 최대화 / 이전 복원 버튼 놀렀을 때
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void winMinMaxBtn_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
@@ -34,6 +44,11 @@ namespace CPU_Preference_Changer.Core.WInStyleHelp.WIndowSytle
             }
         }
 
+        /// <summary>
+        /// 최소화 눌렀을 때
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void winMinimizeBtn_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
@@ -44,6 +59,11 @@ namespace CPU_Preference_Changer.Core.WInStyleHelp.WIndowSytle
             }
         }
 
+        /// <summary>
+        ///  그리드 영역(타이틀바) 눌러서 이동할 때.. 더블클릭도 구현할까...
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void grid_mouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed) {
@@ -66,12 +86,18 @@ namespace CPU_Preference_Changer.Core.WInStyleHelp.WIndowSytle
             return w.Template.FindName("winTitleDockArea",w) as DockPanel;
         }
 
+        /// <summary>
+        /// contentPresenter영역 사이즈를 강제로 0으로 만듦.
+        /// </summary>
+        /// <param name="w"></param>
         public static void setContentPresenterZero(Window w)
         {
-            if (w == null) return ;
+            if (w == null || w.Template==null ) return ;
             var p = w.Template.FindName("wContentPresenter", w) as ContentPresenter;
-            p.Width = 0;
-            p.Height = 0;
+            if (p != null) {
+                p.Width = 0;
+                p.Height = 0;
+            }
         }
     }
 }

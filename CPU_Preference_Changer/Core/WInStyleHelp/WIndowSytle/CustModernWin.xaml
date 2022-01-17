@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib" 
                     xmlns:windowsytle="clr-namespace:CPU_Preference_Changer.Core.WInStyleHelp.WIndowSytle"
                     x:Class="CPU_Preference_Changer.Core.WInStyleHelp.WIndowSytle.CustModernWin">
-
+    <!-- 커스텀 윈도우 템블릿 스타일 정의!!
+        비쥬얼스튜디오 2019처럼,, 윈도우 타이틀영역에 버튼올리거나,,, 사용하는 윈도우에서  쓰기나름으로 다양한 모양으로 변형가능하다!-->
     <Style x:Key="CustModernWinStyle" TargetType="{x:Type Window}">
         <Style.Resources>
             <windowsytle:WindowStateToVisivilityConverter x:Key="winStateVisibleConv"/>
@@ -21,7 +22,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Window}">
-                    <Border BorderThickness="2" BorderBrush="Black">
+                    <!-- 윈도우 테두리.. 검정색은 좀 밍밍한데 시암코드를 넣음 -->
+                    <Border BorderThickness="2" BorderBrush="#FF020721">
                         <Grid x:Name="winOutGrid" Background="{TemplateBinding Background}" >
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>
@@ -40,12 +42,15 @@
                             ( TextBlock의 Z order가 더 낮아서 밑에 깔리기 때문 )-->
                             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Width="{TemplateBinding Width}" MouseMove="grid_mouseMove"/>
                             
+                            <!-- 타이틀 영역 패널. -->
                             <DockPanel x:Name="winTitleDockArea" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Background="Transparent">
                                 <TextBlock Text="{TemplateBinding Title}" Margin="10 0 0 0" DockPanel.Dock="Left"/>
                             </DockPanel>
 
+                            <!-- 이 스타일을 상속받은 윈도우 내부의 아이템들(그리드나 패널이나 등등)이 여기에 표시된다. -->
                             <ContentPresenter x:Name="wContentPresenter" Grid.Row="1"  Grid.ColumnSpan="2"  Content="{TemplateBinding Content}"/>
 
+                            <!-- 윈도우 최소화, 최대화, 닫기버튼을 넣을 스택패널.. -->
                             <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal">
                                 <Button x:Name="winMinimize" Height="auto" BorderThickness="0" Click="winMinimizeBtn_Click">
                                     <Button.Style>
@@ -68,9 +73,11 @@
                                         </Style>
                                     </Button.Style>
                                     <Canvas Height="35" Width="35">
+                                        <!-- ㅡ  모양으로 그림 -->
                                         <Line X1="13" Y1="23"  X2="23" Y2="23" Stroke="Black" StrokeThickness="0.75"/>
                                     </Canvas>
                                 </Button>
+                                
                                 <Button x:Name="winMinMaxBtn" Height="auto" BorderThickness="0" Click="winMinMaxBtn_Click">
                                     <Button.Style>
                                         <Style TargetType="Button">
@@ -94,7 +101,7 @@
                                     <Canvas Height="35" Width="35" >
                                         <!-- 최대화 최소화 모양를 조건에 따라 Visibility를 적절히 조절하여 보이게한다! -->
                                         <WrapPanel>
-                                        
+                                            <!-- 창 최대화 모양 그리는 코드 -->
                                             <Grid Background="Transparent" 
                                                 Visibility="{Binding (Window.WindowState)
                                                             ,RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}
@@ -106,6 +113,7 @@
                                                 <Line X1="13" Y1="23"  X2="13" Y2="13" Stroke="Black" StrokeThickness="0.75"/>
                                             </Grid>
 
+                                            <!-- 창 이전크기 복원 아이콘 모양 그리는 코드 -->
                                             <Grid Background="Transparent" 
                                                 Visibility="{Binding (Window.WindowState)
                                                             ,RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}
@@ -147,6 +155,7 @@
                                         </Style>
                                     </Button.Style>
                                     <Canvas Height="35" Width="35">
+                                        <!-- X모양으로 그림 -->
                                         <Line X1="13" Y1="13"  X2="23" Y2="23" Stroke="Black" StrokeThickness="0.75"/>
                                         <Line X1="13" Y1="23"  X2="23" Y2="13" Stroke="Black" StrokeThickness="0.75"/>
                                     </Canvas>

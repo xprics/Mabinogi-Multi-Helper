@@ -5,12 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="zzzz"
-        Background="#8FFFFFFF"
         Height="450" Width="800" WindowStartupLocation="CenterOwner"
         Style="{StaticResource CustModernWinStyle}"
         Loaded="Window_Loaded">
     <!-- 윈도우 스타일 덮어씌움!! -->
-
     <TextBlock Text="준비중인 기능입니다 ^~^" FontSize="30"/>
-
+    
+    
 </Window>

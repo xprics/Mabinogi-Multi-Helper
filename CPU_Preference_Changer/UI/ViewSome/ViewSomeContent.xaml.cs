@@ -44,6 +44,8 @@ namespace CPU_Preference_Changer.UI.ViewSome
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Right
             };
+
+            byte curTransVal = 100;
             Slider opacitySlider = new Slider(){
                 Margin = new Thickness(0, 0, 10, 0),
                 ToolTip = "투명도 조절",
@@ -52,7 +54,7 @@ namespace CPU_Preference_Changer.UI.ViewSome
                 TickFrequency = 1,
                 IsSnapToTickEnabled = true,
                 Width=100,
-                Value=255
+                Value= curTransVal
             };
             opacitySlider.ValueChanged += slider_valueChanged;
 
@@ -71,6 +73,9 @@ namespace CPU_Preference_Changer.UI.ViewSome
             wp.Children.Add(btnProcessSel);
             wp.Children.Add(opacitySlider);
             titleArea.Children.Add(wp);
+
+            /*현재 값에 맞게 세팅*/
+            changeBackground(curTransVal);
 
             /*콘텐츠 출력영역 사이즈 0으로 강제로 내려버리는 코드. 테스트용.
              * CustModernWin.setContentPresenterZero(this);*/
@@ -106,6 +111,19 @@ namespace CPU_Preference_Changer.UI.ViewSome
             this.Topmost = true;
         }
 
+        private void changeBackground(byte transparentVal)
+        {
+            /*브러쉬 알파채널 값를 통한 투명도 조절기법을 사용한다!*/
+            var brush = new SolidColorBrush(Color.FromArgb(transparentVal, 255, 255, 255));
+            //grid_win.Background = brush;
+            this.Background = brush;
+
+            /*
+             * grid의 모든 자손을 순회하면서 해도되긴한데 그냥 컨트롤이 몇 없기도하고,,
+             * 투명하면 잘안보이기도 하니까 그냥 냅둠
+             */
+        }
+
         /// <summary>
         /// 투명도 슬라이더 움직일 때,,
         /// </summary>
@@ -114,16 +132,7 @@ namespace CPU_Preference_Changer.UI.ViewSome
         private void slider_valueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             byte b = (byte)e.NewValue;
-
-            /*브러쉬 알파채널 값를 통한 투명도 조절기법을 사용한다!*/
-            var brush = new SolidColorBrush(Color.FromArgb(b, 255, 255, 255));
-            //grid_win.Background = brush;
-            this.Background = brush;
-
-            /*
-             * grid의 모든 자손을 순회하면서 해도되긴한데 그냥 컨트롤이 몇 없기도하고,,
-             * 투명하면 잘안보이기도 하니까 그냥 냅둠
-             */
+            changeBackground(b);
         }
     }
 }
