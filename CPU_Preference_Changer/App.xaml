@@ -4,32 +4,37 @@
              >
     <Application.Resources>
         <ResourceDictionary>
-            <Style x:Key="TITLE_STYLE" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="17" />
-                <Setter Property="Foreground" Value="#3f48cc"/>
-                <Setter Property="FontWeight" Value="Bold"/>
-            </Style>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source ="Core/WInStyleHelp/WIndowSytle/CustModernWin.xaml"/>
 
-            <Style x:Key="AUTHOR_STYLE" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="Foreground" Value="#FFFF9292"/>
-            </Style>
-
-            <Style x:Key="INFO_STR_STYLE" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="11" />
-                <Setter Property="Foreground" Value="#FF323232"/>
-            </Style>
-
-            <Style x:Key="ROUND_BORDER_BTN_STYLE" TargetType="Button">
-                <Style.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="3"/>
+                <ResourceDictionary>
+                    <Style x:Key="TITLE_STYLE" TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="17" />
+                    <Setter Property="Foreground" Value="#3f48cc"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
                     </Style>
-                </Style.Resources>
-                <!-- 흰색 버튼이 더 깔끔한것 같다. (배경이 흰색이다 보니) -->
-                <Setter Property="Background" Value="White"/>
-            </Style>
 
+                    <Style x:Key="AUTHOR_STYLE" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="12" />
+                        <Setter Property="Foreground" Value="#FFFF9292"/>
+                    </Style>
+
+                    <Style x:Key="INFO_STR_STYLE" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="11" />
+                        <Setter Property="Foreground" Value="#FF323232"/>
+                    </Style>
+
+                    <Style x:Key="ROUND_BORDER_BTN_STYLE" TargetType="Button">
+                        <Style.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Style.Resources>
+                        <!-- 흰색 버튼이 더 깔끔한것 같다. (배경이 흰색이다 보니) -->
+                        <Setter Property="Background" Value="White"/>
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

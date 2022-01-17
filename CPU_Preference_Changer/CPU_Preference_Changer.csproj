@@ -30,6 +30,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -122,6 +124,8 @@
     <Compile Include="Core\SingleTonTemplate\MMHGlobalInstance.cs" />
     <Compile Include="Core\SystemProcess.cs" />
     <Compile Include="BackgroundTask\SystemShutdownTask.cs" />
+    <Compile Include="Core\WInStyleHelp\WIndowSytle\CustModernWin.cs" />
+    <Compile Include="Core\WInStyleHelp\WIndowSytle\WindowStateToVisivilityConverter.cs" />
     <Compile Include="UI\InfoForm\ProgramInfo.xaml.cs">
       <DependentUpon>ProgramInfo.xaml</DependentUpon>
     </Compile>
@@ -154,7 +158,14 @@
     <Compile Include="UI\Tool\MabiDocRePath\MabiDocRePath.xaml.cs">
       <DependentUpon>MabiDocRePath.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ViewSome\ViewSomeContent.xaml.cs">
+      <DependentUpon>ViewSomeContent.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WinAPI\WinAPI.cs" />
+    <Page Include="Core\WInStyleHelp\WIndowSytle\CustModernWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MabiProcessListView\LV_MabiProcess.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -184,6 +195,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Tool\MabiDocRePath\MabiDocRePath.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ViewSome\ViewSomeContent.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

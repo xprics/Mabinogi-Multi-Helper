@@ -1,0 +1,15 @@
+﻿<Window x:Class="CPU_Preference_Changer.UI.ViewSome.ViewSomeContent"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="zzzz"
+        Background="#00FFFFFF"
+        Height="450" Width="800" WindowStartupLocation="CenterOwner"
+        Style="{StaticResource CustModernWinStyle}"
+        Loaded="Window_Loaded">
+    <!-- 윈도우 스타일 덮어씌움!! -->
+    
+    
+</Window>

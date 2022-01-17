@@ -272,8 +272,7 @@ namespace CPU_Preference_Changer.Core
             bool result = false;
             try
             {
-                using (Process p = Process.GetProcessById(pid))
-                {
+                using (Process p = Process.GetProcessById(pid)) {
                     result = WinAPI.ShowWindow(p.MainWindowHandle, SwindOp.SW_HIDE);
                 }
             }
@@ -284,6 +283,24 @@ namespace CPU_Preference_Changer.Core
             return result;
         }
 
+        /// <summary>
+        /// Top으로 설정하거나 말거나함.. 
+        /// </summary>
+        /// <param name="pid"></param>
+        /// <param name="bTop"></param>
+        /// <returns></returns>
+        public static bool SetTopWindow(int pid, bool bTop)
+        {
+            bool ret = false;
+            try {
+                using (Process p = Process.GetProcessById(pid)) {
+                    ret = WinAPI.SetWindowTopMost(p.MainWindowHandle, bTop);
+                }
+            } catch (Exception err) {
+                throw err;
+            }
+            return ret;
+        }
         /// <summary>
         /// 마비노기가 설치되어있다면 컴퓨터마다 REG값이 등록되어있을것이다. 그 값을 읽어온다.
         /// </summary>

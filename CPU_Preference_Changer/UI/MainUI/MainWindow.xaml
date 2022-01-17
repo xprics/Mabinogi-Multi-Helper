@@ -31,6 +31,8 @@
                     <MenuItem Header="시스템 예약종료" x:Name="menu_SystemPowerOff" Click="menu_SystemPowerOff_Click"/>
                     <Separator/>
                     <MenuItem Header="내문서 경로 옮기기" x:Name="menu_mabiDocRePath" Click="menu_mabiDocRePath_Click"/>
+                    <Separator/>
+                    <MenuItem Header="딴거보자" x:Name="menu_viewSomeContent" Click="menu_viewSomeContent_Click"/>
                 </MenuItem>
             </Menu>
         </Grid>

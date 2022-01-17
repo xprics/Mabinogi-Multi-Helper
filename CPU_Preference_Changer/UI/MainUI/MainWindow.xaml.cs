@@ -11,6 +11,7 @@ using CPU_Preference_Changer.BackgroundTask;
 using CPU_Preference_Changer.Core.Logger;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using CPU_Preference_Changer.UI.ViewSome;
 
 namespace CPU_Preference_Changer.UI.MainUI
 {
@@ -38,7 +39,6 @@ namespace CPU_Preference_Changer.UI.MainUI
             //디버그 모드인지 값 받아온다..
             MMHGlobal gInstance = MMHGlobalInstance<MMHGlobal>.GetInstance();
             bDebugRun = gInstance.bDebugModeRun;
-            bDebugRun = false;
             //윈도우 글자, 이벤트 초기화
             initWindow();
 
@@ -81,6 +81,9 @@ namespace CPU_Preference_Changer.UI.MainUI
                     logger.writeLog("ProcessListRefreshTask Add Fail..");
                 }
             }
+
+            ViewSomeContent a = new ViewSomeContent();
+            a.ShowDialog();
         }
 
         /// <summary>
@@ -101,6 +104,7 @@ namespace CPU_Preference_Changer.UI.MainUI
             lvMabiProcess.onProcessNameClick += MabiLv_OnProcessNameClicked;
             lvMabiProcess.onCoreStateClick += MabiLv_OnCoreClicked;
             lvMabiProcess.onCbHideClicked += LvMabiProcess_onCbHideClicked;
+            lvMabiProcess.onCbTopWindowClicked += LvMabiProcess_onCbTopWindowClicked;
             lvMabiProcess.onCbRkClicked += LvMabiProcess_onCbRkClicked;
             lvMabiProcess.onLvClicked += LvMabiProcess_onLvClicked;
 
@@ -108,7 +112,6 @@ namespace CPU_Preference_Changer.UI.MainUI
             this.tb_CpuCoreCnt.Text = SystemInfo.GetCpuCoreCntStr();
         }
 
-        
         /// <summary>
         /// 메세지 박스 Show.
         /// </summary>
@@ -389,7 +392,7 @@ namespace CPU_Preference_Changer.UI.MainUI
                         } else {
                             dbgLogWriteStr("RefreshMabiProcess", "Lv Data Update.");
                             curList.updateDataCollection(newList, removeReservedInfo);
-                            lvMabiProcess.setDataSoure(newList);
+                            lvMabiProcess.setDataSoure(curList);
                         }
                         lvMabiProcess.LvMabi_ReleaseMutex();
                         dbgLogWriteStr("RefreshMabiProcess", "Release Lv Object");
@@ -487,5 +490,6 @@ namespace CPU_Preference_Changer.UI.MainUI
         {
             RefresMabiProcess();
         }
+
     }
 }
