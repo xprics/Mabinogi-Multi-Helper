@@ -72,7 +72,8 @@ namespace CPU_Preference_Changer.UI.ViewSome
             wp.Children.Add(opacitySlider);
             titleArea.Children.Add(wp);
 
-            CustModernWin.setContentPresenterZero(this);
+            /*콘텐츠 출력영역 사이즈 0으로 강제로 내려버리는 코드. 테스트용.
+             * CustModernWin.setContentPresenterZero(this);*/
         }
 
         /// <summary>
