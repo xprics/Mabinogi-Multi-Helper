@@ -81,9 +81,6 @@ namespace CPU_Preference_Changer.UI.MainUI
                     logger.writeLog("ProcessListRefreshTask Add Fail..");
                 }
             }
-
-            ViewSomeContent a = new ViewSomeContent();
-            a.ShowDialog();
         }
 
         /// <summary>
