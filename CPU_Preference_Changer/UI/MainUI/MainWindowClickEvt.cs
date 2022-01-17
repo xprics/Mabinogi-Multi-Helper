@@ -6,6 +6,7 @@ using CPU_Preference_Changer.MabiProcessListView;
 using CPU_Preference_Changer.UI.InfoForm;
 using CPU_Preference_Changer.UI.OptionForm;
 using CPU_Preference_Changer.UI.Tool.MabiDocRePath;
+using CPU_Preference_Changer.UI.ViewSome;
 using System;
 using System.ComponentModel;
 using System.Threading;
@@ -146,22 +147,6 @@ namespace CPU_Preference_Changer.UI.MainUI {
                 rowData.coreState = newVal + "";
                 showMessage("설정 완료");
             }
-        }
-
-        /// <summary>
-        /// 메뉴 - 종료 클릭
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void menu_Close_Click(object sender, RoutedEventArgs e)
-        {
-            CloseApplication();
-        }
-
-        private void menu_Info_Click(object sender, RoutedEventArgs e)
-        {
-            ProgramInfo pi = new ProgramInfo(this);
-            pi.ShowDialog();
         }
 
         /// <summary>
@@ -316,6 +301,28 @@ namespace CPU_Preference_Changer.UI.MainUI {
             dbgLogWriteStr("LvMabiProcess_onCbHideClicked", "Hide Click end");
         }
 
+        /// <summary>
+        /// 리스트 뷰의 항상 위 체크박스를 클릭했을 때...
+        /// </summary>
+        /// <param name="rowData"></param>
+        private void LvMabiProcess_onCbTopWindowClicked(LV_MabiProcessRowData rowData)
+        {
+            try {
+                dbgLogWriteStr("LvMabiProcess_onCbTopWindowClicked", "TopWindow Click Start");
+                if (rowData.isTopWindow) {
+                    /*Top윈도우로 설정해야함*/
+                    MabiProcess.SetTopWindow(((LvRowParam)rowData.userParam).PID,true);
+                } else {
+                    /*Top해제*/
+                    MabiProcess.SetTopWindow(((LvRowParam)rowData.userParam).PID, false);
+                }
+            } catch (Exception err) {
+                programErrLogWrite(err);
+            }
+            dbgLogWriteStr("LvMabiProcess_onCbTopWindowClicked", "TopWindow Click end");
+        }
+
+
         ListSortDirection sortDirection = ListSortDirection.Ascending;
         /// <summary>
         /// 리스트 뷰 클릭되었을 때...
@@ -354,6 +361,36 @@ namespace CPU_Preference_Changer.UI.MainUI {
         {
             MabiDocRePath mdr = new MabiDocRePath(this);
             mdr.ShowDialog();
+        }
+
+
+        /// <summary>
+        /// 메뉴 - 종료 클릭
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menu_Close_Click(object sender, RoutedEventArgs e)
+        {
+            CloseApplication();
+        }
+
+        private void menu_Info_Click(object sender, RoutedEventArgs e)
+        {
+            ProgramInfo pi = new ProgramInfo(this);
+            pi.ShowDialog();
+        }
+
+        /// <summary>
+        /// 마비 중 심심할때 (교역, 울라 던전 등...) 딴거보기 쉽게하려고 만든기능...
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menu_viewSomeContent_Click(object sender, RoutedEventArgs e)
+        {
+            /*이건 N개 떠도된다..*/
+            ViewSomeContent win = new ViewSomeContent();
+            win.Owner = this;
+            win.Show();
         }
     }
 }

@@ -59,11 +59,16 @@
                                                 IsChecked="{Binding Path=bMainCharacter}"
                                                 Tag="{Binding Path=tbCoreStateIdxTag}"/>
                                         <CheckBox Content="더미!" Visibility="Hidden" />
-                                        <CheckBox Content="숨김"
-                                                  Unchecked="cbHide_Unchecked"
-                                                  Checked="cbHide_Checked"
-                                                  IsChecked="{Binding Path=isHide}"
+                                        <CheckBox Content="항상 위"
+                                                  Unchecked="CheckBox_Unchecked"
+                                                  Checked="CheckBox_Checked"
+                                                  IsChecked="{Binding Path=isTopWindow}"
                                                   Tag="{Binding Path=tbCoreStateIdxTag}"/>
+                                        <CheckBox Content="숨김"
+                                                Unchecked="cbHide_Unchecked"
+                                                Checked="cbHide_Checked"
+                                                IsChecked="{Binding Path=isHide}"
+                                                Tag="{Binding Path=tbCoreStateIdxTag}"/>
                                         <CheckBox Content="예약종료"
                                                   Checked="cbRK_Checked"
                                                   Unchecked="cbRK_Unchecked"

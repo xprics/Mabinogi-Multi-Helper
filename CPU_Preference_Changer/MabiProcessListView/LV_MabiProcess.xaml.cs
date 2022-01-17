@@ -25,12 +25,14 @@ namespace CPU_Preference_Changer.MabiProcessListView
         public delegate void OnCbHideClicked(LV_MabiProcessRowData rowData);
         public delegate void OnCbRkClicked(LV_MabiProcessRowData rowData);
         public delegate void OnLvClicked(object sender, RoutedEventArgs e);
+        public delegate void OnCbTopWindowClicked(LV_MabiProcessRowData rowData);
 
         public event OnProcessNameClicked onProcessNameClick;
         public event OnPCoreStateClicked onCoreStateClick;
         public event OnCbRkClicked onCbRkClicked;
         public event OnCbHideClicked onCbHideClicked;
         public event OnLvClicked onLvClicked;
+        public event OnCbTopWindowClicked onCbTopWindowClicked;
 
         /// <summary>
         /// 리스트 뷰 출력중인 데이터의 스레드 동기화를 위해
@@ -327,6 +329,24 @@ namespace CPU_Preference_Changer.MabiProcessListView
         {
             lvDataMutex.ReleaseMutex();
         }
+        #endregion
+
+        #region 체크박스 항상 위 처리
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            LvMabi_WaitSingleObject();
+            if (onCbTopWindowClicked != null)
+                onCbTopWindowClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+            LvMabi_ReleaseMutex();
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            LvMabi_WaitSingleObject();
+            if (onCbTopWindowClicked != null)
+                onCbTopWindowClicked(GetLvRowItmData(ctlTagStrToInt(sender)));
+            LvMabi_ReleaseMutex();
+        } 
         #endregion
     }
 }

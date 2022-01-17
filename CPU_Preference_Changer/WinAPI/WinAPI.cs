@@ -101,6 +101,44 @@ namespace CPU_Preference_Changer.WinAPI_Wrapper {
         [DllImport("user32")]
         public static extern bool ShowWindow(IntPtr hwnd, SwindOp nCmdShow);
 
+
+        enum ShowWindowFlag : uint
+        {
+            NOSIZE = 0x0001,
+            NOMOVE = 0x0002,
+            SHOWWINDOW = 0x0040
+        }
+
+        /// <summary>
+        /// SetWIndowPos API
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="hWndInsertAfter"></param>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        /// <param name="cx"></param>
+        /// <param name="cy"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, ShowWindowFlag flags);
+
+        /// <summary>
+        /// 주어진 윈도우를 TopMost으로 Set하거나 UnSet..
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="bTop"></param>
+        /// <returns></returns>
+        public static bool SetWindowTopMost(IntPtr hWnd,bool bTop)
+        {
+            IntPtr option;
+            if (bTop)
+                option = new IntPtr(-1);
+            else
+                option = new IntPtr(-2);
+            return SetWindowPos(hWnd, option, 0, 0, 0, 0, (ShowWindowFlag.NOSIZE | ShowWindowFlag.NOMOVE | ShowWindowFlag.SHOWWINDOW));
+        }
+
         /// <summary>
         /// Win32 Api GetTickCount64  =-시간반환 (부팅 후 지금까지 밀리초단위로)
         /// </summary>
