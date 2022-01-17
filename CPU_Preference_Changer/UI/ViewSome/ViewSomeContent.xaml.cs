@@ -28,69 +28,6 @@ namespace CPU_Preference_Changer.UI.ViewSome
             InitializeComponent();
         }
 
-
-        private Process _process;
-
-        [DllImport("user32.dll")]
-        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-        [DllImport("user32")]
-        private static extern IntPtr SetParent(IntPtr hWnd, IntPtr hWndParent);
-
-        [DllImport("user32")]
-        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
-
-        private const int SWP_NOZORDER = 0x0004;
-        private const int SWP_NOACTIVATE = 0x0010;
-        private const int GWL_STYLE = -16;
-        private const int WS_CAPTION = 0x00C00000;
-        private const int WS_THICKFRAME = 0x00040000;
-        const string patran = "patran";
-
-        private void LaunchChildProcess()
-        {
-            _process = Process.Start("notepad.exe");
-            _process.WaitForInputIdle();
-
-            var helper = new WindowInteropHelper(this);
-
-            SetParent(_process.MainWindowHandle, helper.Handle);
-
-            // remove control box
-            int style = GetWindowLong(_process.MainWindowHandle, GWL_STYLE);
-            style = style & ~WS_CAPTION & ~WS_THICKFRAME;
-            SetWindowLong(_process.MainWindowHandle, GWL_STYLE, style);
-            // resize embedded application & refresh
-            ResizeEmbeddedApp();
-        }
-
-        private void ResizeEmbeddedApp()
-        {
-            if (_process == null)
-                return;
-            SetWindowPos(_process.MainWindowHandle, IntPtr.Zero, 50, 50, (int)ActualWidth-30, (int)ActualHeight-30,  SWP_NOACTIVATE);
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            Size size = base.MeasureOverride(availableSize);
-            ResizeEmbeddedApp();
-            return size;
-        }
-
-
-
-
-
-
-
-
-
-
-
         /// <summary>
         /// 타이틀바에 적절히 컨트롤 등록하기위해 로딩되고나서 실행되게 함..
         /// </summary>
@@ -98,9 +35,7 @@ namespace CPU_Preference_Changer.UI.ViewSome
         /// <param name="e"></param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //LaunchChildProcess();
 
-            
             DockPanel titleArea = CustModernWin.getTitleDockPanel(this);
             if (titleArea == null) return;
 
@@ -138,8 +73,6 @@ namespace CPU_Preference_Changer.UI.ViewSome
             titleArea.Children.Add(wp);
 
             CustModernWin.setContentPresenterZero(this);
-            LaunchChildProcess();
-
         }
 
         /// <summary>
@@ -149,8 +82,7 @@ namespace CPU_Preference_Changer.UI.ViewSome
         /// <param name="e"></param>
         private void BtnProcessSel_Click(object sender, RoutedEventArgs e)
         {
-            Process p = Process.Start("notepad.exe");
-            
+
         }
 
         /// <summary>
@@ -191,8 +123,6 @@ namespace CPU_Preference_Changer.UI.ViewSome
              * grid의 모든 자손을 순회하면서 해도되긴한데 그냥 컨트롤이 몇 없기도하고,,
              * 투명하면 잘안보이기도 하니까 그냥 냅둠
              */
-           // formHost.Background = brush;
-           // formHost.Opacity = b;
         }
     }
 }
