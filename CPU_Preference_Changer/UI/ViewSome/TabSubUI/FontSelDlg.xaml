@@ -1,0 +1,12 @@
+﻿<Window x:Class="CPU_Preference_Changer.UI.ViewSome.TabSubUI.FontSelDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CPU_Preference_Changer.UI.ViewSome.TabSubUI"
+        mc:Ignorable="d"
+        Title="폰트 선택" Height="450" Width="800">
+    <Grid>
+        <!-- 언젠가 구현할 폰트 + 색상 선택 가능한 화면.. 일단 Win32시절에쓰던 폰트화면, 색상화면 2개로 땜빵해둠-->
+    </Grid>
+</Window>
