@@ -112,13 +112,13 @@ namespace CPU_Preference_Changer.UI.ViewSome.TabSubUI
                 return;
             }
             string strVal = getSelectedRadioTxt();
-            btRet0.Content = $"{hint1 + hint2 + hint3 + strVal}";
-            btRet1.Content = $"{hint1 + hint2 - hint3 + strVal}";
-            btRet2.Content = $"{hint1 * hint2 * hint3 + strVal}";
-            btRet3.Content = $"{hint1 * hint2 + hint3 + strVal}";
-            btRet4.Content = $"{hint1 * hint2 - hint3 + strVal}";
-            btRet5.Content = $"{hint1 - hint2 + hint3 + strVal}";
-            btRet6.Content = $"{hint1 - hint2 - hint3 + strVal}";
+            btRet0.Content = $"{(hint1 + hint2 + hint3) + strVal}";
+            btRet1.Content = $"{(hint1 + hint2 - hint3) + strVal}";
+            btRet2.Content = $"{(hint1 * hint2 * hint3) + strVal}";
+            btRet3.Content = $"{(hint1 * hint2 + hint3) + strVal}";
+            btRet4.Content = $"{(hint1 * hint2 - hint3) + strVal}";
+            btRet5.Content = $"{(hint1 - hint2 + hint3) + strVal}";
+            btRet6.Content = $"{(hint1 - hint2 - hint3) + strVal}";
         }
 
         private void btRet_Click(object sender, RoutedEventArgs e)
