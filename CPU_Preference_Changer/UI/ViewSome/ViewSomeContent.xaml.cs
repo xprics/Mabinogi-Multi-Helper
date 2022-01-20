@@ -1,4 +1,7 @@
-﻿using CPU_Preference_Changer.Core.WInStyleHelp.WIndowSytle;
+﻿using CPU_Preference_Changer.Core.WinFormTransPanel;
+using CPU_Preference_Changer.Core.WInStyleHelp.WIndowSytle;
+using CPU_Preference_Changer.UI.ViewSome.TabSubUI;
+using CPU_Preference_Changer.WinAPI_Wrapper;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -44,15 +47,17 @@ namespace CPU_Preference_Changer.UI.ViewSome
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Right
             };
+
+            byte curTransVal = 100;
             Slider opacitySlider = new Slider(){
                 Margin = new Thickness(0, 0, 10, 0),
                 ToolTip = "투명도 조절",
                 Maximum = 255,
-                Minimum = 76, /* 윈도우 까지 투명해지니까 너무 투명하면 안됨! 약 30%투명도,,*/
+                Minimum = 15, /* 윈도우 까지 투명해지니까 너무 투명하면 안됨! */
                 TickFrequency = 1,
                 IsSnapToTickEnabled = true,
                 Width=100,
-                Value=255
+                Value= curTransVal
             };
             opacitySlider.ValueChanged += slider_valueChanged;
 
@@ -64,26 +69,41 @@ namespace CPU_Preference_Changer.UI.ViewSome
             cbAlwayTop.Checked += CbAlwayTop_Checked;
             cbAlwayTop.Unchecked += CbAlwayTop_Unchecked;
 
-            Button btnProcessSel = new Button() { Content="프로세스 선택" };
-            btnProcessSel.Click += BtnProcessSel_Click;
-
             wp.Children.Add(cbAlwayTop);
-            wp.Children.Add(btnProcessSel);
             wp.Children.Add(opacitySlider);
             titleArea.Children.Add(wp);
+
+            /*현재 값에 맞게 세팅*/
+            changeBackground(curTransVal);
+
+            lastTransparentVal = curTransVal;
 
             /*콘텐츠 출력영역 사이즈 0으로 강제로 내려버리는 코드. 테스트용.
              * CustModernWin.setContentPresenterZero(this);*/
         }
 
+        private void testFunc()
+        {
+            Process[] lst = Process.GetProcesses();
+            foreach(var cur in lst) {
+                if( cur.MainWindowHandle!= IntPtr.Zero && cur.ProcessName.Equals("chrome")) {
+                    IntPtr hwnd = new WindowInteropHelper(this).Handle;
+                    WinAPI.SetParent(cur.MainWindowHandle, hwnd);
+                    break;
+                }
+            }
+        }
+
         /// <summary>
-        /// 프로세스 선택 버튼,,
+        /// 프로세스 선택 버튼,, (테스트용 코드)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void BtnProcessSel_Click(object sender, RoutedEventArgs e)
         {
-
+            ProcessSelectWindow w = new ProcessSelectWindow();
+            w.Owner = this;
+            w.ShowDialog();
         }
 
         /// <summary>
@@ -106,6 +126,28 @@ namespace CPU_Preference_Changer.UI.ViewSome
             this.Topmost = true;
         }
 
+        private byte lastTransparentVal;
+
+        private void changeBackground(byte transparentVal)
+        {
+            /*브러쉬 알파채널 값를 통한 투명도 조절기법을 사용한다!*/
+            var brush = new SolidColorBrush(Color.FromArgb(transparentVal, 255, 255, 255));
+            //grid_win.Background = brush;
+            this.Background = brush;
+            tabCtl.Background = new SolidColorBrush(Color.FromArgb(transparentVal, 255, 255, 255));
+
+            if (tabCtl.SelectedIndex < 0 || tabCtl.SelectedIndex >= tabCtl.Items.Count)
+                return;
+            TabItem curTabUI = tabCtl.Items[tabCtl.SelectedIndex] as TabItem;
+            if (curTabUI == null) return;
+            /*서브 UI투명도 조절 */
+            ITransCanChange iTC = curTabUI.Content as ITransCanChange;
+            if(iTC != null) {
+                iTC.setBackgroundTrans(transparentVal, 255, 255, 255);
+            }
+            lastTransparentVal = transparentVal;
+        }
+
         /// <summary>
         /// 투명도 슬라이더 움직일 때,,
         /// </summary>
@@ -114,16 +156,161 @@ namespace CPU_Preference_Changer.UI.ViewSome
         private void slider_valueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             byte b = (byte)e.NewValue;
+            changeBackground(b);
+        }
 
-            /*브러쉬 알파채널 값를 통한 투명도 조절기법을 사용한다!*/
-            var brush = new SolidColorBrush(Color.FromArgb(b, 255, 255, 255));
-            //grid_win.Background = brush;
-            this.Background = brush;
+        internal struct MenuCreateInfo
+        {
+            public string header;
+            public RoutedEventHandler evtHandler;
+        }
+        private ContextMenu createMakeTabContextMenu()
+        {
+            ContextMenu m = new ContextMenu();
+            MenuCreateInfo[] menuInfoArr = new MenuCreateInfo[]
+            {
+                new MenuCreateInfo(){ header="메모장", evtHandler= btMemoTabAddClick}
+                ,new MenuCreateInfo(){ header="사진 뷰어", evtHandler= btPictureTabAddClick}
+                ,new MenuCreateInfo(){ header="크롬 계산기", evtHandler= btCalcTabAddClick}
+            };
 
-            /*
-             * grid의 모든 자손을 순회하면서 해도되긴한데 그냥 컨트롤이 몇 없기도하고,,
-             * 투명하면 잘안보이기도 하니까 그냥 냅둠
-             */
+            /*목록에 선언된거 몽땅 등록*/
+            foreach(var cur in menuInfoArr) {
+                MenuItem mi = new MenuItem();
+                mi.Header = cur.header;
+                mi.Click += cur.evtHandler;
+                m.Items.Add(mi);
+            }
+            return m;
+        }
+
+        /// <summary>
+        /// 메모 탭 추가하기
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btMemoTabAddClick(object sender, RoutedEventArgs e)
+        {
+            pushUiToTab("메모", new Tab_Memo());
+        }
+
+        /// <summary>
+        /// 그림 탭 추가하기
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btPictureTabAddClick(object sender, RoutedEventArgs e)
+        {
+            pushUiToTab("사진", new Tab_PictureView());
+        }
+
+        /// <summary>
+        /// 계산기 탭 추가하기
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btCalcTabAddClick(object sender, RoutedEventArgs e)
+        {
+            pushUiToTab("크롬계산기", new ChromeBathCalculator());
+        }
+
+        /// <summary>
+        /// 탭에 서브ui 넣기..
+        /// </summary>
+        /// <param name="headerName"></param>
+        /// <param name="ui"></param>
+        private void pushUiToTab(string headerName, UIElement ui)
+        {
+            TabItem itm = new TabItem();
+
+            itm.Header = headerName;
+            itm.Content = ui;
+            (ui as ITransCanChange).setBackgroundTrans(lastTransparentVal, 255, 255, 255);
+
+            tabCtl.Items.Add(itm);
+            int nCnt = tabCtl.Items.Count;
+            /*텝 인덱스를 태그에 저장*/
+            itm.Tag = nCnt - 1;
+            tabCtl.SelectedIndex = nCnt - 1;
+        }
+
+        /// <summary>
+        /// 탭 추가 버튼 클릭
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btTabAdd_Click(object sender, RoutedEventArgs e)
+        {
+            Button b = sender as Button;
+            if (b == null) return;
+            if(b.ContextMenu == null) {
+                b.ContextMenu = createMakeTabContextMenu();
+            }
+            b.ContextMenu.IsOpen = true;
+        }
+
+        /// <summary>
+        /// 윈도우 닫길 때
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (tabCtl.Items.Count == 0)
+                return;
+            foreach(var x in tabCtl.Items) {
+                TabItem ti = x as TabItem;
+                if (ti == null) continue;
+                /**/
+                IDestroyControl ctlDestroy = ti.Content as IDestroyControl;
+                if( ctlDestroy !=null) {
+                    /*컨트롤이 완전히 파괴됨을 알림*/
+                    ctlDestroy.onDestroy();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 서브UI Destroy시키기위해 IDX번째 아이템의 Destroy 인터페이스 얻기 (없다면 널)
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns></returns>
+        private IDestroyControl getDestroyNotiCtlFromTabCtl(int idx)
+        {
+            if (idx < 0 || idx >= tabCtl.Items.Count)
+                return null;
+            TabItem ti = tabCtl.Items[idx] as TabItem;
+            if(ti != null) {
+                return ti.Content as IDestroyControl;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 탭 닫기 클릭
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnCloseTab_Click(object sender, RoutedEventArgs e)
+        {
+            Button b = sender as Button;
+            if (b == null) return;
+
+            int idx ;
+            if (int.TryParse(b.Tag.ToString(), out idx) == false)
+                return;
+            if (idx < 0 || idx >= tabCtl.Items.Count) return;
+            /*i번째 아이템이 파괴된다!*/
+            var iDestroyNoti = getDestroyNotiCtlFromTabCtl(idx);
+            iDestroyNoti?.onDestroy();
+            tabCtl.Items.RemoveAt(idx);
+        }
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if(e.LeftButton == MouseButtonState.Pressed)
+                this.DragMove();
         }
     }
 }
+
