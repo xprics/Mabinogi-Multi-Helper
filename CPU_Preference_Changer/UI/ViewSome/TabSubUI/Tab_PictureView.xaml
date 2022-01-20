@@ -11,9 +11,11 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Right">
-            <Button x:Name="btnSelPicture" Content="사진 선택" Click="btnSelPicture_Click" Style="{StaticResource FLAT_BTN_STYLE}"/>
+        <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Right" Background="Transparent">
+            <RadioButton x:Name="rb_imgStretch" Content="늘리기" IsChecked="True" Checked="rb_imgStretch_Checked" VerticalContentAlignment="Center"/>
+            <RadioButton x:Name="rb_imgNoResize" Margin="20 0 0 0" Content="원본비율유지" Checked="rb_imgNoResize_Checked" VerticalContentAlignment="Center"/>
+            <Button x:Name="btnSelPicture" Margin="20 0 0 0" Content="사진 선택" Click="btnSelPicture_Click" Style="{StaticResource FLAT_BTN_STYLE}"/>
         </WrapPanel>
-        <local:CustImageCtl x:Name="imgView" Grid.Row="1" Source="{Binding usrImgSrc, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:CustImageCtl x:Name="imgView" Grid.Row="1" Source="{Binding usrImgSrc, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </UserControl>

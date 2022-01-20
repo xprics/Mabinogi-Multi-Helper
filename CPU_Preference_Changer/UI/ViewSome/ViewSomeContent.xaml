@@ -36,7 +36,10 @@
                                     <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
                                     <RowDefinition x:Name="RowDefinition1" Height="*"/>
                                 </Grid.RowDefinitions>
-                                <WrapPanel HorizontalAlignment="Left" Grid.Column="0" Grid.Row="0" MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Width, Converter={StaticResource tabMaxWidthConverter}}">
+                                <WrapPanel HorizontalAlignment="Left" Grid.Column="0" Grid.Row="0" 
+                                           MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, 
+                                                              Path=Width, 
+                                                              Converter={StaticResource tabMaxWidthConverter}}">
                                     <TabPanel x:Name="headerPanel" Background="Transparent" IsItemsHost="true" Margin="2,2,2,0" KeyboardNavigation.TabIndex="1" Panel.ZIndex="1"/>
                                     <Button x:Name="btTabAdd" Click="btTabAdd_Click">
                                         <Button.Style>
@@ -113,9 +116,9 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid>
+    <Grid MouseDown="Grid_MouseDown">
         <!-- 내부 탭 컨트롤은 소스코드상에서 입력된다. -->
-        <TabControl x:Name="tabCtl" Style="{DynamicResource TabControlStyle1}"  Background="Transparent">
+        <TabControl x:Name="tabCtl" Style="{DynamicResource TabControlStyle1}"  Background="Transparent" Margin="0 -25 0 0">  <!--고의로 커스텀 윈도우 타이틀바영역까지 넘긴다!-->
             <TabControl.Resources>
                 <Style TargetType="TabItem">
                     <!--#region NewRegion -->

@@ -305,6 +305,12 @@ namespace CPU_Preference_Changer.UI.ViewSome
             iDestroyNoti?.onDestroy();
             tabCtl.Items.RemoveAt(idx);
         }
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if(e.LeftButton == MouseButtonState.Pressed)
+                this.DragMove();
+        }
     }
 }
 

@@ -150,32 +150,45 @@ namespace CPU_Preference_Changer.UI.ViewSome.TabSubUI
         }
         #endregion
 
+        private Mutex mtx = new Mutex();
+
         public Tab_PictureView()
         {
             InitializeComponent();
             DataContext = this;
             gifPlay(); /*gif플레이용 스레드 시작*/
+            if(rb_imgStretch.IsChecked==true) {
+                imgView.Stretch = Stretch.Fill;
+            }else if (rb_imgNoResize.IsChecked == true) {
+                imgView.Stretch = Stretch.None;
+            }
         }
 
         public void setBackgroundTrans(byte alpha, byte r, byte g, byte b)
         {
             imgView.alphaValue = alpha;
-            PropChanged("usrImgSrc");
+            imgView.InvalidateVisual();
         }
 
-        private bool waitForGifRenderEnd()
+        /// <summary>
+        /// Gif렌더 멈추기
+        /// </summary>
+        private void stopGifRender()
         {
             while (renderState == gifRenderState.drawing) {
                 bGifPlay = false;
                 Thread.Sleep(10);
+                /*thread에서 이 컨트롤의 Dispatcher를 쓰고있으니.. DoEvents로 쓰레드가 블락되지 않게 해야함*/
+                System.Windows.Forms.Application.DoEvents();
             }
-            return true;
         }
 
-        private async void displayPicture(string fileName)
+        /// <summary>
+        /// 그림 출력하기
+        /// </summary>
+        /// <param name="fileName"></param>
+        private void displayPicture(string fileName)
         {
-            var task = Task.Run(() => waitForGifRenderEnd());
-            _ = await task;
             BitmapImage bitmap = new BitmapImage();
             bitmap.BeginInit();
             bitmap.UriSource = new Uri(fileName);
@@ -183,25 +196,33 @@ namespace CPU_Preference_Changer.UI.ViewSome.TabSubUI
             usrImgSrc = bitmap;
         }
 
+        private string lastPath;
+        /// <summary>
+        /// 그림 선택 버튼 클릭
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnSelPicture_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofi = new OpenFileDialog();
             ofi.InitialDirectory = "c:\\";
-            ofi.Filter = "Image files (*.jpg)|*.jpg|Image files (*.png)|*.png|Image files (*.bmp)|*.bmp|Image files (*.gif)|*.gif|All Files (*.*)|*.*";
+            if (string.IsNullOrEmpty(lastPath) == false) {
+                ofi.InitialDirectory = lastPath.Substring(0, lastPath.LastIndexOf('\\'));
+            }
+            ofi.Filter = "Image files (*.jpg)|*.jpg|Image files (*.jpeg)|*.jpeg|Image files (*.png)|*.png|Image files (*.bmp)|*.bmp|Image files (*.gif)|*.gif";
             ofi.RestoreDirectory = true;
             if (ofi.ShowDialog() == DialogResult.OK) {
                 string selectedFileName = ofi.FileName;
+                stopGifRender();
                 if (selectedFileName.ToUpper().EndsWith("GIF")) {
                     lock (gifFilePath) {
                         gifFilePath=selectedFileName;
                         bGifPlay = true;
                     }
                 } else {
-                    /*gif플레이 스레드에서 Dispatch를 얻어서 작업하기때문에 여기 While문에서 블락당하면
-                     데드락이다.. 회피를 위해 버튼 스레드 처리중인 메인 스레드 종료 시켜주고,
-                    별도 Task로 처리*/
                     displayPicture(selectedFileName);
                 }
+                lastPath = selectedFileName;
             }
         }
 
@@ -227,7 +248,6 @@ namespace CPU_Preference_Changer.UI.ViewSome.TabSubUI
                 _usrImgSrc = value;
                 PropChanged("usrImgSrc");
             }
-
         }
 
 
@@ -256,17 +276,12 @@ namespace CPU_Preference_Changer.UI.ViewSome.TabSubUI
                         bGifPlay = false;
                         continue;
                     }
-                    bool bFirst = false;
                     renderState = gifRenderState.drawing;
                     while (bGifPlay == true && bEndUI==false) {
                         try {
                             if (gLoader != null) {
                                 Dispatcher.Invoke(() =>
                                 {
-                                    if (bFirst) {
-                                        PropChanged("usrImgSrc");
-                                        bFirst = false;
-                                    }
                                     usrImgSrc = gLoader.getNextFrame();
                                 });
                             }
@@ -308,6 +323,18 @@ namespace CPU_Preference_Changer.UI.ViewSome.TabSubUI
         public void onDestroy()
         {
             bEndUI = true;
+        }
+
+        private void rb_imgStretch_Checked(object sender, RoutedEventArgs e)
+        {
+            if (imgView == null) return;
+            imgView.Stretch = Stretch.Fill;
+        }
+
+        private void rb_imgNoResize_Checked(object sender, RoutedEventArgs e)
+        {
+            if (imgView == null) return;
+            imgView.Stretch = Stretch.None;
         }
     }
 }
