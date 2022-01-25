@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CPU_Preference_Changer.Core.Logger;
+using System;
 using System.Management;
 
 namespace CPU_Preference_Changer.Core
@@ -9,7 +10,7 @@ namespace CPU_Preference_Changer.Core
         /// CPU이름 얻기.
         /// </summary>
         /// <returns></returns>
-        public static string GetCpuName()
+        public static string GetCpuName(ILogWriter iLogger = null)
         {
             try {
                 ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
@@ -18,9 +19,8 @@ namespace CPU_Preference_Changer.Core
                     return x["Name"].ToString();
                 }
                 return "";
-            } catch (Exception err)
-            {
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+            } catch (Exception err) {
+                iLogger?.writeLog(err);
                 return "";
             }
         }
@@ -29,12 +29,12 @@ namespace CPU_Preference_Changer.Core
         /// int value로 얻기
         /// </summary>
         /// <returns></returns>
-        public static int GetCpuCoreCnt()
+        public static int GetCpuCoreCnt(ILogWriter iLogger = null)
         {
             try {
                 return Environment.ProcessorCount;
             } catch (Exception err) {
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+                iLogger?.writeLog(err);
                 return 0;
             }
         }
@@ -43,12 +43,12 @@ namespace CPU_Preference_Changer.Core
         /// 논리적 프로세서 수량 얻기 (하이퍼 스레딩 포함)
         /// </summary>
         /// <returns></returns>
-        public static string GetCpuCoreCntStr()
+        public static string GetCpuCoreCntStr(ILogWriter iLogger = null)
         {
             try {
                 return Environment.ProcessorCount + "코어";
-            } catch (Exception err) { 
-                SingleTonTemplate.MMHGlobalInstance<MMHGlobal>.GetInstance().dbgLogger.writeLog(err);
+            } catch (Exception err) {
+                iLogger?.writeLog(err);
                 return "???";
             }
         }

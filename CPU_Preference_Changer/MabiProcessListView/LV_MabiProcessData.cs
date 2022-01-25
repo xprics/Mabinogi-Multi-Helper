@@ -90,11 +90,25 @@ namespace CPU_Preference_Changer.MabiProcessListView
             }
             set {
                 _isHide = value;
-                if (value)
-                    Core.SingleTonTemplate.MMHGlobalInstance<Core.MMHGlobal>.GetInstance().dbgLogger.writeLog("PID " + this.processID + " is Hide");
-                else
-                    Core.SingleTonTemplate.MMHGlobalInstance<Core.MMHGlobal>.GetInstance().dbgLogger.writeLog("PID " + this.processID + " is Show");
                 NotifyPropertyChanged("isHide");
+            }
+        }
+
+        /// <summary>
+        /// 항상 위 에 놓을것인가?
+        /// </summary>
+        private bool _isTopWindow;
+
+        public bool isTopWindow
+        {
+            get
+            {
+                return _isTopWindow;
+            }
+            set
+            {
+                _isTopWindow = value;
+                NotifyPropertyChanged("isTopWindow");
             }
         }
 
@@ -134,6 +148,7 @@ namespace CPU_Preference_Changer.MabiProcessListView
             this.coreState = coreState;
             this.bMainCharacter = false;
             this.isHide = false;
+            this.isTopWindow = false;
             this.reservedKillTime = "None"; /*예약 종료 시간 기본 표시 글자.. 뭐로할까..?*/
         }
 

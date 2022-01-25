@@ -4,32 +4,66 @@
              >
     <Application.Resources>
         <ResourceDictionary>
-            <Style x:Key="TITLE_STYLE" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="17" />
-                <Setter Property="Foreground" Value="#3f48cc"/>
-                <Setter Property="FontWeight" Value="Bold"/>
-            </Style>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source ="Core/WInStyleHelp/WIndowSytle/CustModernWin.xaml"/>
 
-            <Style x:Key="AUTHOR_STYLE" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="Foreground" Value="#FFFF9292"/>
-            </Style>
-
-            <Style x:Key="INFO_STR_STYLE" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="11" />
-                <Setter Property="Foreground" Value="#FF323232"/>
-            </Style>
-
-            <Style x:Key="ROUND_BORDER_BTN_STYLE" TargetType="Button">
-                <Style.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="3"/>
+                <ResourceDictionary>
+                    <Style x:Key="TITLE_STYLE" TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="17" />
+                    <Setter Property="Foreground" Value="#3f48cc"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
                     </Style>
-                </Style.Resources>
-                <!-- 흰색 버튼이 더 깔끔한것 같다. (배경이 흰색이다 보니) -->
-                <Setter Property="Background" Value="White"/>
-            </Style>
 
+                    <Style x:Key="AUTHOR_STYLE" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="12" />
+                        <Setter Property="Foreground" Value="#FFFF9292"/>
+                    </Style>
+
+                    <Style x:Key="INFO_STR_STYLE" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="11" />
+                        <Setter Property="Foreground" Value="#FF323232"/>
+                    </Style>
+
+                    <Style x:Key="ROUND_BORDER_BTN_STYLE" TargetType="Button">
+                        <Style.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Style.Resources>
+                        <!-- 흰색 버튼이 더 깔끔한것 같다. (배경이 흰색이다 보니) -->
+                        <Setter Property="Background" Value="White"/>
+                    </Style>
+
+
+                    <SolidColorBrush x:Key="mouseOverBrush" Color="#9FD8D8D8"/>
+                    
+                    <Style x:Key="FLAT_BTN_STYLE" TargetType="Button">
+                        
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" BorderThickness="0">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource mouseOverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="LightGray"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -30,6 +30,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -122,6 +124,11 @@
     <Compile Include="Core\SingleTonTemplate\MMHGlobalInstance.cs" />
     <Compile Include="Core\SystemProcess.cs" />
     <Compile Include="BackgroundTask\SystemShutdownTask.cs" />
+    <Compile Include="Core\WinFormTransPanel\WinFormTransPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Core\WInStyleHelp\WIndowSytle\CustModernWin.cs" />
+    <Compile Include="Core\WInStyleHelp\WIndowSytle\WindowStateToVisivilityConverter.cs" />
     <Compile Include="UI\InfoForm\ProgramInfo.xaml.cs">
       <DependentUpon>ProgramInfo.xaml</DependentUpon>
     </Compile>
@@ -154,7 +161,32 @@
     <Compile Include="UI\Tool\MabiDocRePath\MabiDocRePath.xaml.cs">
       <DependentUpon>MabiDocRePath.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ViewSome\ProcessSelectWindow.xaml.cs">
+      <DependentUpon>ProcessSelectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ViewSome\TabSubUI\ChromeBathCalculator.xaml.cs">
+      <DependentUpon>ChromeBathCalculator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ViewSome\TabSubUI\FontSelDlg.xaml.cs">
+      <DependentUpon>FontSelDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ViewSome\TabSubUI\IDestroyControl.cs" />
+    <Compile Include="UI\ViewSome\TabSubUI\ITransCanChange.cs" />
+    <Compile Include="UI\ViewSome\TabSubUI\Tab_Memo.xaml.cs">
+      <DependentUpon>Tab_Memo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ViewSome\TabSubUI\Tab_PictureView.xaml.cs">
+      <DependentUpon>Tab_PictureView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ViewSome\ViewSomeContent.xaml.cs">
+      <DependentUpon>ViewSomeContent.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ViewSome\ViewSomeContentTabMaxWidthConverter.cs" />
     <Compile Include="WinAPI\WinAPI.cs" />
+    <Page Include="Core\WInStyleHelp\WIndowSytle\CustModernWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MabiProcessListView\LV_MabiProcess.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -184,6 +216,30 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Tool\MabiDocRePath\MabiDocRePath.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ViewSome\ProcessSelectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ViewSome\TabSubUI\ChromeBathCalculator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ViewSome\TabSubUI\FontSelDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ViewSome\TabSubUI\Tab_Memo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ViewSome\TabSubUI\Tab_PictureView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ViewSome\ViewSomeContent.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

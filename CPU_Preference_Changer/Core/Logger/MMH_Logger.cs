@@ -3,10 +3,20 @@ using System.IO;
 
 namespace CPU_Preference_Changer.Core.Logger {
     /// <summary>
+    /// 로그 Writer 인터페이스 정의
+    /// </summary>
+    public interface ILogWriter {
+        void writeLog(string str);
+
+        void writeLog(Exception err);
+    }
+
+    /// <summary>
     /// by LT인척하는엘프 2021.06.20 
     /// 적절히 로그를 찍는 클래스..
     /// </summary>
-    class MMH_Logger {
+    class MMH_Logger : ILogWriter
+    {
         private string logPath;
         private StreamWriter sw;
         private FileStream fs;

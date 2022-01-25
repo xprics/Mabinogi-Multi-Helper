@@ -25,6 +25,11 @@ namespace CPU_Preference_Changer.BackgroundTask {
         }
 
         /// <summary>
+        /// 작동 중 에러 발생했을 때 이벤트 핸들러...
+        /// </summary>
+        public event ErrWriteEvent errWriteEventHandler = null;
+
+        /// <summary>
         /// 시스템 종료 시간 업데이트
         /// </summary>
         public void modiSysShutdownTime(DateTime targetTime)

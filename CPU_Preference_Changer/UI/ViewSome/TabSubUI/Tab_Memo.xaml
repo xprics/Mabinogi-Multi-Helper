@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="CPU_Preference_Changer.UI.ViewSome.TabSubUI.Tab_Memo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CPU_Preference_Changer.UI.ViewSome.TabSubUI"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid x:Name="outGrid" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Right" Background="Transparent">
+            <Button x:Name="btnSelFont" Content="폰트 변경" Click="btnSelFont_Click" Style="{StaticResource FLAT_BTN_STYLE}"/>
+            <Button x:Name="btnSelColor" Margin="20 0 10 0" Content="글자 색 변경" Click="btnSelColor_Click" Style="{StaticResource FLAT_BTN_STYLE}"/>
+            <Button x:Name="btnCopy" Margin="20 0 10 0" Content="복사" Click="btnCopy_Click"  Style="{StaticResource FLAT_BTN_STYLE}"/>
+        </WrapPanel>
+
+        <!-- 백그라운드가 Transparent라서 visualbrush와 트리거를 이용한 hintMessage출력 안됨.-->
+        <TextBox 
+            x:Name="tbMemo"
+            FontSize="17"
+            Foreground="Magenta"
+            Background="Transparent"
+            Grid.Row="1" 
+            Text="{Binding memoTxt,UpdateSourceTrigger=PropertyChanged}" 
+            BorderThickness="2" BorderBrush="#7FFF00FF"
+            AcceptsReturn="True" AcceptsTab="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"/>
+    </Grid>
+</UserControl>

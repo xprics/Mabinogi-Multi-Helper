@@ -17,7 +17,7 @@ OS : Windows 10 Pro 64bit 20H2
 
 Build : Visual Studio 2019
 
-.Net Framework : 4.5
+.Net Framework : 4.6
 ```
 
 ## Change Log
@@ -68,9 +68,12 @@ Build : Visual Studio 2019
     - Add ReleaseNote.txt for Normal Users.
     - Source Code relocate ( folder , namespace , ... )
     
-    
+ 2022-01-18
+    - Add Topwindow Option
+    - Add Transparent Controlable Window (* include override window title , implement by style resource. )
+        
     
 ##############이 아래 글자 버전 값 이외 수정 금지####################    
-^^#$2021.07.29_REV_1.001
+^^#$2022.01.21_REV_1.011
     
 ```
