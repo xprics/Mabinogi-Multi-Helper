@@ -114,7 +114,8 @@ namespace CPU_Preference_Changer.Core
                                               p.MainWindowHandle == IntPtr.Zero ? true : false,
                                               ref usrParam);
                         }
-                    } catch (Exception err) {
+                    } catch (Exception)
+                    {
                         /* 실패하면 아무것도 안하고 다음 process찾아봐도 된다,, */
                     }
                 }

@@ -285,7 +285,8 @@ namespace CPU_Preference_Changer.UI.ViewSome.TabSubUI
                                     usrImgSrc = gLoader.getNextFrame();
                                 });
                             }
-                        } catch (Exception err ) {
+                        } catch (Exception)
+                        {
                             
                         }
                         Thread.Sleep(gLoader.getSleepTime());

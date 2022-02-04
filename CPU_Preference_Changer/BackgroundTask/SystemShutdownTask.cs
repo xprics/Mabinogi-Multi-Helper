@@ -9,7 +9,7 @@ namespace CPU_Preference_Changer.BackgroundTask {
     /// 시스템 종료 작업 정보 클래스
     /// </summary>
     class SystemShutdownTask : IBackgroundFreqTask {
-        const ulong freq = 1000 ; /*1초 단위로 반복할 작업임*/
+        private const ulong freq = 1000 ; /*1초 단위로 반복할 작업임*/
         /// <summary>
         /// 예약 종료시간
         /// </summary>
@@ -27,7 +27,10 @@ namespace CPU_Preference_Changer.BackgroundTask {
         /// <summary>
         /// 작동 중 에러 발생했을 때 이벤트 핸들러...
         /// </summary>
-        public event ErrWriteEvent errWriteEventHandler = null;
+        public event ErrWriteEvent errWriteEventHandler = (Exception err) =>
+        {
+            throw err;
+        };
 
         /// <summary>
         /// 시스템 종료 시간 업데이트
@@ -45,14 +48,22 @@ namespace CPU_Preference_Changer.BackgroundTask {
         public bool runFreqWork(HBFT hTask, object param)
         {
             DateTime curTime = DateTime.Now;
-
-            if (curTime.CompareTo(targetTime) > 0) {
-                /* 종료 시간이 되었다.
-                 * 유저의 변심을 고려하여 최후의 1분 선택지를 유저에게 보여준다.*/
-                SysShutdownAskForm askForm = new SysShutdownAskForm();
-                askForm.ShowDialog();
-                return false;
+            try
+            {
+                if (curTime.CompareTo(targetTime) > 0)
+                {
+                    /* 종료 시간이 되었다.
+                     * 유저의 변심을 고려하여 최후의 1분 선택지를 유저에게 보여준다.*/
+                    SysShutdownAskForm askForm = new SysShutdownAskForm();
+                    askForm.ShowDialog();
+                    return false;
+                }
             }
+            catch (Exception err)
+            {
+                errWriteEventHandler(err);
+            }
+
             return true;
         }
     }
