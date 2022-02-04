@@ -389,7 +389,8 @@ namespace CPU_Preference_Changer.UI.MainUI {
         {
             /*이건 N개 떠도된다..*/
             ViewSomeContent win = new ViewSomeContent();
-            win.Owner = this;
+            //win.Owner = this;
+            win.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             win.Show();
         }
     }
