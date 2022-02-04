@@ -30,6 +30,7 @@ namespace CPU_Preference_Changer.UI.OptionForm {
             this.label1 = new System.Windows.Forms.Label();
             this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.bt_OK = new System.Windows.Forms.Button();
+            this.btOneHourLater = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -64,11 +65,22 @@ namespace CPU_Preference_Changer.UI.OptionForm {
             this.bt_OK.UseVisualStyleBackColor = true;
             this.bt_OK.Click += new System.EventHandler(this.btOk_Click);
             // 
+            // btOneHourLater
+            // 
+            this.btOneHourLater.Location = new System.Drawing.Point(26, 87);
+            this.btOneHourLater.Name = "btOneHourLater";
+            this.btOneHourLater.Size = new System.Drawing.Size(110, 23);
+            this.btOneHourLater.TabIndex = 3;
+            this.btOneHourLater.Text = "1시간 후";
+            this.btOneHourLater.UseVisualStyleBackColor = true;
+            this.btOneHourLater.Click += new System.EventHandler(this.btOneHourLater_Click);
+            // 
             // TimeSelectForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(303, 122);
+            this.Controls.Add(this.btOneHourLater);
             this.Controls.Add(this.bt_OK);
             this.Controls.Add(this.dateTimePicker1);
             this.Controls.Add(this.label1);
@@ -89,5 +101,6 @@ namespace CPU_Preference_Changer.UI.OptionForm {
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DateTimePicker dateTimePicker1;
         private System.Windows.Forms.Button bt_OK;
+        private System.Windows.Forms.Button btOneHourLater;
     }
 }

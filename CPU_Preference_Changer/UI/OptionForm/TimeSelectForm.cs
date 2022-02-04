@@ -18,12 +18,17 @@ namespace CPU_Preference_Changer.UI.OptionForm {
         private void btOk_Click(object sender, EventArgs e)
         {
             selTime = dateTimePicker1.Value;
-            if ( selTime.CompareTo(DateTime.Now) <= 0) {
+            if (selTime.CompareTo(DateTime.Now) <= 0) {
                 MessageBox.Show("현재보다 과거 시간을 선택할 수는 없습니다!","안내");
                 return;
             }
             this.DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void btOneHourLater_Click(object sender, EventArgs e)
+        {
+            this.dateTimePicker1.Value = DateTime.Now.AddHours(1.0);
         }
     }
 }
