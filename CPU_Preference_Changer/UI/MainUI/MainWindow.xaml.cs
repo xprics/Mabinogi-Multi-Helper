@@ -305,13 +305,16 @@ namespace CPU_Preference_Changer.UI.MainUI
             try {
                 LvMabiDataCollection lvItm = (LvMabiDataCollection)usrParam;
 
-                var newData = new LV_MabiProcessRowData(pName,
+                LV_MabiProcessRowData newData = new LV_MabiProcessRowData(pName,
                                                    PID + "",
                                                    startTime,
                                                    coreState + "",
                                                    runPath);
-                LvRowParam param = new LvRowParam();
-                param.PID = PID; param.hReservedKillTask = null;
+                LvRowParam param = new LvRowParam
+                {
+                    PID = PID,
+                    hReservedKillTask = null
+                };
                 newData.userParam = param; //찾았던 프로세스 정보 보관해서 나중에 써먹기위함
                 newData.isHide = isHide;
                 lvItm.Add(newData);

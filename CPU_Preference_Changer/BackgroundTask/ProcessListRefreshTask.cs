@@ -28,7 +28,10 @@ namespace CPU_Preference_Changer.BackgroundTask {
         /// <summary>
         /// 작동 중 에러 발생했을 때 이벤트 핸들러...
         /// </summary>
-        public event ErrWriteEvent errWriteEventHandler = null;
+        public event ErrWriteEvent errWriteEventHandler = (System.Exception err) =>
+        {
+            throw err;
+        };
 
         public ProcessListRefreshTask(MainWindow mainWindow)
         {
@@ -59,17 +62,28 @@ namespace CPU_Preference_Changer.BackgroundTask {
         /// <param name="param"></param>
         public bool runFreqWork(HBFT hTask, object param)
         {
-            if (runCount <= 0) {
-                //실제로 5회 실행된 후 목록 갱신
-                mainWindow.updateRefreshTimeLabelText("목록 갱신!");
-                mainWindow.RefresMabiProcess();
-                runCount = runTerm;
-            } else {
-                //글자 먼저찍어서 0초 후 고침 방지.
-                //몇초 뒤 갱신작업하는지 화면에 뿌려준다.
-                mainWindow.updateRefreshTimeLabelText(runCount.ToString() + "초 후 새로고침");
-                runCount--;
+            try
+            {
+                if (runCount <= 0)
+                {
+                    //실제로 5회 실행된 후 목록 갱신
+                    mainWindow.updateRefreshTimeLabelText("목록 갱신!");
+                    mainWindow.RefresMabiProcess();
+                    runCount = runTerm;
+                }
+                else
+                {
+                    //글자 먼저찍어서 0초 후 고침 방지.
+                    //몇초 뒤 갱신작업하는지 화면에 뿌려준다.
+                    mainWindow.updateRefreshTimeLabelText(runCount.ToString() + "초 후 새로고침");
+                    runCount--;
+                }
             }
+            catch (System.Exception err)
+            {
+                errWriteEventHandler(err);
+            }
+
             return true;
         }
 
